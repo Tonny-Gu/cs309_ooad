@@ -18,6 +18,6 @@ public class MyUserDetailsService implements UserDetailsService {
         if (userBean == null) {
             throw new UsernameNotFoundException("数据库中无此用户！");
         }
-        return (UserDetails) userBean;
+        return userBean;
     }
 }

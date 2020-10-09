@@ -1,7 +1,7 @@
 package com.sustech.dboj.backend.domain;
 
 import javax.persistence.*;
-
+@Entity
 public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -11,7 +11,7 @@ public class Question {
     @ManyToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "lesson", nullable = false)
     private Lesson lesson;
-    @ManyToOne(cascade = {CascadeType.ALL})
+    @OneToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "author", nullable = false)
     private User author;
     @Column(nullable = false)

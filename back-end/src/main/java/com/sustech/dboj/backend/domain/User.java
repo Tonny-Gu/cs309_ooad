@@ -1,23 +1,30 @@
 package com.sustech.dboj.backend.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
-public class User {
+@Table(name = "user_info")
+public class User implements UserDetails {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer Id;
     @Column(nullable = false)
     private String username;
     @Column(nullable = false)
-    private String name;
+    private String name;// True Name
     @Column(nullable = false)
     private String nickname;
     @Column(nullable = false)
-    private String password;
+    private String password;// password after encoding
     @Column(nullable = false)
-    private Integer role;
+    private String role;// Three types:Student/Teacher/SA
 
 
     public User() {
@@ -32,9 +39,7 @@ public class User {
         this.name = name;
     }
 
-    public String getUsername() {
-        return username;
-    }
+
 
     public void setUsername( String username ) {
         this.username = username;
@@ -48,11 +53,11 @@ public class User {
         this.nickname = nickname;
     }
 
-    public Integer getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole( Integer role ) {
+    public void setRole( String role ) {
         this.role = role;
     }
 
@@ -63,12 +68,48 @@ public class User {
     public void setId( Integer id ) {
         Id = id;
     }
+    public void setPassword( String password ) {
+        this.password = password;
+    }
 
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        String[] authorities = role.split(",");
+        List<SimpleGrantedAuthority> simpleGrantedAuthorities = new ArrayList<>();
+        for (String role : authorities) {
+            simpleGrantedAuthorities.add(new SimpleGrantedAuthority(role));
+        }
+        return simpleGrantedAuthorities;
+    }
+
+    @Override
     public String getPassword() {
         return password;
     }
 
-    public void setPassword( String password ) {
-        this.password = password;
+    @Override
+    public String getUsername() {
+        return username;
     }
+
 }

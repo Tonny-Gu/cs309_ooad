@@ -1,7 +1,7 @@
 package com.sustech.dboj.backend.domain;
 
 import javax.persistence.*;
-
+@Entity
 public class Lesson {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
