@@ -13,11 +13,11 @@ public class MyUserDetailsService implements UserDetailsService {
     @Autowired
     UserRepository mapper;
     @Override
-    public UserDetails loadUserByUsername( Integer username) throws UsernameNotFoundException {
-        User userBean = mapper.selectByUsername(username);
+    public UserDetails loadUserByUsername( String username) throws UsernameNotFoundException {
+        User userBean = mapper.findByUsername(username);
         if (userBean == null) {
             throw new UsernameNotFoundException("数据库中无此用户！");
         }
-        return userBean;
+        return (UserDetails) userBean;
     }
 }
