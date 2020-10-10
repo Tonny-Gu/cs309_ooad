@@ -3,6 +3,7 @@ package com.sustech.dboj.backend.domain;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;// password after encoding
     @Column(nullable = false)
-    private String role;// Three types:Student/Teacher/SA
+    private String role;// Three types:STU/TA/SA
 
 
     public User() {
@@ -38,7 +39,6 @@ public class User implements UserDetails {
     public void setName( String name ) {
         this.name = name;
     }
-
 
 
     public void setUsername( String username ) {
@@ -68,6 +68,7 @@ public class User implements UserDetails {
     public void setId( Integer id ) {
         Id = id;
     }
+
     public void setPassword( String password ) {
         this.password = password;
     }
@@ -75,12 +76,12 @@ public class User implements UserDetails {
     @Override
     public boolean isAccountNonExpired() {
         return true;
-    }
+    }//是否过期
 
     @Override
     public boolean isAccountNonLocked() {
         return true;
-    }
+    }//是否冻结
 
     @Override
     public boolean isCredentialsNonExpired() {
@@ -94,10 +95,10 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String[] authorities = role.split(",");
-        List<SimpleGrantedAuthority> simpleGrantedAuthorities = new ArrayList<>();
+        String[] authorities = role.split( "," );
+        List<SimpleGrantedAuthority> simpleGrantedAuthorities = new ArrayList<>( );
         for (String role : authorities) {
-            simpleGrantedAuthorities.add(new SimpleGrantedAuthority(role));
+            simpleGrantedAuthorities.add( new SimpleGrantedAuthority( role ) );
         }
         return simpleGrantedAuthorities;
     }
