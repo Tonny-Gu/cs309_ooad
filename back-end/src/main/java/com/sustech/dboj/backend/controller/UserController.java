@@ -25,6 +25,7 @@ public class UserController {
         if( !TextChecker.passwordChecker( password ) )return "Invalid user password";
         BCryptPasswordEncoder encoder =new BCryptPasswordEncoder();
         newUser.setPassword( encoder.encode( password ) );
+        newUser.setNickname( name );
         userRepository.save(newUser);
         return "Create user successful";
     }
@@ -34,16 +35,20 @@ public class UserController {
         User user = userRepository.findByUsername( username );
         if(user==null)return null;
         BCryptPasswordEncoder encoder =new BCryptPasswordEncoder();
-        if(encoder.matches( user.getPassword(),encoder.encode( password )))return user;
+        if(encoder.matches( password,user.getPassword()))return user;
         else return null;
     }
-    @GetMapping("/user/authtest")
+    @GetMapping("/user")
     public String test1() {
         return "you are user";
     }
-    @PostMapping("/admin/authtest")
+    @PostMapping("/admin")
     public String test2() {
         return "you are admin";
+    }
+    @GetMapping("/index")
+    public String index() {
+        return "index";
     }
 
 }

@@ -33,14 +33,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure( HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/","/index","/error").permitAll()
+                .antMatchers("/","/index","/error","/login","/register").permitAll()
                 .antMatchers("/user/**").hasRole("STU")
-                .antMatchers("/admin/**").hasAnyRole("TA","SA");
+                .antMatchers("/admin/**").hasAnyRole("TA","SA")
+                .anyRequest().permitAll()
+                .and().csrf().disable();
 //                .antMatchers("/**").hasIpAddress("127.0.0.1")
 //                .and()
 //                .formLogin().loginPage("/login").defaultSuccessUrl("/user")
 //                //1.自定义参数名称，与login.html中的参数对应
-//                .usernameParameter("myusername").passwordParameter("mypassword")
+//                .usernameParameter("username").passwordParameter("password")
 //                .and()
 //                .logout().logoutUrl("/logout").logoutSuccessUrl("/login");
     }
