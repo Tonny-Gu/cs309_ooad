@@ -1,8 +1,10 @@
 package com.sustech.dboj.backend.domain;
 
 import javax.persistence.*;
+import java.util.Set;
+
 @Entity
-public class Lesson {
+public class Contest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer Id;
@@ -12,10 +14,19 @@ public class Lesson {
     private String beginTime;
     @Column(nullable = false)
     private String endTime;
+    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
+    private Set<Question> questions;
 
-    public Lesson() {
+    public Contest() {
     }
 
+    public Set<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions( Set<Question> questions ) {
+        this.questions = questions;
+    }
 
     public Integer getId() {
         return Id;
@@ -51,11 +62,12 @@ public class Lesson {
 
     @Override
     public String toString() {
-        return "Lesson{" +
+        return "Contest{" +
                 "Id=" + Id +
                 ", name='" + name + '\'' +
                 ", beginTime='" + beginTime + '\'' +
                 ", endTime='" + endTime + '\'' +
+                ", questions=" + questions +
                 '}';
     }
 }

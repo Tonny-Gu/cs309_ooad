@@ -16,5 +16,11 @@ public class TextChecker {
 
         return true;
     }
+    public static boolean userNameChecker(String password){
+        // TODO: 2020/10/10 match rules
+
+
+        return true;
+    }
 
 }

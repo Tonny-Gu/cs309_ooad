@@ -1,6 +1,8 @@
 package com.sustech.dboj.backend.domain;
 
 import javax.persistence.*;
+import java.util.Set;
+
 @Entity
 public class Question {
     @Id
@@ -8,9 +10,8 @@ public class Question {
     private Integer Id;
     @Column(nullable = false)
     private String name;
-    @ManyToOne(cascade = {CascadeType.ALL})
-    @JoinColumn(name = "lesson", nullable = false)
-    private Lesson lesson;
+    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
+    private Set<Contest> contests;
     @OneToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "author", nullable = false)
     private User author;
@@ -36,12 +37,12 @@ public class Question {
         this.name = name;
     }
 
-    public Lesson getLesson() {
-        return lesson;
+    public Set<Contest> getContests() {
+        return contests;
     }
 
-    public void setLesson( Lesson lesson ) {
-        this.lesson = lesson;
+    public void setLesson( Set<Contest> contest ) {
+        this.contests = contest;
     }
 
     public User getAuthor() {
@@ -59,12 +60,13 @@ public class Question {
     public void setFileAddress( String fileAddress ) {
         this.fileAddress = fileAddress;
     }
+
     @Override
     public String toString() {
         return "Question{" +
                 "Id=" + Id +
                 ", name='" + name + '\'' +
-                ", lesson=" + lesson +
+                ", contests=" + contests +
                 ", author=" + author +
                 ", fileAddress='" + fileAddress + '\'' +
                 '}';
