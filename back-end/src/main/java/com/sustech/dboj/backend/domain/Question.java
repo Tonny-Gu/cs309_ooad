@@ -15,8 +15,8 @@ public class Question {
     @OneToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "author", nullable = false)
     private User author;
-    @Column(nullable = false)
-    private String fileAddress;
+    @Column(nullable = false, columnDefinition="text")
+    private String content;
 
     public Question() {
     }
@@ -53,12 +53,12 @@ public class Question {
         this.author = author;
     }
 
-    public String getFileAddress() {
-        return fileAddress;
+    public String getContent() {
+        return content;
     }
 
-    public void setFileAddress( String fileAddress ) {
-        this.fileAddress = fileAddress;
+    public void setContent( String content ) {
+        this.content = content;
     }
 
     @Override
@@ -68,7 +68,8 @@ public class Question {
                 ", name='" + name + '\'' +
                 ", contests=" + contests +
                 ", author=" + author +
-                ", fileAddress='" + fileAddress + '\'' +
+                ", content='" + content + '\'' +
                 '}';
     }
+
 }

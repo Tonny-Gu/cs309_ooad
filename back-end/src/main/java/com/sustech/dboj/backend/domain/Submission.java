@@ -5,7 +5,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "submit_log")
 public class Submission {
-    @javax.persistence.Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer Id;
 

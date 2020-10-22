@@ -12,10 +12,11 @@
     <artifactId>back-end</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>back-end</name>
-    <description>Demo project for Spring Boot</description>
+    <description>DBOJ baek-end based on SpringBoot</description>
 
     <properties>
         <java.version>1.8</java.version>
+        <flexmark.version>0.42.8</flexmark.version>
     </properties>
 
     <dependencies>
@@ -63,6 +64,29 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!--markdown to html-->
+        <dependency>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-all</artifactId>
+            <version>${flexmark.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-util</artifactId>
+            <version>${flexmark.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-ext-tables</artifactId>
+            <version>${flexmark.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.5</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>

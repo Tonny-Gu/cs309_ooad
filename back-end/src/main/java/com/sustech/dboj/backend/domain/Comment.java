@@ -15,6 +15,61 @@ public class Comment {
     @ManyToOne(cascade = CascadeType.PERSIST)
     private Question question;
 
-    @Column(nullable = false)
-    private String fileAddress;
+    @Column(nullable = false, columnDefinition="text")
+    private String content;
+
+    public Comment() {
+
+    }
+
+    public Integer getId() {
+        return Id;
+    }
+
+    public void setId( Integer id ) {
+        Id = id;
+    }
+
+    public User getStudent() {
+        return student;
+    }
+
+    public void setStudent( User student ) {
+        this.student = student;
+    }
+
+    public Contest getContest() {
+        return contest;
+    }
+
+    public void setContest( Contest contest ) {
+        this.contest = contest;
+    }
+
+    public Question getQuestion() {
+        return question;
+    }
+
+    public void setQuestion( Question question ) {
+        this.question = question;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent( String content ) {
+        this.content = content;
+    }
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "Id=" + Id +
+                ", student=" + student +
+                ", contest=" + contest +
+                ", question=" + question +
+                ", content='" + content + '\'' +
+                '}';
+    }
 }
