@@ -12,7 +12,7 @@ public class Question {
     private String name;
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
     private Set<Contest> contests;
-    @OneToOne(cascade = {CascadeType.ALL})
+    @OneToOne()// 去掉cascade = CascadeType.ALL就成了，取消关联的级联新增！
     @JoinColumn(name = "author", nullable = false)
     private User author;
     @Column(nullable = false, columnDefinition="text")

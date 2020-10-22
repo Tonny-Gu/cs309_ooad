@@ -1,6 +1,7 @@
 package com.sustech.dboj.backend.controller;
 
 import com.sustech.dboj.backend.domain.Question;
+import com.sustech.dboj.backend.domain.User;
 import com.sustech.dboj.backend.repository.QuestionRepository;
 import com.sustech.dboj.backend.repository.UserRepository;
 import com.sustech.dboj.backend.util.MarkDown2HtmlWrapper;
@@ -14,8 +15,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 
 @RestController
@@ -36,35 +39,45 @@ public class QuestionController {
         return questionQuery.orElse( null );
     }
 
-//    @PostMapping("/question/upload")
-//    public String Question( MultipartFile file , String author) {
-//        if(file.isEmpty()){
-//            return "error:file is empty";
-//        }else {
-//            MarkDown2HtmlWrapper w2h = new MarkDown2HtmlWrapper();
-//            try {
-//                BufferedOutputStream out = new BufferedOutputStream(
-//                        new FileOutputStream(new File(
-//                                Objects.requireNonNull( file.getOriginalFilename( ) ) )));
-//                System.out.println(file.getName());
-//                System.out.println(file.getName());
-//                System.out.println(file.getName());
-//                out.write(file.getBytes());
-//                out.flush();
-//                out.close();
-//                Question question = new Question();
-//                question.setName( file.getName() );
-//                question.setAuthor( userRepository.findByUsername( author ) );
-//                question.setContent( w2h.markdown2Html( file.getInputStream()) );
-//                questionRepository.save( question );
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//                return "error:" + e.getMessage();
-//            }
-//
-//            return "upload successful!";
-//        }
-//
-//    }
+    @PostMapping("/question/findAll")
+    public List<Question> getAllQuestion() {
+        return questionRepository.findAll();
+    }
+
+    @PostMapping("/question/upload")
+    public String uploadQuestion( MultipartFile file , String author) {
+        if(file.isEmpty()){
+            return "error:file is empty";
+        }else {
+            MarkDown2HtmlWrapper w2h = new MarkDown2HtmlWrapper();
+            try {
+                BufferedOutputStream out = new BufferedOutputStream(
+                        new FileOutputStream(new File(
+                                Objects.requireNonNull( file.getOriginalFilename( ) ) )));
+                System.out.println(file.getName());
+                if(file.getContentType()!=null && !file.getContentType().equals( "text/markdown" )) {
+                    return "error:not markdown file";
+                }
+                System.out.println(file.getOriginalFilename());
+                out.write(file.getBytes());
+                out.flush();
+                out.close();
+                Question question = new Question();
+                question.setName( file.getOriginalFilename().split( "\\." )[0] );
+                User au = userRepository.findByUsername( author );
+                System.out.println( "author Id = " + au.getId() );
+                question.setAuthor( au );
+                question.setContent( w2h.markdown2Html( file.getInputStream()) );
+                System.out.println( question );
+                questionRepository.save( question );
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "error:" + e.getMessage();
+            }
+
+            return "upload successful!";
+        }
+
+    }
 
 }
