@@ -46,9 +46,7 @@ public class FileTypeInterceptor extends HandlerInterceptorAdapter {
      * 判断是否为允许的上传文件类型,true表示允许
      */
     private boolean checkFile(String fileName) {
-        //设置允许上传文件类型
-        String suffixList = "jpg,gif,png,ico,bmp,jpeg";
-        // 获取文件后缀
+        String suffixList = "md";
         String suffix = fileName.substring(fileName.lastIndexOf(".")
                 + 1, fileName.length());
         if (suffixList.contains(suffix.trim().toLowerCase())) {

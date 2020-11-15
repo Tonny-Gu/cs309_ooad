@@ -34,7 +34,6 @@ public class QuestionController {
 
     @PostMapping("/question/findById")
     public Question getQuestion( Integer id) {
-        Question question;
         Optional<Question> questionQuery = questionRepository.findById( id );
         return questionQuery.orElse( null );
     }

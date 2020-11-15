@@ -1,5 +1,6 @@
 package com.sustech.dboj.backend.controller;
 
+import com.sustech.dboj.backend.domain.Question;
 import com.sustech.dboj.backend.domain.User;
 import com.sustech.dboj.backend.repository.UserRepository;
 import com.sustech.dboj.backend.util.TextChecker;
@@ -8,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 public class UserController {
@@ -36,9 +39,10 @@ public class UserController {
         return "Create user successful";
     }
 
-    @GetMapping("/user")
-    public String test1() {
-        return "you are user";
+    @GetMapping("/user/getinfo")
+    public User getinfo( Integer id) {
+        Optional<User> userQuery = userRepository.findById( id );
+        return userQuery.orElse( null );
     }
 
     @PostMapping("/admin")
