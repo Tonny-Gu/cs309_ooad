@@ -16,7 +16,7 @@ public class MyUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername( String username) throws UsernameNotFoundException {
         User userBean = mapper.findByUsername(username);
         if (userBean == null) {
-            throw new UsernameNotFoundException("数据库中无此用户！");
+            throw new UsernameNotFoundException("User not found!");
         }
         return userBean;
     }

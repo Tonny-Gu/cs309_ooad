@@ -1,8 +1,7 @@
 package com.sustech.dboj.backend.controller;
 
-import com.sustech.dboj.backend.domain.Question;
-import com.sustech.dboj.backend.domain.User;
-import com.sustech.dboj.backend.repository.UserRepository;
+import com.sustech.dboj.backend.domain.*;
+import com.sustech.dboj.backend.repository.*;
 import com.sustech.dboj.backend.util.TextChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +17,9 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ContestRepository contestRepository;
 
     @PostMapping("/register")
     public String register( String username , String password , String name , String role ) {
@@ -45,10 +47,26 @@ public class UserController {
         return userQuery.orElse( null );
     }
 
-    @PostMapping("/admin")
-    public String test2() {
-        return "you are admin";
+    @PostMapping("/user/joinContest")
+    public String joinContest(Integer user_id, Integer contest_id) {
+        Optional<User> userQuery = userRepository.findById( user_id );
+        User myUser = userQuery.orElse( null );
+
+        Optional<Contest> contestQuery = contestRepository.findById( contest_id );
+        Contest myContest = contestQuery.orElse( null );
+        if ( myUser == null )return "User not found";
+        if ( myContest == null )return "Contest not found";
+
+        myContest.getUsers().add( myUser );
+        myUser.getContests().add( myContest );
+
+        userRepository.save( myUser );
+        contestRepository.save( myContest );
+
+        return "Join contest successfully";
     }
+
+
 
     @GetMapping("/index")
     public String index() {
