@@ -17,7 +17,18 @@ public class Contest {
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
     private Set<Question> questions;
 
+    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
+    private Set<User> users;
+
     public Contest() {
+    }
+
+    public Set<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers( Set<User> users ) {
+        this.users = users;
     }
 
     public Set<Question> getQuestions() {
@@ -68,6 +79,7 @@ public class Contest {
                 ", beginTime='" + beginTime + '\'' +
                 ", endTime='" + endTime + '\'' +
                 ", questions=" + questions +
+                ", users=" + users +
                 '}';
     }
 }

@@ -10,13 +10,15 @@ public class Question {
     private Integer Id;
     @Column(nullable = false)
     private String name;
-    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
+    @ManyToMany(mappedBy = "contest")
     private Set<Contest> contests;
     @OneToOne()// 去掉cascade = CascadeType.ALL就成了，取消关联的级联新增！
     @JoinColumn(name = "author", nullable = false)
     private User author;
     @Column(nullable = false, columnDefinition="text")
     private String content;
+    @Column(nullable = false)
+    private String degree;// Hard/Mid/Easy
 
     public Question() {
     }
@@ -61,6 +63,18 @@ public class Question {
         this.content = content;
     }
 
+    public void setContests( Set<Contest> contests ) {
+        this.contests = contests;
+    }
+
+    public String getDegree() {
+        return degree;
+    }
+
+    public void setDegree( String degree ) {
+        this.degree = degree;
+    }
+
     @Override
     public String toString() {
         return "Question{" +
@@ -69,6 +83,7 @@ public class Question {
                 ", contests=" + contests +
                 ", author=" + author +
                 ", content='" + content + '\'' +
+                ", degree='" + degree + '\'' +
                 '}';
     }
 

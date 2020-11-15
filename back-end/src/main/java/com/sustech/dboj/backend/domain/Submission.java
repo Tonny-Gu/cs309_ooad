@@ -17,6 +17,11 @@ public class Submission {
     private Question question;
 
     @Column(nullable = false)
+    private String code;
+    @Column(nullable = false)
+    private String language;
+
+    @Column(nullable = false)
     private String submitTime;
     @Column(nullable = false)
     private String info;
@@ -72,6 +77,22 @@ public class Submission {
         this.info = info;
     }
 
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode( String code ) {
+        this.code = code;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage( String language ) {
+        this.language = language;
+    }
+
     @Override
     public String toString() {
         return "Submission{" +
@@ -79,6 +100,8 @@ public class Submission {
                 ", student=" + student +
                 ", contest=" + contest +
                 ", question=" + question +
+                ", code='" + code + '\'' +
+                ", language='" + language + '\'' +
                 ", submitTime='" + submitTime + '\'' +
                 ", info='" + info + '\'' +
                 '}';

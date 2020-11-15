@@ -9,6 +9,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "user_info")
@@ -26,11 +27,19 @@ public class User implements UserDetails {
     private String password;// password after encoding
     @Column(nullable = false)
     private String role;// Three types:STU/TA/SA
-
+    @ManyToMany(mappedBy = "contest")
+    private Set<Contest> contests;
 
     public User() {
     }
 
+    public Set<Contest> getContests() {
+        return contests;
+    }
+
+    public void setContests( Set<Contest> contests ) {
+        this.contests = contests;
+    }
 
     public String getName() {
         return name;
