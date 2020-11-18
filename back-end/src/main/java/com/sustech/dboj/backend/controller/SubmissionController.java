@@ -1,8 +1,6 @@
 package com.sustech.dboj.backend.controller;
 
-import com.sustech.dboj.backend.domain.Contest;
-import com.sustech.dboj.backend.domain.Submission;
-import com.sustech.dboj.backend.domain.User;
+import com.sustech.dboj.backend.domain.*;
 import com.sustech.dboj.backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +16,6 @@ public class SubmissionController {
 
     @PostMapping("/user/submit")
     public String submitCode(Integer user_id, String code, String language) {
-
 
         return null;
     }

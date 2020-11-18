@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -74,7 +73,7 @@ public class QuestionController {
                 return "error:" + e.getMessage();
             }
 
-            return "upload successful!";
+            return "upload successful";
         }
 
     }

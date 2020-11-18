@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 @Entity
 public class Comment {
-    @javax.persistence.Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer Id;
 
@@ -17,6 +17,9 @@ public class Comment {
 
     @Column(nullable = false, columnDefinition="text")
     private String content;
+
+    @Column(nullable = false)
+    private String time;
 
     public Comment() {
 
