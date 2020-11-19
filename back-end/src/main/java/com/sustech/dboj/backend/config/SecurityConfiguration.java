@@ -11,8 +11,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.io.PrintWriter;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.Collections;
 
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -74,6 +80,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     out.close( );
                 } )
                 .permitAll( )
+                .and()
+                .cors()
                 .and( )
                 .csrf( ).disable( ).exceptionHandling( )
                 .authenticationEntryPoint( ( req , resp , authException ) -> {
@@ -83,5 +91,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     out.flush( );
                     out.close( );
                 } );
+    }
+    @Bean
+    CorsConfigurationSource corsConfigurationSource(){
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration configuration = new CorsConfiguration(  );
+        configuration.setAllowCredentials( true );
+        configuration.setAllowedOrigins( Collections.singletonList( "*" ) );
+        configuration.setAllowedMethods( Collections.singletonList( "*" ) );
+        configuration.setAllowedHeaders( Collections.singletonList( "*" ) );
+        configuration.setMaxAge( Duration.ofHours( 1 ) );
+        source.registerCorsConfiguration( "/**",configuration );
+        return source;
     }
 }

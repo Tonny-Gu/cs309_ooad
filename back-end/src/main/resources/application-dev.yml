@@ -1,7 +1,7 @@
 server:
   port: 11081
   servlet:
-    context-path: /dboj
+    context-path: /dboj/api
 spring:
   datasource:
     url: jdbc:postgresql://glab2.mylab.cc:11432/cs309proj
@@ -30,5 +30,4 @@ spring:
   servlet:
     multipart:
       max-file-size: 2000000
-      location: ../question/
-
+      location: ./ReceFile/
