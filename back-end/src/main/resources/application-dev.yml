@@ -4,7 +4,7 @@ server:
     context-path: /dboj
 spring:
   datasource:
-    url: jdbc:postgresql://glab2.hpc.mylab.cc:11432/cs309proj
+    url: jdbc:postgresql://glab2.mylab.cc:11432/cs309proj
     username: dboj
     password: dboj2020
     driver-class-name: org.postgresql.Driver

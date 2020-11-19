@@ -1,7 +1,6 @@
 package com.sustech.dboj.backend.controller;
 
 import com.sustech.dboj.backend.domain.News;
-import com.sustech.dboj.backend.domain.Question;
 import com.sustech.dboj.backend.domain.User;
 import com.sustech.dboj.backend.repository.NewsRepository;
 import com.sustech.dboj.backend.repository.UserRepository;
@@ -31,14 +30,14 @@ public class NewsController {
 
     @GetMapping("/notice/new")
     public News getCurrentNew() {
-        List<News> enableNews = newsRepository.findByEnableTrueOrderByIdDesc( );
+        List<News> enableNews = newsRepository.findCurrentNotice( );
         if ( enableNews.isEmpty( ) ) return null;
         return enableNews.get( 0 );
     }
 
     @GetMapping("/notice/all")
     public List<News> getEnableNew() {
-        return newsRepository.findByEnableTrueOrderByIdDesc( );
+        return newsRepository.findCurrentNotice( );
     }
 
     @PostMapping("/notice/upload")

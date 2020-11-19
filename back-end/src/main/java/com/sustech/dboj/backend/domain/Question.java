@@ -10,7 +10,7 @@ public class Question {
     private Integer Id;
     @Column(nullable = false)
     private String name;
-    @ManyToMany(mappedBy = "contest")
+    @ManyToMany(mappedBy = "questions")
     private Set<Contest> contests;
     @OneToOne()// 去掉cascade = CascadeType.ALL就成了，取消关联的级联新增！
     @JoinColumn(name = "author", nullable = false)

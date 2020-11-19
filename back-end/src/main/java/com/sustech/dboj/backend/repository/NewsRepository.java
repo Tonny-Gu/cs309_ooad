@@ -11,9 +11,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface NewsRepository extends JpaRepository<News, Integer> {
-    List<News> findByEnableTrueOrderByIdDesc();
+    @Query(value = "select * from notice where en_able=true order by id desc;",nativeQuery=true)
+    List<News> findCurrentNotice();
 
-    @Query(value = "update news set en_able=?2 where id=?1",nativeQuery=true)
+    @Query(value = "update notice set en_able=?2 where id=?1",nativeQuery=true)
     void activeNotice( Integer id, Boolean status );
 
 }

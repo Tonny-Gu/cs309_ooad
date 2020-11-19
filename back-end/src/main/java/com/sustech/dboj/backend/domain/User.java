@@ -27,7 +27,7 @@ public class User implements UserDetails {
     private String password;// password after encoding
     @Column(nullable = false)
     private String role;// Three types:STU/TA/SA
-    @ManyToMany(mappedBy = "contest")
+    @ManyToMany(mappedBy = "users")
     private Set<Contest> contests;
 
     public User() {
