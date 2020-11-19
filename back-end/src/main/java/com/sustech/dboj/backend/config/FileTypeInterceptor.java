@@ -46,13 +46,10 @@ public class FileTypeInterceptor extends HandlerInterceptorAdapter {
      * 判断是否为允许的上传文件类型,true表示允许
      */
     private boolean checkFile(String fileName) {
-        String suffixList = "md";
+        String suffixList = "md,sql,txt";
         String suffix = fileName.substring(fileName.lastIndexOf(".")
                 + 1, fileName.length());
-        if (suffixList.contains(suffix.trim().toLowerCase())) {
-            return true;
-        }
-        return false;
+        return suffixList.contains( suffix.trim( ).toLowerCase( ) );
     }
 }
 

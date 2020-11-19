@@ -12,14 +12,17 @@ public class TestCase {
     @ManyToOne(cascade = CascadeType.PERSIST)
     private Question question;
 
-    @Column(nullable = false)
+    @Column
     private String env; // docker id
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "text")
     private String answerCode; // standard ans
 
     @Column(nullable = false)
-    private Boolean Orderliness;
+    private String initDB;
+
+    @Column
+    private String extension;// Judge rules
 
     public TestCase() {
     }
@@ -56,12 +59,20 @@ public class TestCase {
         this.answerCode = answerCode;
     }
 
-    public Boolean getOrderliness() {
-        return Orderliness;
+    public String getExtension() {
+        return extension;
     }
 
-    public void setOrderliness( Boolean orderliness ) {
-        Orderliness = orderliness;
+    public void setExtension( String extension ) {
+        this.extension = extension;
+    }
+
+    public String getInitDB() {
+        return initDB;
+    }
+
+    public void setInitDB( String initDB ) {
+        this.initDB = initDB;
     }
 
     @Override
@@ -71,7 +82,8 @@ public class TestCase {
                 ", question=" + question +
                 ", env='" + env + '\'' +
                 ", answerCode='" + answerCode + '\'' +
-                ", Orderliness=" + Orderliness +
+                ", initDB='" + initDB + '\'' +
+                ", extension='" + extension + '\'' +
                 '}';
     }
 }

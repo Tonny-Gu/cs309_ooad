@@ -3,6 +3,7 @@ package com.sustech.dboj.backend.controller;
 import com.sustech.dboj.backend.domain.*;
 import com.sustech.dboj.backend.repository.*;
 import com.sustech.dboj.backend.util.TextChecker;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ public class UserController {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder( );
         newUser.setPassword( encoder.encode( password ) );
         newUser.setNickname( name );
+        Hibernate.initialize(newUser.getContests());
         userRepository.save( newUser );
         return "Create user successful";
     }

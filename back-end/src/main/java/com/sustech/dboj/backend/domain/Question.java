@@ -15,10 +15,13 @@ public class Question {
     @OneToOne()// 去掉cascade = CascadeType.ALL就成了，取消关联的级联新增！
     @JoinColumn(name = "author", nullable = false)
     private User author;
-    @Column(nullable = false, columnDefinition="text")
+    @Column(nullable = false, columnDefinition = "text")
     private String content;
     @Column(nullable = false)
     private String degree;// Hard/Mid/Easy
+
+    @Column(nullable = false)
+    private String dbType; // SQLite/MySQL/PostgreSQL/ALL
 
     public Question() {
     }
@@ -75,6 +78,14 @@ public class Question {
         this.degree = degree;
     }
 
+    public String getDbType() {
+        return dbType;
+    }
+
+    public void setDbType( String dbType ) {
+        this.dbType = dbType;
+    }
+
     @Override
     public String toString() {
         return "Question{" +
@@ -84,6 +95,7 @@ public class Question {
                 ", author=" + author +
                 ", content='" + content + '\'' +
                 ", degree='" + degree + '\'' +
+                ", dbType='" + dbType + '\'' +
                 '}';
     }
 

@@ -4,6 +4,7 @@ import com.sustech.dboj.backend.domain.Question;
 import com.sustech.dboj.backend.domain.User;
 import com.sustech.dboj.backend.repository.QuestionRepository;
 import com.sustech.dboj.backend.repository.UserRepository;
+import com.sustech.dboj.backend.util.IOUtil;
 import com.sustech.dboj.backend.util.MarkDown2HtmlWrapper;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -13,16 +14,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.*;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 
 @RestController
 public class QuestionController {
     private static final Logger log = LoggerFactory.getLogger( UserController.class );
+    private static final String pathName = "./questions/";
 
     @Autowired
     private QuestionRepository questionRepository;
@@ -32,48 +33,50 @@ public class QuestionController {
 
 
     @PostMapping("/question/findById")
-    public Question getQuestion( Integer id) {
+    public Question getQuestion( Integer id ) {
         Optional<Question> questionQuery = questionRepository.findById( id );
         return questionQuery.orElse( null );
     }
 
     @PostMapping("/question/findAll")
     public List<Question> getAllQuestion() {
-        return questionRepository.findAll();
+        return questionRepository.findAll( );
     }
 
-    @PostMapping("/question/upload")
-    public String uploadQuestion( MultipartFile file , String author) {
-        if(file.isEmpty()){
-            return "error:file is empty";
-        }else {
-            MarkDown2HtmlWrapper w2h = new MarkDown2HtmlWrapper();
-            try {
-                BufferedOutputStream out = new BufferedOutputStream(
-                        new FileOutputStream(new File(
-                                Objects.requireNonNull( file.getOriginalFilename( ) ) )));
-                System.out.println(file.getName());
-                if(file.getContentType()!=null && !file.getContentType().equals( "text/markdown" )) {
-                    return "error:not markdown file";
-                }
-                System.out.println(file.getOriginalFilename());
-                out.write(file.getBytes());
-                out.flush();
-                out.close();
-                Question question = new Question();
-                question.setName( file.getOriginalFilename().split( "\\." )[0] );
-                User au = userRepository.findByUsername( author );
-                System.out.println( "author Id = " + au.getId() );
-                question.setAuthor( au );
-                question.setContent( w2h.markdown2Html( file.getInputStream()) );
-                System.out.println( question );
-                questionRepository.save( question );
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "error:" + e.getMessage();
+    @Transactional
+    @PostMapping("admin/question/upload")
+    public String uploadQuestion( MultipartFile questionFile , Integer author , String degree , String dbType ) {
+        Question question = new Question( );
+        if ( questionFile.isEmpty( ) ) {
+            return "error: question file is empty";
+        } else {
+            if ( questionFile.getContentType( ) != null && !questionFile.getContentType( ).equals( "text/markdown" ) ) {
+                return "error: not markdown file";
             }
+            User au = userRepository.findById( author ).orElse( null );
+            if ( au == null ) return "error: invalid author";
+            if ( !( degree.equalsIgnoreCase( "Hard" ) || degree.equalsIgnoreCase( "Mid" ) || degree.equalsIgnoreCase( "Easy" ) ) ) {
+                return "error:degree error";
+            }
+            if ( !( dbType.equalsIgnoreCase( "ALL" ) || dbType.equalsIgnoreCase( "SQLite" )
+                    || dbType.equalsIgnoreCase( "MySQL" ) || dbType.equalsIgnoreCase( "PostgreSQL" ) ) ) {
+                return "error:degree error";
+            }
+            MarkDown2HtmlWrapper w2h = new MarkDown2HtmlWrapper( );
+            try {
+                IOUtil.fileStore( questionFile,  pathName+
+                        Objects.requireNonNull( questionFile.getOriginalFilename( ) ));
+                question.setContent( Base64.getEncoder( ).encodeToString( w2h.markdown2Html( questionFile.getInputStream( ) ).getBytes( StandardCharsets.UTF_8 ) ) );
 
-            return "upload successful";
+            } catch (IOException e) {
+                e.printStackTrace( );
+                return "error: " + e.getMessage( );
+            }
+            question.setName( questionFile.getOriginalFilename( ).split( "\\." )[0] );
+            question.setDegree( degree );
+            question.setAuthor( au );
+            questionRepository.save( question );
+            return "success: " + question.getId();
         }
 
     }

@@ -1,8 +1,4 @@
 package com.sustech.dboj.backend.domain;
-
-
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import javax.persistence.*;
 
 @Entity(name = "notice")
