@@ -25,6 +25,7 @@ public class UserController {
     @PostMapping("/register")
     public String register( String username , String password , String name , String role ) {
         if ( !TextChecker.userNameChecker( username ) ) return "Invalid username";
+        if(userRepository.findByUsername( username )!=null)return "Username have been used";
         if ( ( !role.contains( "TA" ) ) && ( !role.contains( "SA" ) ) && ( !role.contains( "STU" ) ) )
             return "Invalid role";
         if ( !TextChecker.passwordChecker( password ) ) return "Invalid password";
@@ -38,7 +39,6 @@ public class UserController {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder( );
         newUser.setPassword( encoder.encode( password ) );
         newUser.setNickname( name );
-        Hibernate.initialize(newUser.getContests());
         userRepository.save( newUser );
         return "Create user successful";
     }

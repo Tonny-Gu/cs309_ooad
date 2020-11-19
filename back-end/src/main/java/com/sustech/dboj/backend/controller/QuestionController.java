@@ -6,7 +6,6 @@ import com.sustech.dboj.backend.repository.QuestionRepository;
 import com.sustech.dboj.backend.repository.UserRepository;
 import com.sustech.dboj.backend.util.IOUtil;
 import com.sustech.dboj.backend.util.MarkDown2HtmlWrapper;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
