@@ -16,8 +16,8 @@ import java.util.Base64;
 
 @RestController
 public class TestCaseController {
-    private static final String envPathName = "./env/";//想要存储文件的地址
-    private static final String ansPathName = "./ans/";
+    private static final String envPathName = "env/";//想要存储文件的地址
+    private static final String ansPathName = "ans/";
     @Autowired
     private QuestionRepository questionRepository;
 

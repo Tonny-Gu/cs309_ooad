@@ -4,6 +4,7 @@ import com.sustech.dboj.backend.domain.News;
 import com.sustech.dboj.backend.domain.User;
 import com.sustech.dboj.backend.repository.NewsRepository;
 import com.sustech.dboj.backend.repository.UserRepository;
+import com.sustech.dboj.backend.util.IOUtil;
 import com.sustech.dboj.backend.util.MarkDown2HtmlWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +29,8 @@ public class NewsController {
     @Autowired
     private UserRepository userRepository;
 
+    private static final String noticePathName = "notice/";
+
     @GetMapping("/notice/new")
     public News getCurrentNew() {
         List<News> enableNews = newsRepository.findCurrentNotice( );
@@ -45,33 +48,26 @@ public class NewsController {
         if ( file.isEmpty( ) ) {
             return "error:file is empty";
         } else {
+            if ( file.getContentType( ) != null && !file.getContentType( ).equals( "text/markdown" ) ) {
+                return "error:not markdown file";
+            }
+            User au = userRepository.findByUsername( author );
+            if ( au == null ) return "error: invalid author";
             MarkDown2HtmlWrapper w2h = new MarkDown2HtmlWrapper( );
+            News notice = new News( );
             try {
-                BufferedOutputStream out = new BufferedOutputStream(
-                        new FileOutputStream( new File(
-                                Objects.requireNonNull( file.getOriginalFilename( ) ) ) ) );
-                System.out.println( file.getName( ) );
-                if ( file.getContentType( ) != null && !file.getContentType( ).equals( "text/markdown" ) ) {
-                    return "error:not markdown file";
-                }
-                out.write( file.getBytes( ) );
-                out.flush( );
-                out.close( );
-                News notice = new News( );
-                notice.setTopic( file.getOriginalFilename( ).split( "\\." )[0] );
-                User au = userRepository.findByUsername( author );
-                System.out.println( "author Id = " + au.getId( ) );
-                notice.setAuthor( au );
+                IOUtil.fileStore( file , noticePathName + Objects.requireNonNull( file.getOriginalFilename( ) ) );
                 notice.setContent( w2h.markdown2Html( file.getInputStream( ) ) );
-                notice.setEnable( true );
-                SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd hh:mm:ss" );
-                notice.setTime( ft.format( new Date( ) ) );
-                newsRepository.save( notice );
             } catch (IOException e) {
                 e.printStackTrace( );
                 return "error:" + e.getMessage( );
             }
-
+            notice.setTopic( file.getOriginalFilename( ).split( "\\." )[0] );
+            SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd hh:mm:ss" );
+            notice.setTime( ft.format( new Date( ) ) );
+            notice.setEnable( true );
+            notice.setAuthor( au );
+            newsRepository.save( notice );
             return "upload successful";
         }
     }
@@ -79,16 +75,16 @@ public class NewsController {
     @GetMapping("/notice/enable")
     public String enableNew( Integer Id ) {
         News notice = newsRepository.findById( Id ).orElse( null );
-        if ( notice == null )return "notice not found";
-        newsRepository.activeNotice( Id, true );
-        return String.format( "notice %d enable", Id );
+        if ( notice == null ) return "notice not found";
+        newsRepository.activeNotice( Id , true );
+        return String.format( "notice %d enable" , Id );
     }
 
     @GetMapping("/notice/cancel")
     public String cancelNew( Integer Id ) {
         News notice = newsRepository.findById( Id ).orElse( null );
-        if ( notice == null )return "notice not found";
-        newsRepository.activeNotice( Id, false );
-        return String.format( "notice %d cancel", Id );
+        if ( notice == null ) return "notice not found";
+        newsRepository.activeNotice( Id , false );
+        return String.format( "notice %d cancel" , Id );
     }
 }

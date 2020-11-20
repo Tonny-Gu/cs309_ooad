@@ -22,7 +22,7 @@ import java.util.*;
 @RestController
 public class QuestionController {
     private static final Logger log = LoggerFactory.getLogger( UserController.class );
-    private static final String pathName = "./questions/";
+    private static final String pathName = "questions/";
 
     @Autowired
     private QuestionRepository questionRepository;
