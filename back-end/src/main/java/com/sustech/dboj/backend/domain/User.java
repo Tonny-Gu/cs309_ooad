@@ -1,5 +1,6 @@
 package com.sustech.dboj.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +25,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String role;// Three types:STU/TA/SA
     @ManyToMany(mappedBy = "users")
+    @JsonIgnore //关掉不重要的一边的序列化，防止循环引用
     private Set<Contest> contests;
 
     public User() {
@@ -118,4 +120,16 @@ public class User implements UserDetails {
         return username;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "Id=" + Id +
+                ", username='" + username + '\'' +
+                ", name='" + name + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", password='" + password + '\'' +
+                ", role='" + role + '\'' +
+                ", contests=" + contests +
+                '}';
+    }
 }

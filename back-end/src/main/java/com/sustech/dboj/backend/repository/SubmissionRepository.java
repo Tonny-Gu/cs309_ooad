@@ -15,4 +15,6 @@ public interface SubmissionRepository extends JpaRepository<Submission, Integer>
 
     @Query(value = "select * from submit_log where student_id=?1 and question_id=?2",nativeQuery=true)
     List<Submission> getLog( Integer student, Integer question);
+
+
 }

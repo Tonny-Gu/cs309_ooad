@@ -33,6 +33,7 @@ spring:
       hibernate:
         temp:
           use_jdbc_metadata_defaults: false
+          open-in-view: true
     hibernate:
       ddl-auto: update #if use create, we will build new table and clean all the date.
     open-in-view: false

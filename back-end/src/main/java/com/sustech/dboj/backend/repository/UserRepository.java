@@ -11,8 +11,12 @@ import java.util.Set;
 public interface UserRepository extends JpaRepository<User, Integer> {
     User findByUsername(String username);
 
-    @Query(value = "select * from contest_users where users_id=?1",nativeQuery=true)
-    Set<Contest> getContests( Integer id);
+    @Query(value = "select * from user_info where user_info.id in (select users_id from contest_users where contests_id=?1)",nativeQuery=true)
+    Set<User> contestGetUsers( Integer id);
+
+
+    @Query(value = "insert into contest_users (contests_id, users_id) values (?1,?2)",nativeQuery=true)
+    int joinContest( Integer user_id, Integer contest_id);
 
 
 }

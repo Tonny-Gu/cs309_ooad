@@ -3,7 +3,6 @@ package com.sustech.dboj.backend.controller;
 import com.sustech.dboj.backend.domain.*;
 import com.sustech.dboj.backend.repository.*;
 import com.sustech.dboj.backend.util.TextChecker;
-import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.List;
 
 @Configuration
 @RestController
@@ -24,10 +23,16 @@ public class UserController {
     @Autowired
     private ContestRepository contestRepository;
 
+    @Autowired
+    private SubmissionRepository submissionRepository;
+
+    @Autowired
+    private QuestionRepository questionRepository;
+
     @PostMapping("/register")
     public String register( String username , String password , String name , String role ) {
         if ( !TextChecker.userNameChecker( username ) ) return "Invalid username";
-        if(userRepository.findByUsername( username )!=null)return "Username have been used";
+        if ( userRepository.findByUsername( username ) != null ) return "Username have been used";
         if ( ( !role.contains( "TA" ) ) && ( !role.contains( "SA" ) ) && ( !role.contains( "STU" ) ) )
             return "Invalid role";
         if ( !TextChecker.passwordChecker( password ) ) return "Invalid password";
@@ -45,33 +50,43 @@ public class UserController {
         return "Create user successful";
     }
 
-    @PostMapping("/user/getinfo")
-    public User getinfo( Integer id) {
-        User userQuery = userRepository.findById( id ).orElse( null );
-        if(userQuery==null)return null;
-        userQuery.setContests( userRepository.getContests( userQuery.getId() ) );
-        return userQuery;
+    @PostMapping("/user/get/contests")
+    public List<Contest> getContests( Integer id ) {
+        User user = userRepository.findById( id ).orElse( null );
+        if ( user == null ) return null;
+        return contestRepository.userGetContests( id );
+    }
+
+    @PostMapping("/user/get/submission")
+    public List<Submission> getSubmissionsByUser( Integer id ) {
+        User user = userRepository.findById( id ).orElse( null );
+        if ( user == null ) return null;
+        return submissionRepository.getLog( id );
+    }
+
+    @PostMapping("/user/get/submission")
+    public List<Submission> getSubmissions( Integer id , Integer question_id ) {
+        User user = userRepository.findById( id ).orElse( null );
+        if ( user == null ) return null;
+        Question question = questionRepository.findById( id ).orElse( null );
+        if ( question == null ) return null;
+        return submissionRepository.getLog( id , question_id );
     }
 
     @PostMapping("/user/joinContest")
-    public String joinContest(Integer user_id, Integer contest_id) {
-        Optional<User> userQuery = userRepository.findById( user_id );
-        User myUser = userQuery.orElse( null );
-
-        Optional<Contest> contestQuery = contestRepository.findById( contest_id );
-        Contest myContest = contestQuery.orElse( null );
-        if ( myUser == null )return "User not found";
-        if ( myContest == null )return "Contest not found";
-
-        myContest.getUsers().add( myUser );
-        myUser.getContests().add( myContest );
-
-        userRepository.save( myUser );
-        contestRepository.save( myContest );
-
+    public String joinContest( Integer user_id , Integer contest_id ) {
+        User myUser = userRepository.findById( user_id ).orElse( null );
+        Contest myContest = contestRepository.findById( contest_id ).orElse( null );
+        if ( myUser == null ) return "User not found";
+        if ( myContest == null ) return "Contest not found";
+        int statusCode = userRepository.joinContest( user_id , contest_id );
+//        myUser.setContests( userRepository.getContests( myUser.getId() ) );
+//        myContest.getUsers().add( myUser );
+//        myUser.getContests().add( myContest );
+//        userRepository.save( myUser );
+//        contestRepository.save( myContest );
         return "Join contest successfully";
     }
-
 
 
     @GetMapping("/index")

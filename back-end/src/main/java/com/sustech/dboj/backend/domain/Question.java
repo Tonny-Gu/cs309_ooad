@@ -1,5 +1,7 @@
 package com.sustech.dboj.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -11,6 +13,7 @@ public class Question {
     @Column(nullable = false)
     private String name;
     @ManyToMany(mappedBy = "questions")
+    @JsonIgnore
     private Set<Contest> contests;
     @OneToOne()// 去掉cascade = CascadeType.ALL就成了，取消关联的级联新增！
     @JoinColumn(name = "author", nullable = false)
