@@ -80,11 +80,7 @@ public class UserController {
         if ( myUser == null ) return "User not found";
         if ( myContest == null ) return "Contest not found";
         int statusCode = userRepository.joinContest( user_id , contest_id );
-//        myUser.setContests( userRepository.getContests( myUser.getId() ) );
-//        myContest.getUsers().add( myUser );
-//        myUser.getContests().add( myContest );
-//        userRepository.save( myUser );
-//        contestRepository.save( myContest );
+        System.out.println( "statusCode=" + statusCode );
         return "Join contest successfully";
     }
 

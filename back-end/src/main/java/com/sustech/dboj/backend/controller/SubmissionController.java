@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class SubmissionController {
@@ -22,13 +21,5 @@ public class SubmissionController {
         return null;
     }
 
-    @PostMapping("/user/getLog/question")
-    public List<Submission> getLog( Integer user_id, Integer question_id) {
-        return submissionRepository.getLog( user_id, question_id );
-    }
 
-    @PostMapping("/user/getLog/all")
-    public List<Submission> getLog(Integer user_id) {
-        return submissionRepository.getLog( user_id );
-    }
 }
