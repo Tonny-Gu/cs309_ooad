@@ -26,7 +26,7 @@ public class MyUserDetailsService implements UserDetailsService {
         }catch (Exception e){
             userBean.setContests(null);
         }
-
+        System.out.println( userBean );
         return userBean;
     }
 }

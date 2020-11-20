@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,18 +35,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         //加入数据库验证类，下面的语句实际上在验证链中加入了一个DaoAuthenticationProvider
         auth.userDetailsService( myUserDetailsService ).passwordEncoder( new BCryptPasswordEncoder( ) );
     }
-@Bean
-    RoleHierarchy roleHierarchy (){
-        RoleHierarchyImpl hierarchy = new RoleHierarchyImpl();
-        hierarchy.setHierarchy( "TA > SA SA > STU" );
-        return hierarchy;
-}
+//
+//    @Bean
+//    RoleHierarchy roleHierarchy() {
+//        RoleHierarchyImpl hierarchy = new RoleHierarchyImpl( );
+//        hierarchy.setHierarchy( "TA > SA SA > STU" );
+//        return hierarchy;
+//    }
 
     @Override
     protected void configure( HttpSecurity http ) throws Exception {
-        http
+        http.cors( )
+                .and( )
                 .authorizeRequests( )
-                .antMatchers( "/user/**" ).hasRole( "STU" )
+                .antMatchers( "/user/**" ).hasAnyRole( "STU" , "TA" , "SA" )
                 .antMatchers( "/admin/**" ).hasAnyRole( "TA" , "SA" )
                 .anyRequest( ).permitAll( )
 //                .and()
@@ -80,9 +83,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     out.close( );
                 } )
                 .permitAll( )
-                .and()
-                .cors()
                 .and( )
+//                .and( )
                 .csrf( ).disable( ).exceptionHandling( )
                 .authenticationEntryPoint( ( req , resp , authException ) -> {
                     resp.setContentType( "application/json;charset=utf-8" );
@@ -92,16 +94,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     out.close( );
                 } );
     }
+
     @Bean
-    CorsConfigurationSource corsConfigurationSource(){
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration configuration = new CorsConfiguration(  );
+    CorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource( );
+        CorsConfiguration configuration = new CorsConfiguration( );
         configuration.setAllowCredentials( true );
         configuration.setAllowedOrigins( Collections.singletonList( "*" ) );
         configuration.setAllowedMethods( Collections.singletonList( "*" ) );
         configuration.setAllowedHeaders( Collections.singletonList( "*" ) );
+        configuration.applyPermitDefaultValues( );
         configuration.setMaxAge( Duration.ofHours( 1 ) );
-        source.registerCorsConfiguration( "/**",configuration );
+        source.registerCorsConfiguration( "/**" , configuration );
         return source;
     }
+
 }

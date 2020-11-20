@@ -7,11 +7,13 @@ import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+@Configuration
 @RestController
 public class UserController {
     private static final Logger log = LoggerFactory.getLogger( UserController.class );
@@ -43,10 +45,12 @@ public class UserController {
         return "Create user successful";
     }
 
-    @GetMapping("/user/getinfo")
+    @PostMapping("/user/getinfo")
     public User getinfo( Integer id) {
-        Optional<User> userQuery = userRepository.findById( id );
-        return userQuery.orElse( null );
+        User userQuery = userRepository.findById( id ).orElse( null );
+        if(userQuery==null)return null;
+        userQuery.setContests( userRepository.getContests( userQuery.getId() ) );
+        return userQuery;
     }
 
     @PostMapping("/user/joinContest")
