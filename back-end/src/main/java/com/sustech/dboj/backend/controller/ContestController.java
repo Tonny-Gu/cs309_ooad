@@ -19,7 +19,7 @@ public class ContestController {
     @Autowired
     private ContestRepository contestRepository;
 
-    @GetMapping("/admin/contest/stu")
+    @PostMapping("/admin/contest/stu")
     public List<User> getUserByContest( Integer id ) {
         Contest contest = contestRepository.findById( id ).orElse( null );
         if ( contest == null ) return null;
@@ -31,7 +31,7 @@ public class ContestController {
         return contestRepository.findAll();
     }
 
-    @GetMapping("/contest")
+    @GetMapping("/contest/id")
     public Contest getContestsById(Integer id) {
         return contestRepository.findById( id ).orElse( null );
     }
