@@ -83,7 +83,7 @@ public class QuestionController {
     }
 
     @Transactional
-    @PostMapping("admin/question/upload")
+    @PostMapping("/admin/question/upload")
     public String uploadQuestion( MultipartFile questionFile , Integer author , String degree , String dbType ) {
         Question question = new Question( );
         if ( questionFile.isEmpty( ) ) {

@@ -27,7 +27,7 @@ spring:
         max-active: 8
         min-idle: -1
         max-idle: 8
-        max-wait:
+        max-wait: 1000
   jpa:
     properties:
       hibernate:

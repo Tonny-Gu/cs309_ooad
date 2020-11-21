@@ -21,7 +21,7 @@ public class TestCaseController {
     @Autowired
     private QuestionRepository questionRepository;
 
-    @PostMapping("admin/testcase/upload")
+    @PostMapping("/admin/testcase/upload")
     public String uploadQuestion( MultipartFile initFile , MultipartFile ansFile ,
                                   MultipartFile extenFile , Integer questionId ) {
         if ( initFile.isEmpty( ) ) {

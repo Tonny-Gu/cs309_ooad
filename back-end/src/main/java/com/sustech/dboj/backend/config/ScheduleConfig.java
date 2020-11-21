@@ -17,7 +17,7 @@ public class ScheduleConfig {
     @Autowired
     private ContestRepository contestRepository;
 
-    @Scheduled(cron = "10 0 0 ?")// cancel
+    @Scheduled(cron = "10 0 0 * * ?")// cancel
     public void cancelContest() {
         SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd hh:mm:ss" );
         String now = ft.format( new Date( ) );

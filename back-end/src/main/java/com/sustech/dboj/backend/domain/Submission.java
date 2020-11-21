@@ -24,7 +24,7 @@ public class Submission {
     @Column(nullable = false)
     private String submitTime;
     @Column(nullable = false)
-    private String info;
+    private String info;//Submit/AC/TLE/WA/Err
 
     public Submission() {
     }
