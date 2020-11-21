@@ -14,6 +14,8 @@ public class Contest {
     private String beginTime;
     @Column(nullable = false)
     private String endTime;
+    @Column(nullable = false, name = "en_able")
+    private Boolean enable;
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
     private Set<Question> questions;
 
@@ -71,6 +73,14 @@ public class Contest {
         this.endTime = endTime;
     }
 
+    public Boolean getEnable() {
+        return enable;
+    }
+
+    public void setEnable( Boolean enable ) {
+        this.enable = enable;
+    }
+
     @Override
     public String toString() {
         return "Contest{" +
@@ -78,6 +88,7 @@ public class Contest {
                 ", name='" + name + '\'' +
                 ", beginTime='" + beginTime + '\'' +
                 ", endTime='" + endTime + '\'' +
+                ", enable=" + enable +
                 ", questions=" + questions +
                 ", users=" + users +
                 '}';

@@ -16,7 +16,9 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -57,7 +59,7 @@ public class NewsController {
             News notice = new News( );
             try {
                 IOUtil.fileStore( file , noticePathName + Objects.requireNonNull( file.getOriginalFilename( ) ) );
-                notice.setContent( w2h.markdown2Html( file.getInputStream( ) ) );
+                notice.setContent( Base64.getEncoder( ).encodeToString( w2h.markdown2Html( file.getInputStream( ) ).getBytes( StandardCharsets.UTF_8 ) ) );
             } catch (IOException e) {
                 e.printStackTrace( );
                 return "error:" + e.getMessage( );

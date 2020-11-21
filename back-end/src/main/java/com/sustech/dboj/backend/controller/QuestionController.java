@@ -106,7 +106,6 @@ public class QuestionController {
                 IOUtil.fileStore( questionFile,  pathName+
                         Objects.requireNonNull( questionFile.getOriginalFilename( ) ));
                 question.setContent( Base64.getEncoder( ).encodeToString( w2h.markdown2Html( questionFile.getInputStream( ) ).getBytes( StandardCharsets.UTF_8 ) ) );
-
             } catch (IOException e) {
                 e.printStackTrace( );
                 return "error: " + e.getMessage( );

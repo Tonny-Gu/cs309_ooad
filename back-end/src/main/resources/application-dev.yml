@@ -20,12 +20,12 @@ spring:
   redis:
     host: glab2.mylab.cc
     port: 11379
-    timeout: 0
+    timeout: 1000
     database: 0
     jedis:
       pool:
         max-active: 8
-        min-idle: 0
+        min-idle: -1
         max-idle: 8
         max-wait:
   jpa:
