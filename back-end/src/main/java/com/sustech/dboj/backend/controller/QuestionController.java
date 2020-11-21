@@ -37,49 +37,45 @@ public class QuestionController {
     @Autowired
     private ContestRepository contestRepository;
 
+    @GetMapping("/question")
+    public List<Question> getAllQuestion() {
+        return questionRepository.findAll( );
+    }
 
-    @PostMapping("/question/get/id")
+
+    @GetMapping("/question")
     public Question getQuestionById( Integer id ) {
         Optional<Question> questionQuery = questionRepository.findById( id );
         return questionQuery.orElse( null );
     }
 
-    @GetMapping("/question/get/all")
-    public List<Question> getAllQuestion() {
-        return questionRepository.findAll( );
-    }
-
-    @PostMapping("/question/get/contest")
-    public List<Question> getQuestionByContest(Integer contest_id)
-    {
+    @GetMapping("/question")
+    public List<Question> getQuestionByContest( Integer contest_id ) {
         Contest contest = contestRepository.findById( contest_id ).orElse( null );
-        if(contest == null)return null;
+        if ( contest == null ) return null;
         return questionRepository.contestGetQuestions( contest_id );
     }
-    @PostMapping("/question/get/name")
-    public List<Question> getQuestionByName(String name)
-    {
+
+    @GetMapping("/question")
+    public List<Question> getQuestionByName( String name ) {
         return questionRepository.findByName( name );
     }
 
-    @PostMapping("/question/get/author")
-    public List<Question> getQuestionByAuthor(Integer user_id)
-    {
+    @GetMapping("/question")
+    public List<Question> getQuestionByDegree( String degree ) {
+        return questionRepository.findByDegree( degree );
+    }
+
+    @GetMapping("/question")
+    public List<Question> getQuestionByDbType( String dbType ) {
+        return questionRepository.findByDbType( dbType );
+    }
+
+    @GetMapping("/question")
+    public List<Question> getQuestionByAuthor( Integer user_id ) {
         User user = userRepository.findById( user_id ).orElse( null );
-        if ( user == null )return null;
+        if ( user == null ) return null;
         return questionRepository.findByAuthor( user );
-    }
-
-    @PostMapping("/question/get/degree")
-    public List<Question> getQuestionByDegree(String degree)
-    {
-        return questionRepository.findByName( degree );
-    }
-
-    @PostMapping("/question/get/dbtype")
-    public List<Question> getQuestionByDbType(String dbType)
-    {
-        return questionRepository.findByName( dbType );
     }
 
     @Transactional
@@ -103,8 +99,8 @@ public class QuestionController {
             }
             MarkDown2HtmlWrapper w2h = new MarkDown2HtmlWrapper( );
             try {
-                IOUtil.fileStore( questionFile,  pathName+
-                        Objects.requireNonNull( questionFile.getOriginalFilename( ) ));
+                IOUtil.fileStore( questionFile , pathName +
+                        Objects.requireNonNull( questionFile.getOriginalFilename( ) ) );
                 question.setContent( Base64.getEncoder( ).encodeToString( w2h.markdown2Html( questionFile.getInputStream( ) ).getBytes( StandardCharsets.UTF_8 ) ) );
 
             } catch (IOException e) {
@@ -115,7 +111,7 @@ public class QuestionController {
             question.setDegree( degree );
             question.setAuthor( au );
             questionRepository.save( question );
-            return "success: " + question.getId();
+            return "success: " + question.getId( );
         }
 
     }

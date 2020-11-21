@@ -50,14 +50,14 @@ public class UserController {
         return "Create user successful";
     }
 
-    @PostMapping("/user/get/contests")
+    @GetMapping("/user/get/contests")
     public List<Contest> getContests( Integer id ) {
         User user = userRepository.findById( id ).orElse( null );
         if ( user == null ) return null;
         return contestRepository.userGetContests( id );
     }
 
-    @PostMapping("/user/get/submission")
+    @GetMapping("/user/get/submission")
     public List<Submission> getSubmissionsByUser( Integer id ) {
         User user = userRepository.findById( id ).orElse( null );
         if ( user == null ) return null;
