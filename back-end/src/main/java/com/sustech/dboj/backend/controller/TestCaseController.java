@@ -31,12 +31,12 @@ public class TestCaseController {
         }
         Question question = questionRepository.findById( questionId ).orElse( null );
         if ( question == null ) return "error: question not found";
-        if ( initFile.getContentType( ) != null && !initFile.getContentType( ).equals( "text/sql" ) && !initFile.getContentType( ).equals( "text/x-sql" ) ) {
-            return "error: initFile not sql file";
-        }
-        if ( ansFile.getContentType( ) != null && !ansFile.getContentType( ).equals( "text/sql" ) && !ansFile.getContentType( ).equals( "text/x-sql" ) ) {
-            return "error: ansFile not sql file";
-        }
+//        if ( initFile.getContentType( ) != null && !initFile.getContentType( ).equals( "text/sql" ) && !initFile.getContentType( ).equals( "text/x-sql" ) ) {
+//            return "error: initFile not sql file";
+//        }
+//        if ( ansFile.getContentType( ) != null && !ansFile.getContentType( ).equals( "text/sql" ) && !ansFile.getContentType( ).equals( "text/x-sql" ) ) {
+//            return "error: ansFile not sql file";
+//        }
         TestCase testCase = new TestCase( );
         try {
             IOUtil.fileStore( initFile, envPathName + questionId + ".sql" );

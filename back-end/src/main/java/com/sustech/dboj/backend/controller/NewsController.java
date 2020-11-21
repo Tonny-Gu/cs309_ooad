@@ -50,9 +50,9 @@ public class NewsController {
         if ( file.isEmpty( ) ) {
             return "error:file is empty";
         } else {
-            if ( file.getContentType( ) != null && !file.getContentType( ).equals( "text/markdown" ) ) {
-                return "error:not markdown file";
-            }
+//            if ( file.getContentType( ) != null && !file.getContentType( ).equals( "text/markdown" ) ) {
+//                return "error:not markdown file";
+//            }
             User au = userRepository.findByUsername( author );
             if ( au == null ) return "error: invalid author";
             MarkDown2HtmlWrapper w2h = new MarkDown2HtmlWrapper( );

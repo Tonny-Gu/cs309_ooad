@@ -89,9 +89,10 @@ public class QuestionController {
         if ( questionFile.isEmpty( ) ) {
             return "error: question file is empty";
         } else {
-            if ( questionFile.getContentType( ) != null && !questionFile.getContentType( ).equals( "text/markdown" ) ) {
-                return "error: not markdown file";
-            }
+//            if ( questionFile.getContentType( ) != null && !questionFile.getContentType( ).equals( "text/markdown" ) ) {
+//                System.out.println( questionFile.getContentType( ) );
+//                return "error: not markdown file";
+//            }
             User au = userRepository.findById( author ).orElse( null );
             if ( au == null ) return "error: invalid author";
             if ( !( degree.equalsIgnoreCase( "Hard" ) || degree.equalsIgnoreCase( "Mid" ) || degree.equalsIgnoreCase( "Easy" ) ) ) {
@@ -112,6 +113,7 @@ public class QuestionController {
             }
             question.setName( questionFile.getOriginalFilename( ).split( "\\." )[0] );
             question.setDegree( degree );
+            question.setDbType( dbType );
             question.setAuthor( au );
             questionRepository.save( question );
             return "success: " + question.getId();
