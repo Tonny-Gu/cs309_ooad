@@ -3,8 +3,7 @@ package com.sustech.dboj.backend.domain;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "submit_log")
-public class Submission {
+public class Score {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer Id;
@@ -17,16 +16,15 @@ public class Submission {
     private Question question;
 
     @Column(nullable = false)
-    private String code;
-    @Column(nullable = false)
-    private String language;
+    private Integer submit=0;
 
     @Column(nullable = false)
-    private String submitTime;
-    @Column(nullable = false)
-    private String info;//Submit/AC/WA
+    private Boolean ac=false;
 
-    public Submission() {
+    @Column(nullable = false)
+    private Integer wa=0;
+
+    public Score() {
     }
 
     public Integer getId() {
@@ -61,49 +59,40 @@ public class Submission {
         this.question = question;
     }
 
-    public String getSubmitTime() {
-        return submitTime;
+    public Integer getSubmit() {
+        return submit;
     }
 
-    public void setSubmitTime( String submitTime ) {
-        this.submitTime = submitTime;
+    public void setSubmit( Integer submit ) {
+        this.submit = submit;
     }
 
-    public String getInfo() {
-        return info;
+    public Boolean getAc() {
+        return ac;
     }
 
-    public void setInfo( String info ) {
-        this.info = info;
+    public void setAc( Boolean ac ) {
+        this.ac = ac;
     }
 
-    public String getCode() {
-        return code;
+    public Integer getWa() {
+        return wa;
     }
 
-    public void setCode( String code ) {
-        this.code = code;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage( String language ) {
-        this.language = language;
+    public void setWa( Integer wa ) {
+        this.wa = wa;
     }
 
     @Override
     public String toString() {
-        return "Submission{" +
+        return "Score{" +
                 "Id=" + Id +
                 ", student=" + student +
                 ", contest=" + contest +
                 ", question=" + question +
-                ", code='" + code + '\'' +
-                ", language='" + language + '\'' +
-                ", submitTime='" + submitTime + '\'' +
-                ", info='" + info + '\'' +
+                ", submit=" + submit +
+                ", ac=" + ac +
+                ", wa=" + wa +
                 '}';
     }
 }

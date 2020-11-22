@@ -16,7 +16,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     List<User> contestGetUsers( Integer id);
 
 
-    @Query(value = "insert into contest_users (contests_id, users_id) values (?1,?2)",nativeQuery=true)
+    @Query(value = "insert into contest_users (users_id, contests_id) values (?1,?2)",nativeQuery=true)
     int joinContest( Integer user_id, Integer contest_id);
 
 

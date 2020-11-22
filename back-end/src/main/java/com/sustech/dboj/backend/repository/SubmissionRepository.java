@@ -15,5 +15,11 @@ public interface SubmissionRepository extends JpaRepository<Submission, Integer>
     List<Submission> getLog( Integer student , Integer question );
 
     @Query(value = "insert into submit_log (code, info, language, submit_time, contest_id, question_id, student_id) values (?1,?2,?3,?4,?5,?6,?7)", nativeQuery = true)
-    int submitToDB( String code , String info , String language , String submitTime , Integer contest , Integer question , Integer student );
+    void submitToDB( String code , String info , String language , String submitTime , Integer contest , Integer question , Integer student );
+
+    @Query(value = "select * from submit_log where contest_id=?1 and question_id=?2 and info='AC' order by id ", nativeQuery = true)
+    List<Submission> getSubmissionRank( Integer contest , Integer question );
+
+    @Query(value = "select * from submit_log limit ?2 offset ?1", nativeQuery = true)
+    List<Submission> getSubmissionLimit( Integer begin , Integer length );
 }

@@ -18,9 +18,10 @@ public class Contest {
     private String endTime;
     @Column(nullable = false, name = "en_able")
     private Boolean enable;
+
+
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
     private Set<Question> questions;
-
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
     @JsonIgnore //for security
     private Set<User> users;

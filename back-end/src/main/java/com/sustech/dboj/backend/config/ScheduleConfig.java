@@ -17,7 +17,7 @@ public class ScheduleConfig {
     @Autowired
     private ContestRepository contestRepository;
 
-    @Scheduled(cron = "10 0 0 * * ?")// cancel
+    @Scheduled(cron = "1 0 0 * * ?")// cancel
     public void cancelContest() {
         SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd hh:mm:ss" );
         String now = ft.format( new Date( ) );
@@ -27,6 +27,10 @@ public class ScheduleConfig {
                 contest.setEnable( false );
                 contestRepository.save( contest );
                 System.out.printf( "Contest:%d Expired" , contest.getId( ) );
+            }else if(contest.getBeginTime( ).compareTo( now ) < 0){
+                contest.setEnable( true );
+                contestRepository.save( contest );
+                System.out.printf( "Contest:%d Enabled" , contest.getId( ) );
             }
         }
     }

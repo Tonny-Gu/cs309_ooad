@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Configuration
@@ -28,6 +29,9 @@ public class UserController {
 
     @Autowired
     private QuestionRepository questionRepository;
+
+    @Autowired
+    private ScoreRepository scoreRepository;
 
     @PostMapping("/register")
     public String register( String username , String password , String name , String role ) {
@@ -74,15 +78,25 @@ public class UserController {
         return submissionRepository.getLog( id , question_id );
     }
 
+    @Transactional
     @PostMapping("/user/joinContest")
     public String joinContest( Integer user_id , Integer contest_id ) {
+        // add contest-user
         User myUser = userRepository.findById( user_id ).orElse( null );
         Contest myContest = contestRepository.findById( contest_id ).orElse( null );
         if ( myUser == null ) return "User not found";
         if ( myContest == null ) return "Contest not found";
         int statusCode = userRepository.joinContest( user_id , contest_id );
         System.out.println( "statusCode=" + statusCode );
-        log.info( "User: {} join Contest: name: {}",myUser.getUsername(),myContest.getName() );
+        log.info( "User: {} join Contest: {}",myUser.getUsername(),myContest.getName() );
+        // create score table
+        for (Question question : myContest.getQuestions()){
+            Score score = new Score();
+            score.setContest( myContest );
+            score.setQuestion( question );
+            score.setStudent( myUser );
+            scoreRepository.save( score );
+        }
         return "Join contest successfully";
     }
 
