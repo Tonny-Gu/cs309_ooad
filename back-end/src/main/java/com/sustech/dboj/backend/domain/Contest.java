@@ -1,5 +1,7 @@
 package com.sustech.dboj.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -20,6 +22,7 @@ public class Contest {
     private Set<Question> questions;
 
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
+    @JsonIgnore //for security
     private Set<User> users;
 
     public Contest() {
