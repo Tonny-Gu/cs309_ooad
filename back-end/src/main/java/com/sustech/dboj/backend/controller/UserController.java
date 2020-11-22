@@ -47,6 +47,7 @@ public class UserController {
         newUser.setPassword( encoder.encode( password ) );
         newUser.setNickname( name );
         userRepository.save( newUser );
+        log.info( "User: {}, name: {} have been created",newUser.getUsername(), newUser.getName() );
         return "Create user successful";
     }
 
@@ -81,6 +82,7 @@ public class UserController {
         if ( myContest == null ) return "Contest not found";
         int statusCode = userRepository.joinContest( user_id , contest_id );
         System.out.println( "statusCode=" + statusCode );
+        log.info( "User: {} join Contest: name: {}",myUser.getUsername(),myContest.getName() );
         return "Join contest successfully";
     }
 

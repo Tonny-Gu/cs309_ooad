@@ -1,18 +1,23 @@
 package com.sustech.dboj.backend.config;
 
+import com.sustech.dboj.backend.controller.UserController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
  * 全局文件类型拦截器
  */
+@Component
 public class FileTypeInterceptor extends HandlerInterceptorAdapter {
+    private static final Logger logger = LoggerFactory.getLogger( FileTypeInterceptor.class );
     @Override
     public boolean preHandle( HttpServletRequest request,
                               HttpServletResponse response, Object handler)throws Exception {
@@ -33,9 +38,7 @@ public class FileTypeInterceptor extends HandlerInterceptorAdapter {
                 assert filename != null;
                 if ( !checkFile( filename ) ) {
                     //限制文件类型，请求转发到原始请求页面，并携带错误提示信息
-                    request.setAttribute( "errormessage" , "不支持的文件类型！" );
-                    request.getRequestDispatcher( "/WEB-INF/jsp/userEdit.jsp" )
-                            .forward( request , response );
+                    logger.info( "Invalid file type: {}", filename );
                     flag = false;
                 }
             }

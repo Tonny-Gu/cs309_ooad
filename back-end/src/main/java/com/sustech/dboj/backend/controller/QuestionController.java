@@ -90,7 +90,6 @@ public class QuestionController {
             return "error: question file is empty";
         } else {
 //            if ( questionFile.getContentType( ) != null && !questionFile.getContentType( ).equals( "text/markdown" ) ) {
-//                System.out.println( questionFile.getContentType( ) );
 //                return "error: not markdown file";
 //            }
             User au = userRepository.findById( author ).orElse( null );
