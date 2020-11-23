@@ -6,10 +6,8 @@ import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
-import com.vladsch.flexmark.util.options.DataHolder;
-
-
-import com.vladsch.flexmark.util.options.MutableDataSet;
+import com.vladsch.flexmark.util.data.DataHolder;
+import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -53,7 +51,7 @@ public class MarkDown2HtmlWrapper {
         entity.setCss( MD_CSS );
         entity.setHtml( renderer.render( document ) );
         entity.addDivStyle( "class" , "markdown-body " );
-        return entity.getHtml().toString( );
+        return entity.toString( );
     }
 
     public String markdown2html_demo( InputStream stream ) throws IOException {

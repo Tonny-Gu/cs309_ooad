@@ -1,6 +1,5 @@
 package com.sustech.dboj.backend.controller;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.sustech.dboj.backend.domain.Contest;
 import com.sustech.dboj.backend.domain.Question;
 import com.sustech.dboj.backend.domain.Score;
