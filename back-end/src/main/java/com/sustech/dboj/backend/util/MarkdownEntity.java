@@ -9,8 +9,40 @@ public class MarkdownEntity {
     // css 样式
     private String css;
 
-    // 最外网的div标签， 可以用来设置样式，宽高，字体等
+    // 最外围的div标签， 可以用来设置样式，宽高，字体等
     private Map<String, String> divStyle = new ConcurrentHashMap<>();
+
+    public static String getTagWidth() {
+        return TAG_WIDTH;
+    }
+
+    public static void setTagWidth( String tagWidth ) {
+        TAG_WIDTH = tagWidth;
+    }
+
+    public String getCss() {
+        return css;
+    }
+
+    public void setCss( String css ) {
+        this.css = css;
+    }
+
+    public Map<String, String> getDivStyle() {
+        return divStyle;
+    }
+
+    public void setDivStyle( Map<String, String> divStyle ) {
+        this.divStyle = divStyle;
+    }
+
+    public String getHtml() {
+        return html;
+    }
+
+    public void setHtml( String html ) {
+        this.html = html;
+    }
 
     // 转换后的html文档
     private String html;

@@ -11,12 +11,12 @@ import java.io.InputStream;
 public class MarkDown2HtmlTest {
 
     @Test
-    void test01() throws IOException {
-        System.out.println("-----------test from csdn-----------" );
+    void test01() throws IOException {// my md2html test
+//        System.out.println("-----------test from csdn-----------" );
         MarkDown2HtmlWrapper mhw = new MarkDown2HtmlWrapper();
         InputStream is = null;
         try {
-            is = new FileInputStream("./src/test/testresources/testmd.md");
+            is = new FileInputStream("./src/test/testresources/test1123.md");
         } catch (FileNotFoundException e) {
             e.printStackTrace( );
         }
@@ -24,8 +24,8 @@ public class MarkDown2HtmlTest {
     }
 
     @Test
-    void test02() throws IOException {
-        System.out.println("-----------test demo-----------" );
+    void test02() throws IOException {//demo md2html test
+//        System.out.println("-----------test demo-----------" );
         MarkDown2HtmlWrapper mhw = new MarkDown2HtmlWrapper();
         InputStream is = null;
         try {

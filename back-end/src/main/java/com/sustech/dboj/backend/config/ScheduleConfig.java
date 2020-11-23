@@ -1,8 +1,11 @@
 package com.sustech.dboj.backend.config;
 
 
+import com.sustech.dboj.backend.controller.UserController;
 import com.sustech.dboj.backend.domain.Contest;
 import com.sustech.dboj.backend.repository.ContestRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -13,7 +16,7 @@ import java.util.List;
 
 @Component
 public class ScheduleConfig {
-
+    private static final Logger logger = LoggerFactory.getLogger( ScheduleConfig.class );
     @Autowired
     private ContestRepository contestRepository;
 
@@ -26,11 +29,11 @@ public class ScheduleConfig {
             if ( contest.getEndTime( ).compareTo( now ) < 0 ) {
                 contest.setEnable( false );
                 contestRepository.save( contest );
-                System.out.printf( "Contest:%d Expired" , contest.getId( ) );
-            }else if(contest.getBeginTime( ).compareTo( now ) < 0){
+                logger.info( "Contest:{} Expired" , contest.getId( ) );
+            } else if ( contest.getBeginTime( ).compareTo( now ) < 0 ) {
                 contest.setEnable( true );
                 contestRepository.save( contest );
-                System.out.printf( "Contest:%d Enabled" , contest.getId( ) );
+                logger.info( "Contest:{} Enabled" , contest.getId( ) );
             }
         }
     }
