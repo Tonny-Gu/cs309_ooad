@@ -24,12 +24,12 @@ public class MqttConfig {
 
     private static final String username = "username";
     private static final String password = "password";
-    private static final String[] serverURIs = new String[]{"tcp://ip:port"};
+    private static final String[] serverURIs = new String[]{"tcp://broker.hivemq.com:1883"};
     private static final String CLINT_ID = "id";
     private static final int keepAliveInterval = 30;
     private static final int connectionTimeout = 30;
 
-    private static final int defaultProducerQos = 1;
+    private static final int defaultProducerQos = 2;
     private static final boolean defaultRetained = true;
     private static final String defaultTopic = "defaultTopicName";
 

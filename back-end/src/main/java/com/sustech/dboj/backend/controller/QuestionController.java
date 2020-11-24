@@ -1,8 +1,11 @@
 package com.sustech.dboj.backend.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sustech.dboj.backend.domain.Contest;
 import com.sustech.dboj.backend.domain.Question;
 import com.sustech.dboj.backend.domain.User;
+import com.sustech.dboj.backend.mqtt.MqttSender;
 import com.sustech.dboj.backend.repository.ContestRepository;
 import com.sustech.dboj.backend.repository.QuestionRepository;
 import com.sustech.dboj.backend.repository.UserRepository;
@@ -33,10 +36,14 @@ public class QuestionController {
     @Autowired
     private UserRepository userRepository;
 
-
     @Autowired
     private ContestRepository contestRepository;
 
+    @Autowired
+    private MqttSender mqttSender;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @GetMapping("/question/id")
     public Question getQuestionById( Integer id ) {
@@ -92,7 +99,7 @@ public class QuestionController {
 
     @Transactional
     @PostMapping("/admin/question/upload")
-    public String uploadQuestion( MultipartFile questionFile , Integer author , String degree , String dbType ) {
+    public String uploadQuestion( MultipartFile questionFile , Integer author , String degree , String dbType ) throws JsonProcessingException {
         Question question = new Question( );
         if ( questionFile.isEmpty( ) ) {
             return "error: question file is empty";
@@ -123,6 +130,11 @@ public class QuestionController {
             question.setDbType( dbType );
             question.setAuthor( au );
             questionRepository.save( question );
+            question.setContent( null );
+            question.setDegree( null );
+            question.setContent( null );
+            question.setAuthor( null );
+            mqttSender.sendToMqtt("topic/submit",mapper.writeValueAsString( question ));
             return "success: " + question.getId();
         }
 

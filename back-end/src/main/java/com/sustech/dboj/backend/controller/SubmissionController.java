@@ -1,7 +1,9 @@
 package com.sustech.dboj.backend.controller;
 
 import com.sustech.dboj.backend.domain.*;
+import com.sustech.dboj.backend.mqtt.MqttSender;
 import com.sustech.dboj.backend.repository.*;
+import jdk.internal.loader.AbstractClassLoaderValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +25,9 @@ public class SubmissionController {
     @Autowired
     private ContestRepository contestRepository;
 
+    @Autowired
+    private MqttSender mqttSender;
+
     @PostMapping("/user/submit")
     public String submitCode( Integer user_id , Integer question_id , Integer contest_id , String code , String language ) {
         //put into DB
@@ -38,13 +43,13 @@ public class SubmissionController {
         Base64.getEncoder( ).encodeToString( code.getBytes( ) );
         SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
         String submit_time = ft.format( new Date( ) );
-
+        User student = userRepository.findById( user_id ).orElse( null );
+        if ( student == null )return "err: student not found";
         submissionRepository.submitToDB( code , info , language , submit_time , contest_id , question_id , user_id );
-
+        Submission submission = submissionRepository.findByStudentAndSubmitTime( student, submit_time );
         //push to MQTT
-
-
-        return null;
+        mqttSender.sendToMqtt("topic/submit", submission.toString());
+        return "submit success";
     }
 
     @PostMapping("/user/submission/rank")
