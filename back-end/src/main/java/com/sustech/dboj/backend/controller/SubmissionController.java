@@ -36,7 +36,7 @@ public class SubmissionController {
 //        if ( contest == null )return "err: contest Not Found";
         String info = "Submit";
         Base64.getEncoder( ).encodeToString( code.getBytes( ) );
-        SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd hh:mm:ss" );
+        SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
         String submit_time = ft.format( new Date( ) );
 
         submissionRepository.submitToDB( code , info , language , submit_time , contest_id , question_id , user_id );

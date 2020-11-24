@@ -65,7 +65,7 @@ public class NewsController {
                 return "error:" + e.getMessage( );
             }
             notice.setTopic( file.getOriginalFilename( ).split( "\\." )[0] );
-            SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd hh:mm:ss" );
+            SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
             notice.setTime( ft.format( new Date( ) ) );
             notice.setEnable( true );
             notice.setAuthor( au );

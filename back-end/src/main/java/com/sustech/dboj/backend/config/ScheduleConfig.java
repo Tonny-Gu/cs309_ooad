@@ -22,7 +22,7 @@ public class ScheduleConfig {
 
     @Scheduled(cron = "1 0 0 * * ?")// cancel
     public void cancelContest() {
-        SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd hh:mm:ss" );
+        SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
         String now = ft.format( new Date( ) );
         List<Contest> contestList = contestRepository.findAll( );
         for (Contest contest : contestList) {

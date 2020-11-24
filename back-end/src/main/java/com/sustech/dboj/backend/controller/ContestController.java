@@ -52,13 +52,13 @@ public class ContestController {
         contest.setBeginTime( beginTime );
         contest.setEndTime( endTime );
         contest.setName( name );
-        SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd hh:mm:ss" );
+        SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
         String now = ft.format( new Date( ) );
-        logger.info( "now:{} ,contest.getBeginTime( ).compareTo( now )={}" , now , contest.getBeginTime( ).compareTo( now ) );
         if ( contest.getBeginTime( ).compareTo( now ) < 0 && contest.getEndTime( ).compareTo( now ) > 0 ) {
             contest.setEnable( true );
             logger.info( "Contest:{} is enable" , contest.getName( ) );
         } else {
+            contest.setEnable( false );
             logger.info( "Contest:{} is disable" , contest.getName( ) );
         }
         contestRepository.save( contest );

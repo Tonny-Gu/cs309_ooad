@@ -25,7 +25,7 @@ public class MqttConfig {
     private static final String username = "username";
     private static final String password = "password";
     private static final String[] serverURIs = new String[]{"tcp://ip:port"};
-    private static final String clientId = "id";
+    private static final String CLINT_ID = "id";
     private static final int keepAliveInterval = 30;
     private static final int connectionTimeout = 30;
 
@@ -68,7 +68,7 @@ public class MqttConfig {
 //    @Bean
 //    @ServiceActivator(inputChannel = OUTBOUND_CHANNEL)
     public MessageHandler getMqttProducer() {
-        MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler( clientId + "_producer" , getMqttClientFactory( ) );
+        MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler( CLINT_ID + "_producer" , getMqttClientFactory( ) );
         messageHandler.setAsync( true );
         messageHandler.setDefaultTopic( defaultTopic );
         messageHandler.setDefaultRetained( defaultRetained );
@@ -87,7 +87,7 @@ public class MqttConfig {
 //    @Bean
     public MessageProducer getMqttConsumer() {
         MqttPahoMessageDrivenChannelAdapter adapter =
-                new MqttPahoMessageDrivenChannelAdapter( clientId + "_consumer" , getMqttClientFactory( ) , consumerTopics );
+                new MqttPahoMessageDrivenChannelAdapter( CLINT_ID + "_consumer" , getMqttClientFactory( ) , consumerTopics );
         adapter.setCompletionTimeout( completionTimeout );
         adapter.setConverter( new DefaultPahoMessageConverter( ) );
         adapter.setQos( defaultConsumerQos );
