@@ -1,8 +1,11 @@
 package com.sustech.dboj.backend.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sustech.dboj.backend.domain.Question;
 import com.sustech.dboj.backend.domain.TestCase;
 import com.sustech.dboj.backend.domain.User;
+import com.sustech.dboj.backend.mqtt.MqttSender;
 import com.sustech.dboj.backend.repository.QuestionRepository;
 import com.sustech.dboj.backend.util.IOUtil;
 import com.sustech.dboj.backend.util.MarkDown2HtmlWrapper;
@@ -20,10 +23,14 @@ public class TestCaseController {
     private static final String ansPathName = "ans/";//path of standard code '.sql'
     @Autowired
     private QuestionRepository questionRepository;
+    @Autowired
+    private MqttSender mqttSender;
+    @Autowired
+    private ObjectMapper mapper;
 
     @PostMapping("/admin/testcase/upload")
     public String uploadQuestion( MultipartFile initFile , MultipartFile ansFile ,
-                                  MultipartFile extenFile , Integer questionId ) {
+                                  MultipartFile extenFile , Integer questionId ) throws JsonProcessingException {
         if ( initFile.isEmpty( ) ) {
             return "error: init file is empty";
         } else if ( ansFile.isEmpty( ) ) {
@@ -42,12 +49,12 @@ public class TestCaseController {
             IOUtil.fileStore( initFile, envPathName + questionId + ".sql" );
             IOUtil.fileStore( ansFile, ansPathName + questionId + ".sql" );
             testCase.setAnswerCode( Base64.getEncoder( ).encodeToString(ansFile.getBytes()) );
+            testCase.setInitDB( Base64.getEncoder( ).encodeToString(initFile.getBytes()) );
         } catch (IOException e) {
             e.printStackTrace( );
             return "error: " + e.getMessage( );
         }
         testCase.setQuestion( question );
-        testCase.setInitDB( envPathName + questionId + ".sql" );
         if ( !extenFile.isEmpty( ) ) {
             try {
                 testCase.setExtension( Base64.getEncoder( ).encodeToString(extenFile.getBytes()) );
@@ -56,6 +63,8 @@ public class TestCaseController {
                 return "error: " + e.getMessage( );
             }
         }
+        mqttSender.sendToMqtt("topic/initEnv",mapper.writeValueAsString( testCase ));
+        testCase.setInitDB( envPathName + questionId + ".sql" );
         return "success: " + testCase.getId();
      }
 }

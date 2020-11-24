@@ -39,11 +39,8 @@ public class QuestionController {
     @Autowired
     private ContestRepository contestRepository;
 
-    @Autowired
-    private MqttSender mqttSender;
 
-    @Autowired
-    private ObjectMapper mapper;
+
 
     @GetMapping("/question/id")
     public Question getQuestionById( Integer id ) {
@@ -130,11 +127,7 @@ public class QuestionController {
             question.setDbType( dbType );
             question.setAuthor( au );
             questionRepository.save( question );
-            question.setContent( null );
-            question.setDegree( null );
-            question.setContent( null );
-            question.setAuthor( null );
-            mqttSender.sendToMqtt("topic/submit",mapper.writeValueAsString( question ));
+
             return "success: " + question.getId();
         }
 

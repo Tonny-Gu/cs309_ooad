@@ -71,6 +71,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and( )
                 .logout( )
                 .logoutUrl( "/logout" )
+                .deleteCookies("JSESSIONID")
                 .logoutSuccessHandler( ( req , resp , authentication ) -> {
                     resp.setContentType( "application/json;charset=utf-8" );
                     PrintWriter out = resp.getWriter( );
