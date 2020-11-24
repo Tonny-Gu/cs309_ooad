@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
-@Component
+//@Component
 public class MqttConsumer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MqttConsumer.class);
 
-    @Bean
-    @ServiceActivator(inputChannel = MqttConfig.INBOUND_CHANNEL)
+//    @Bean
+//    @ServiceActivator(inputChannel = MqttConfig.INBOUND_CHANNEL)
     public MessageHandler handler() {
         return message -> {
             String topic = Objects.requireNonNull( message.getHeaders( ).get( MqttConfig.RECEIVED_TOPIC_KEY ) ).toString();

@@ -51,7 +51,7 @@ public class FileTypeInterceptor extends HandlerInterceptorAdapter {
     private boolean checkFile(String fileName) {
         String suffixList = "md,sql,txt";
         String suffix = fileName.substring(fileName.lastIndexOf(".")
-                + 1, fileName.length());
+                + 1 );
         return suffixList.contains( suffix.trim( ).toLowerCase( ) );
     }
 }

@@ -38,7 +38,7 @@ public class MqttConfig {
     private static final String[] consumerTopics = new String[]{"topic1" , "topic2"};
 
     /* 客户端 */
-    @Bean
+//    @Bean
     public MqttConnectOptions getMqttConnectOptions() {
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions( );
         mqttConnectOptions.setUserName( username );
@@ -50,7 +50,7 @@ public class MqttConfig {
         return mqttConnectOptions;
     }
 
-    @Bean
+//    @Bean
     public MqttPahoClientFactory getMqttClientFactory() {
         DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory( );
         factory.setConnectionOptions( getMqttConnectOptions( ) );
@@ -60,13 +60,13 @@ public class MqttConfig {
 
     /* 发布者 */
 
-    @Bean
+//    @Bean
     public MessageChannel outboundChannel() {
         return new DirectChannel( );
     }
 
-    @Bean
-    @ServiceActivator(inputChannel = OUTBOUND_CHANNEL)
+//    @Bean
+//    @ServiceActivator(inputChannel = OUTBOUND_CHANNEL)
     public MessageHandler getMqttProducer() {
         MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler( clientId + "_producer" , getMqttClientFactory( ) );
         messageHandler.setAsync( true );
@@ -79,12 +79,12 @@ public class MqttConfig {
 
     /* 订阅者 */
 
-    @Bean
+//    @Bean
     public MessageChannel inboundChannel() {
         return new DirectChannel( );
     }
 
-    @Bean
+//    @Bean
     public MessageProducer getMqttConsumer() {
         MqttPahoMessageDrivenChannelAdapter adapter =
                 new MqttPahoMessageDrivenChannelAdapter( clientId + "_consumer" , getMqttClientFactory( ) , consumerTopics );

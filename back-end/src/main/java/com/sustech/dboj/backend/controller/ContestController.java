@@ -12,13 +12,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 @RestController
 public class ContestController {
-    private static final Logger log = LoggerFactory.getLogger( UserController.class );
+    private static final Logger logger = LoggerFactory.getLogger( UserController.class );
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -37,45 +38,50 @@ public class ContestController {
 
     @GetMapping("/contest")
     public List<Contest> getAllContests() {
-        return contestRepository.findAll();
+        return contestRepository.findAll( );
     }
 
     @GetMapping("/contest/id")
-    public Contest getContestsById(Integer id) {
+    public Contest getContestsById( Integer id ) {
         return contestRepository.findById( id ).orElse( null );
     }
 
     @PostMapping("/admin/contest/create")
-    public Contest createContest(String name, String beginTime, String endTime){
-        Contest contest = new Contest();
+    public Contest createContest( String name , String beginTime , String endTime ) {
+        Contest contest = new Contest( );
         contest.setBeginTime( beginTime );
         contest.setEndTime( endTime );
         contest.setName( name );
         SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd hh:mm:ss" );
         String now = ft.format( new Date( ) );
-        if(contest.getBeginTime( ).compareTo( now ) < 0){
+        logger.info( "now:{} ,contest.getBeginTime( ).compareTo( now )={}" , now , contest.getBeginTime( ).compareTo( now ) );
+        if ( contest.getBeginTime( ).compareTo( now ) < 0 && contest.getEndTime( ).compareTo( now ) > 0 ) {
             contest.setEnable( true );
+            logger.info( "Contest:{} is enable" , contest.getName( ) );
+        } else {
+            logger.info( "Contest:{} is disable" , contest.getName( ) );
         }
         contestRepository.save( contest );
         return contest;
     }
+
+    @Transactional
     @PostMapping("/admin/contest/addquestion")
-    public String addQuestion( Integer contest_id, Integer question_id){
+    public String addQuestion( Integer contest_id , Integer question_id ) {
         // add contest-user
         Question question = questionRepository.findById( question_id ).orElse( null );
         Contest myContest = contestRepository.findById( contest_id ).orElse( null );
-        if ( question == null ) return String.format( "question:%s not found" , question_id);
-        if ( myContest == null ) return String.format( "contest:%s not found" , contest_id);
-        int statusCode = questionRepository.addQuestion( contest_id , question_id );
-        System.out.println( "statusCode=" + statusCode );
-        log.info( "Question: {} was added into Contest: {}",question.getName(),myContest.getName() );
-        return "Join contest successfully";
+        if ( question == null ) return String.format( "question:%s not found" , question_id );
+        if ( myContest == null ) return String.format( "contest:%s not found" , contest_id );
+        questionRepository.addQuestion( contest_id , question_id );
+        logger.info( "Question: {} was added into Contest: {}" , question.getName( ) , myContest.getName( ) );
+        return "question add successfully";
     }
 
     @PostMapping("/admin/contest/modify")
-    public Contest modifyContest(Contest contest) {
+    public Contest modifyContest( Contest contest ) {
         contestRepository.save( contest );
-        return contestRepository.findById( contest.getId() ).orElse( null );
+        return contestRepository.findById( contest.getId( ) ).orElse( null );
     }
 
 }

@@ -86,8 +86,7 @@ public class UserController {
         Contest myContest = contestRepository.findById( contest_id ).orElse( null );
         if ( myUser == null ) return "User not found";
         if ( myContest == null ) return "Contest not found";
-        int statusCode = userRepository.joinContest( user_id , contest_id );
-        System.out.println( "statusCode=" + statusCode );
+        userRepository.joinContest( user_id , contest_id );
         log.info( "User: {} join Contest: {}",myUser.getUsername(),myContest.getName() );
         // create score table
         for (Question question : myContest.getQuestions()){

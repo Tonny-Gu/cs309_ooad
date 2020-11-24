@@ -45,10 +45,10 @@ public class QuestionController {
     }
 
 
-    @GetMapping("/question/")
-    public List<Question> getAllQuestion(Boolean withContest) {
+    @GetMapping("/question")
+    public List<Question> getAllQuestion(Boolean withContent) {
         List<Question> questionList = questionRepository.findAll( );
-        if(!withContest){
+        if(!withContent){
             for (Question q : questionList){
                 q.setContent( "" );
             }
@@ -126,6 +126,11 @@ public class QuestionController {
             return "success: " + question.getId();
         }
 
+    }
+    @PostMapping("/admin/question/modify")
+    public String modifyQuestion( Question question ){
+        questionRepository.save( question );
+        return "Success";
     }
 
 }
