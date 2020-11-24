@@ -42,18 +42,4 @@ spring:
   servlet:
     multipart:
       max-file-size: 2000000
-  mqtt:
-    username: username
-    password: password
-    serverURIs: tcp://ip:port
-    clientId: client0001
-    keepAliveInterval: 30
-    connectionTimeout: 30
-    producer:
-      defaultQos: 1
-      defaultRetained: true
-      defaultTopic: defaultTopicName
-    consumer:
-      defaultQos: 1
-      completionTimeout: 30000
-      consumerTopics: topic1,topic2 # 监听的 topic，多个使用逗号隔开
+

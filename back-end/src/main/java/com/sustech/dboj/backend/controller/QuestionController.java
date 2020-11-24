@@ -44,10 +44,18 @@ public class QuestionController {
         return questionQuery.orElse( null );
     }
 
-    @GetMapping("/question")
-    public List<Question> getAllQuestion() {
-        return questionRepository.findAll( );
+
+    @GetMapping("/question/")
+    public List<Question> getAllQuestion(Boolean withContest) {
+        List<Question> questionList = questionRepository.findAll( );
+        if(!withContest){
+            for (Question q : questionList){
+                q.setContent( "" );
+            }
+        }
+        return questionList;
     }
+
 
     @GetMapping("/question/contest")
     public List<Question> getQuestionByContest(Integer contest_id)

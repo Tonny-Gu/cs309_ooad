@@ -1,7 +1,6 @@
 package com.sustech.dboj.backend.config;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -23,50 +22,38 @@ public class MqttConfig {
 
     public static final String RECEIVED_TOPIC_KEY = "mqtt_receivedTopic";
 
-    @Value("${spring.mqtt.client.username}")
-    private String username;
-    @Value("${spring.mqtt.client.password}")
-    private String password;
-    @Value("${spring.mqtt.client.serverURIs}")
-    private String[] serverURIs;
-    @Value("${spring.mqtt.client.clientId}")
-    private String clientId;
-    @Value("${spring.mqtt.client.keepAliveInterval}")
-    private int keepAliveInterval;
-    @Value("${spring.mqtt.client.connectionTimeout}")
-    private int connectionTimeout;
+    private static final String username = "username";
+    private static final String password = "password";
+    private static final String[] serverURIs = new String[]{"tcp://ip:port"};
+    private static final String clientId = "id";
+    private static final int keepAliveInterval = 30;
+    private static final int connectionTimeout = 30;
 
-    @Value("${spring.mqtt.producer.defaultQos}")
-    private int defaultProducerQos;
-    @Value("${spring.mqtt.producer.defaultRetained}")
-    private boolean defaultRetained;
-    @Value("${spring.mqtt.producer.defaultTopic}")
-    private String defaultTopic;
+    private static final int defaultProducerQos = 1;
+    private static final boolean defaultRetained = true;
+    private static final String defaultTopic = "defaultTopicName";
 
-    @Value("${spring.mqtt.consumer.defaultQos}")
-    private int defaultConsumerQos;
-    @Value("${spring.mqtt.consumer.completionTimeout}")
-    private long completionTimeout;
-    @Value("${spring.mqtt.consumer.consumerTopics}")
-    private String[] consumerTopics;
+    private static final int defaultConsumerQos = 1;
+    private static final long completionTimeout = 30000;
+    private static final String[] consumerTopics = new String[]{"topic1" , "topic2"};
 
     /* 客户端 */
     @Bean
     public MqttConnectOptions getMqttConnectOptions() {
-        MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
-        mqttConnectOptions.setUserName(username);
-        mqttConnectOptions.setPassword(password.toCharArray());
-        mqttConnectOptions.setServerURIs(serverURIs);
-        mqttConnectOptions.setKeepAliveInterval(keepAliveInterval);
-        mqttConnectOptions.setConnectionTimeout(connectionTimeout);
+        MqttConnectOptions mqttConnectOptions = new MqttConnectOptions( );
+        mqttConnectOptions.setUserName( username );
+        mqttConnectOptions.setPassword( password.toCharArray( ) );
+        mqttConnectOptions.setServerURIs( serverURIs );
+        mqttConnectOptions.setKeepAliveInterval( keepAliveInterval );
+        mqttConnectOptions.setConnectionTimeout( connectionTimeout );
 
         return mqttConnectOptions;
     }
 
     @Bean
     public MqttPahoClientFactory getMqttClientFactory() {
-        DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
-        factory.setConnectionOptions(getMqttConnectOptions());
+        DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory( );
+        factory.setConnectionOptions( getMqttConnectOptions( ) );
 
         return factory;
     }
@@ -75,17 +62,17 @@ public class MqttConfig {
 
     @Bean
     public MessageChannel outboundChannel() {
-        return new DirectChannel();
+        return new DirectChannel( );
     }
 
     @Bean
     @ServiceActivator(inputChannel = OUTBOUND_CHANNEL)
     public MessageHandler getMqttProducer() {
-        MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(clientId + "_producer", getMqttClientFactory());
-        messageHandler.setAsync(true);
-        messageHandler.setDefaultTopic(defaultTopic);
-        messageHandler.setDefaultRetained(defaultRetained);
-        messageHandler.setDefaultQos(defaultProducerQos);
+        MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler( clientId + "_producer" , getMqttClientFactory( ) );
+        messageHandler.setAsync( true );
+        messageHandler.setDefaultTopic( defaultTopic );
+        messageHandler.setDefaultRetained( defaultRetained );
+        messageHandler.setDefaultQos( defaultProducerQos );
 
         return messageHandler;
     }
@@ -94,17 +81,17 @@ public class MqttConfig {
 
     @Bean
     public MessageChannel inboundChannel() {
-        return new DirectChannel();
+        return new DirectChannel( );
     }
 
     @Bean
     public MessageProducer getMqttConsumer() {
         MqttPahoMessageDrivenChannelAdapter adapter =
-                new MqttPahoMessageDrivenChannelAdapter(clientId + "_consumer", getMqttClientFactory(), consumerTopics);
-        adapter.setCompletionTimeout(completionTimeout);
-        adapter.setConverter(new DefaultPahoMessageConverter());
-        adapter.setQos(defaultConsumerQos);
-        adapter.setOutputChannel(inboundChannel());
+                new MqttPahoMessageDrivenChannelAdapter( clientId + "_consumer" , getMqttClientFactory( ) , consumerTopics );
+        adapter.setCompletionTimeout( completionTimeout );
+        adapter.setConverter( new DefaultPahoMessageConverter( ) );
+        adapter.setQos( defaultConsumerQos );
+        adapter.setOutputChannel( inboundChannel( ) );
 
         return adapter;
     }
