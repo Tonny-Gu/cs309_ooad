@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 public class MqttTest {
     @Test
     void testSender() throws MqttException {
-        String broker = "tcp://broker.mqttdashboard.com:8000" ;
-        String topic =  "test/qwqwrqrqwfqfqwsd";
+        String broker = "tcp://192.168.122.10:1883" ;
+        String topic =  "test";
         int qos  = 2;
         String message = "gtz nb!";
         MqttUtil.sender( broker, topic, qos, message );

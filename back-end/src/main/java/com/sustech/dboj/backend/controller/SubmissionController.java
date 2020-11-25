@@ -1,7 +1,11 @@
 package com.sustech.dboj.backend.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sustech.dboj.backend.domain.*;
 import com.sustech.dboj.backend.repository.*;
+import com.sustech.dboj.backend.util.JsonFormat;
+import com.sustech.dboj.backend.util.MqttUtil;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +27,8 @@ public class SubmissionController {
     private QuestionRepository questionRepository;
     @Autowired
     private ContestRepository contestRepository;
+    @Autowired
+    private TestCaseRepository testCaseRepository;
 
 
     @Transactional
@@ -46,8 +52,17 @@ public class SubmissionController {
         submissionRepository.submitToDB( code , info , language , submit_time , contest_id , question_id , user_id );
         Submission submission = submissionRepository.findByStudentAndSubmitTime( student , submit_time );
         //push to MQTT
-//        mqttSender.sendToMqtt( "topic/submit" ,"");
-        return "submit success";
+        List<TestCase> testCases = testCaseRepository.findByQuestion( submission.getQuestion() );
+        String broker = "tcp://192.168.122.10:1883" ;
+        String topic =  "submit/to_judge";
+        int qos  = 2;
+        try {
+            String messageJson = JsonFormat.submitFormat( submission, testCases );
+            MqttUtil.sender( broker,topic,qos, messageJson );
+        } catch (JsonProcessingException | MqttException e) {
+            e.printStackTrace( );
+        }
+        return "submit success: " + submission.getId();
     }
 
     @PostMapping("/admin/submission/rank")

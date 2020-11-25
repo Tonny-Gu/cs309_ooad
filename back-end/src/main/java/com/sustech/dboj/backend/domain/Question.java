@@ -22,6 +22,11 @@ public class Question {
     private String content;
     @Column(nullable = false)
     private String degree;// Hard/Mid/Easy
+    @Column(nullable = false, columnDefinition = "text")
+    private String answerCode; // standard ans
+
+    @Column
+    private String extension;// Judge rules
 
     @Column(nullable = false)
     private String dbType; // SQLite/MySQL/PostgreSQL
@@ -81,6 +86,24 @@ public class Question {
         this.degree = degree;
     }
 
+
+    public String getAnswerCode() {
+        return answerCode;
+    }
+
+    public void setAnswerCode( String answerCode ) {
+        this.answerCode = answerCode;
+    }
+
+
+    public String getExtension() {
+        return extension;
+    }
+
+    public void setExtension( String extension ) {
+        this.extension = extension;
+    }
+
     public String getDbType() {
         return dbType;
     }
@@ -98,8 +121,9 @@ public class Question {
                 ", author=" + author +
                 ", content='" + content + '\'' +
                 ", degree='" + degree + '\'' +
+                ", answerCode='" + answerCode + '\'' +
+                ", extension='" + extension + '\'' +
                 ", dbType='" + dbType + '\'' +
                 '}';
     }
-
 }

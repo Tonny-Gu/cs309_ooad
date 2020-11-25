@@ -15,14 +15,9 @@ public class TestCase {
     @Column
     private String env; // docker id
 
-    @Column(nullable = false, columnDefinition = "text")
-    private String answerCode; // standard ans
-
     @Column(nullable = false)
     private String initDB;
 
-    @Column
-    private String extension;// Judge rules
 
     public TestCase() {
     }
@@ -51,22 +46,6 @@ public class TestCase {
         this.env = env;
     }
 
-    public String getAnswerCode() {
-        return answerCode;
-    }
-
-    public void setAnswerCode( String answerCode ) {
-        this.answerCode = answerCode;
-    }
-
-    public String getExtension() {
-        return extension;
-    }
-
-    public void setExtension( String extension ) {
-        this.extension = extension;
-    }
-
     public String getInitDB() {
         return initDB;
     }
@@ -81,9 +60,7 @@ public class TestCase {
                 "Id=" + Id +
                 ", question=" + question +
                 ", env='" + env + '\'' +
-                ", answerCode='" + answerCode + '\'' +
                 ", initDB='" + initDB + '\'' +
-                ", extension='" + extension + '\'' +
                 '}';
     }
 }

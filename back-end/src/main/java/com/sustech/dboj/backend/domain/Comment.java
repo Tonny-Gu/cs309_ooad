@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import javax.persistence.*;
 
 @Entity
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
