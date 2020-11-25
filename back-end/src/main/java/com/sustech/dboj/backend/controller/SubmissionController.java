@@ -3,12 +3,12 @@ package com.sustech.dboj.backend.controller;
 import com.sustech.dboj.backend.domain.*;
 import com.sustech.dboj.backend.mqtt.MqttSender;
 import com.sustech.dboj.backend.repository.*;
-import jdk.internal.loader.AbstractClassLoaderValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
@@ -28,6 +28,7 @@ public class SubmissionController {
     @Autowired
     private MqttSender mqttSender;
 
+    @Transactional
     @PostMapping("/user/submit")
     public String submitCode( Integer user_id , Integer question_id , Integer contest_id , String code , String language ) {
         //put into DB
@@ -44,17 +45,27 @@ public class SubmissionController {
         SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
         String submit_time = ft.format( new Date( ) );
         User student = userRepository.findById( user_id ).orElse( null );
-        if ( student == null )return "err: student not found";
+        if ( student == null ) return "err: student not found";
         submissionRepository.submitToDB( code , info , language , submit_time , contest_id , question_id , user_id );
-        Submission submission = submissionRepository.findByStudentAndSubmitTime( student, submit_time );
+        Submission submission = submissionRepository.findByStudentAndSubmitTime( student , submit_time );
         //push to MQTT
-        mqttSender.sendToMqtt("topic/submit", submission.toString());
+//        mqttSender.sendToMqtt( "topic/submit" ,"");
         return "submit success";
     }
 
-    @PostMapping("/user/submission/rank")
+    @PostMapping("/admin/submission/rank")
     public List<Submission> getRank( Integer contest_id , Integer question_id ) {
         return submissionRepository.getSubmissionRank( contest_id , question_id );
+    }
+
+    @PostMapping("/admin/submission/contest")
+    public List<Submission> getSubmissionByContest( Integer contest_id ) {
+        return submissionRepository.getLogByContest( contest_id );
+    }
+
+    @PostMapping("/admin/submission/question")
+    public List<Submission> getSubmissionByQuestion( Integer question_id ) {
+        return submissionRepository.getLogByQuestion( question_id );
     }
 
     @GetMapping("admin/submission/all")
@@ -62,10 +73,12 @@ public class SubmissionController {
         return submissionRepository.findAll( );
     }
 
-    @GetMapping("admin/submission/range")
-    public List<Submission> getAllSubmission( Integer begin , Integer length ) {
+    @GetMapping("admin/submission/all/range")
+    public List<Submission> getSomeSubmission( Integer begin , Integer length ) {
         return submissionRepository.getSubmissionLimit( begin , length );
     }
+
+
 
 
 }

@@ -51,7 +51,7 @@ public class UserController {
         newUser.setPassword( encoder.encode( password ) );
         newUser.setNickname( name );
         userRepository.save( newUser );
-        log.info( "User: {}, name: {} have been created",newUser.getUsername(), newUser.getName() );
+        log.info( "User: {}, name: {} have been created" , newUser.getUsername( ) , newUser.getName( ) );
         return "Create user successful";
     }
 
@@ -66,16 +66,24 @@ public class UserController {
     public List<Submission> getSubmissionsByUser( Integer id ) {
         User user = userRepository.findById( id ).orElse( null );
         if ( user == null ) return null;
-        return submissionRepository.getLog( id );
+        return submissionRepository.getLogByStu( id );
     }
 
     @PostMapping("/user/get/submission")
-    public List<Submission> getSubmissions( Integer id , Integer question_id ) {
-        User user = userRepository.findById( id ).orElse( null );
-        if ( user == null ) return null;
-        Question question = questionRepository.findById( id ).orElse( null );
-        if ( question == null ) return null;
-        return submissionRepository.getLog( id , question_id );
+    public List<Submission> getSubmissions( Integer id , Integer contest_id , Integer question_id, Boolean recent ) {
+//        User user = userRepository.findById( id ).orElse( null );
+//        if ( user == null ) return null;
+//        Question question = questionRepository.findById( id ).orElse( null );
+//        if ( question == null ) return null;
+//        Contest contest = contestRepository.findById( contest_id ).orElse( null );
+//        if ( contest == null ) return null;
+        List<Submission> submissionList = submissionRepository.getLog( id , question_id, contest_id );
+        if(recent){
+            while (submissionList.size() > 1){
+                submissionList.remove( submissionList.size() - 1 );
+            }
+        }
+        return submissionList;
     }
 
     @Transactional
@@ -87,10 +95,10 @@ public class UserController {
         if ( myUser == null ) return "User not found";
         if ( myContest == null ) return "Contest not found";
         userRepository.joinContest( user_id , contest_id );
-        log.info( "User: {} join Contest: {}",myUser.getUsername(),myContest.getName() );
+        log.info( "User: {} join Contest: {}" , myUser.getUsername( ) , myContest.getName( ) );
         // create score table
-        for (Question question : myContest.getQuestions()){
-            Score score = new Score();
+        for (Question question : myContest.getQuestions( )) {
+            Score score = new Score( );
             score.setContest( myContest );
             score.setQuestion( question );
             score.setStudent( myUser );
