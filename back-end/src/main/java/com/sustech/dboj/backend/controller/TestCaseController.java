@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Base64;
-import java.util.List;
 
 @RestController
 public class TestCaseController {
@@ -52,7 +51,7 @@ public class TestCaseController {
         testCase.setQuestion( question );
         //push to MQTT
         String broker = "tcp://192.168.122.10:1883" ;
-        String topic =  "init/to_judge";
+        String topic =  "env/send";
         int qos  = 2;
         try {
             String messageJson = JsonFormat.initFormat( testCase );

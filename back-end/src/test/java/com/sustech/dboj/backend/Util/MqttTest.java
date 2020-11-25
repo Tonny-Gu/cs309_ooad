@@ -4,6 +4,7 @@ import com.sustech.dboj.backend.util.MqttUtil;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.junit.jupiter.api.Test;
 
+// mosquitto_pub -t "topic" -m "message" -h "host"
 public class MqttTest {
     @Test
     void testSender() throws MqttException {

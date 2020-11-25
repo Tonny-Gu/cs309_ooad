@@ -53,8 +53,8 @@ public class SubmissionController {
         Submission submission = submissionRepository.findByStudentAndSubmitTime( student , submit_time );
         //push to MQTT
         List<TestCase> testCases = testCaseRepository.findByQuestion( submission.getQuestion() );
-        String broker = "tcp://192.168.122.10:1883" ;
-        String topic =  "submit/to_judge";
+        String broker = "tcp://192.168.122.10:1883";
+        String topic =  "code/send";
         int qos  = 2;
         try {
             String messageJson = JsonFormat.submitFormat( submission, testCases );

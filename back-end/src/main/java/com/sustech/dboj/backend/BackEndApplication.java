@@ -15,22 +15,6 @@ public class BackEndApplication {
     //nohup java -jar back-end-0.0.1-SNAPSHOT.jar >backend.log 2>&1 &
     public static void main( String[] args ) {
         SpringApplication.run( BackEndApplication.class , args );
-        new Thread( () -> {
-            try {
-                MqttUtil.initListener();
-            } catch (MqttException e) {
-                e.printStackTrace( );
-            }
-        }).start();
-        new Thread( () -> {
-            try {
-                MqttUtil.submitListener();
-            } catch (MqttException e) {
-                e.printStackTrace( );
-            }
-        }).start();
-
-
     }
 
 }
