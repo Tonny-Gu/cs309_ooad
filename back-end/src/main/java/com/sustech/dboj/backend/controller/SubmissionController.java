@@ -1,7 +1,6 @@
 package com.sustech.dboj.backend.controller;
 
 import com.sustech.dboj.backend.domain.*;
-import com.sustech.dboj.backend.mqtt.MqttSender;
 import com.sustech.dboj.backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,8 +24,6 @@ public class SubmissionController {
     @Autowired
     private ContestRepository contestRepository;
 
-    @Autowired
-    private MqttSender mqttSender;
 
     @Transactional
     @PostMapping("/user/submit")

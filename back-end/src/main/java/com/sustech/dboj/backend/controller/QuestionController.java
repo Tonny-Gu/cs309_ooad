@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sustech.dboj.backend.domain.Contest;
 import com.sustech.dboj.backend.domain.Question;
 import com.sustech.dboj.backend.domain.User;
-import com.sustech.dboj.backend.mqtt.MqttSender;
 import com.sustech.dboj.backend.repository.ContestRepository;
 import com.sustech.dboj.backend.repository.QuestionRepository;
 import com.sustech.dboj.backend.repository.UserRepository;

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sustech.dboj.backend.domain.Question;
 import com.sustech.dboj.backend.domain.TestCase;
 import com.sustech.dboj.backend.domain.User;
-import com.sustech.dboj.backend.mqtt.MqttSender;
 import com.sustech.dboj.backend.repository.QuestionRepository;
 import com.sustech.dboj.backend.util.IOUtil;
 import com.sustech.dboj.backend.util.MarkDown2HtmlWrapper;
@@ -23,8 +22,7 @@ public class TestCaseController {
     private static final String ansPathName = "ans/";//path of standard code '.sql'
     @Autowired
     private QuestionRepository questionRepository;
-    @Autowired
-    private MqttSender mqttSender;
+
     @Autowired
     private ObjectMapper mapper;
 
@@ -63,7 +61,6 @@ public class TestCaseController {
                 return "error: " + e.getMessage( );
             }
         }
-        mqttSender.sendToMqtt("topic/initEnv",mapper.writeValueAsString( testCase ));
         testCase.setInitDB( envPathName + questionId + ".sql" );
         return "success: " + testCase.getId();
      }

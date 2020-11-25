@@ -24,7 +24,9 @@ public class Submission {
     @Column(nullable = false)
     private String submitTime;
     @Column(nullable = false)
-    private String info;//Submit/AC/WA
+    private String info;
+    @Column(nullable = false)
+    private String status;//Submit/AC/WA
 
     public Submission() {
     }
@@ -91,6 +93,14 @@ public class Submission {
 
     public void setLanguage( String language ) {
         this.language = language;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus( String status ) {
+        this.status = status;
     }
 
     @Override

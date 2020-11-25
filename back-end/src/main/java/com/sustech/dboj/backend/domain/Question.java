@@ -24,7 +24,7 @@ public class Question {
     private String degree;// Hard/Mid/Easy
 
     @Column(nullable = false)
-    private String dbType; // SQLite/MySQL/PostgreSQL/ALL
+    private String dbType; // SQLite/MySQL/PostgreSQL
 
     public Question() {
     }
