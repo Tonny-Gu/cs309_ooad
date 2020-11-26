@@ -91,7 +91,7 @@ public class QuestionController {
 
     @Transactional
     @PostMapping("/admin/question/upload")
-    public String uploadQuestion( MultipartFile questionFile , @RequestParam(required = false)MultipartFile extenFile , MultipartFile ansFile , Integer author , String degree , String dbType ) throws JsonProcessingException {
+    public String uploadQuestion( MultipartFile questionFile , MultipartFile ansFile , Integer author , String degree , String dbType ) throws JsonProcessingException {
         Question question = new Question( );
         if ( questionFile.isEmpty( ) ) {
             return "error: question file is empty";
@@ -126,14 +126,14 @@ public class QuestionController {
             question.setDegree( degree );
             question.setDbType( dbType );
             question.setAuthor( au );
-            if ( !extenFile.isEmpty( ) ) {
-                try {
-                    question.setExtension( Base64.getEncoder( ).encodeToString( extenFile.getBytes( ) ) );
-                } catch (IOException e) {
-                    e.printStackTrace( );
-                    return "error: " + e.getMessage( );
-                }
-            }
+//            if ( !extenFile.isEmpty( ) ) {
+//                try {
+//                    question.setExtension( Base64.getEncoder( ).encodeToString( extenFile.getBytes( ) ) );
+//                } catch (IOException e) {
+//                    e.printStackTrace( );
+//                    return "error: " + e.getMessage( );
+//                }
+//            }
             questionRepository.save( question );
 
             return "success: " + question.getId( );

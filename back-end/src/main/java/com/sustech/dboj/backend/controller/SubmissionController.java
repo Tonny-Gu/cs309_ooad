@@ -31,7 +31,6 @@ public class SubmissionController {
     private TestCaseRepository testCaseRepository;
 
 
-    @Transactional
     @PostMapping("/user/submit")
     public String submitCode( Integer user_id , Integer question_id , Integer contest_id , String code , String language ) {
         //put into DB
@@ -43,26 +42,29 @@ public class SubmissionController {
 //        if ( question == null )return "err: Question Not Found";
 //        Contest contest = contestRepository.findById( contest_id ).orElse( null );
 //        if ( contest == null )return "err: contest Not Found";
-        String info = "Submit";
-        Base64.getEncoder( ).encodeToString( code.getBytes( ) );
+        String status = "Submit";
+        code = Base64.getEncoder( ).encodeToString( code.getBytes( ) );
         SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
         String submit_time = ft.format( new Date( ) );
         User student = userRepository.findById( user_id ).orElse( null );
         if ( student == null ) return "err: student not found";
-        submissionRepository.submitToDB( code , info , language , submit_time , contest_id , question_id , user_id );
+        submissionRepository.submitToDB( code , status , language , submit_time , contest_id , question_id , user_id , "" );
         Submission submission = submissionRepository.findByStudentAndSubmitTime( student , submit_time );
+        Question question = questionRepository.findById( question_id ).orElse( null );
+        if ( question==null )return "err: Question Not Found";
         //push to MQTT
-        List<TestCase> testCases = testCaseRepository.findByQuestion( submission.getQuestion() );
+
+        List<TestCase> testCases = testCaseRepository.findByQuestion( question );
         String broker = "tcp://192.168.122.10:1883";
-        String topic =  "code/send";
-        int qos  = 2;
+        String topic = "code/send";
+        int qos = 2;
         try {
-            String messageJson = JsonFormat.submitFormat( submission, testCases );
-            MqttUtil.sender( broker,topic,qos, messageJson );
+            String messageJson = JsonFormat.submitFormat( submission , question , testCases );
+            MqttUtil.sender( broker , topic , qos , messageJson );
         } catch (JsonProcessingException | MqttException e) {
             e.printStackTrace( );
         }
-        return "submit success: " + submission.getId();
+        return submission.getId( ).toString();
     }
 
     @PostMapping("/admin/submission/rank")
@@ -90,7 +92,10 @@ public class SubmissionController {
         return submissionRepository.getSubmissionLimit( begin , length );
     }
 
-
+    @GetMapping("user/submission/byId")
+    public Submission getSomeSubmission( Integer id ) {
+        return submissionRepository.findById( id ).orElse( null );
+    }
 
 
 }

@@ -83,11 +83,11 @@ public class MqttUtil {
             logger.info( "topic: {} msg: {}" , t , msg );
             ObjectNode node = new ObjectMapper( ).readValue( msg.getPayload( ) , ObjectNode.class );
             if ( node.has( "info" ) && node.has( "id" ) ) {
-                String info = node.get( "info" ).toString( );
-                Integer id = node.get( "Id" ).asInt( );
-                submissionRepository.updateInfo( id , info );
+                String info = node.get( "info" ).asText();
+                String status = node.get( "status" ).asText();//will del
+                Integer id = node.get( "id" ).asInt( );
+                submissionRepository.updateInfo( id , info , status);
             }
-
         } );
     }
 }

@@ -23,7 +23,7 @@ public class Submission {
 
     @Column(nullable = false)
     private String submitTime;
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "text")
     private String info;
     @Column(nullable = false)
     private String status;//Submit/AC/WA

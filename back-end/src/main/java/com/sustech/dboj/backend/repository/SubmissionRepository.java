@@ -26,9 +26,10 @@ public interface SubmissionRepository extends JpaRepository<Submission, Integer>
     @Query(value = "select * from submit_log where student_id=?1 and question_id=?2 and contest_id=?3 order by id desc ", nativeQuery = true)
     List<Submission> getLog( Integer student , Integer question, Integer contest );
 
+    @Transactional
     @Modifying
-    @Query(value = "insert into submit_log (code, info, language, submit_time, contest_id, question_id, student_id) values (?1,?2,?3,?4,?5,?6,?7)", nativeQuery = true)
-    void submitToDB( String code , String info , String language , String submitTime , Integer contest , Integer question , Integer student );
+    @Query(value = "insert into submit_log (code, status, language, submit_time, contest_id, question_id, student_id, info) values (?1,?2,?3,?4,?5,?6,?7,?8)", nativeQuery = true)
+    void submitToDB( String code , String status , String language , String submitTime , Integer contest , Integer question , Integer student ,String info);
 
     @Query(value = "select * from submit_log where contest_id=?1 and question_id=?2 and info='AC' order by id ", nativeQuery = true)
     List<Submission> getSubmissionRank( Integer contest , Integer question );
@@ -40,6 +41,6 @@ public interface SubmissionRepository extends JpaRepository<Submission, Integer>
 
     @Transactional
     @Modifying
-    @Query(value = "update submit_log set info=?2 where id=?1",nativeQuery=true)
-    void updateInfo( Integer id, String info );
+    @Query(value = "update submit_log set info=?2, status=?3 where id=?1",nativeQuery=true)
+    void updateInfo( Integer id, String info, String status );
 }
