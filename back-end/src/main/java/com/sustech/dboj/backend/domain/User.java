@@ -21,6 +21,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String nickname;
     @Column(nullable = false)
+    @JsonIgnore
     private String password;// password after encoding
     @Column(nullable = false)
     private String role;// Three types:STU/TA/SA

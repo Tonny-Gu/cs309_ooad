@@ -6,6 +6,8 @@ import com.sustech.dboj.backend.repository.NewsRepository;
 import com.sustech.dboj.backend.repository.UserRepository;
 import com.sustech.dboj.backend.util.IOUtil;
 import com.sustech.dboj.backend.util.MarkDown2HtmlWrapper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 @RestController
+@Api(tags = "布告栏")
 public class NewsController {
     @Autowired
     private NewsRepository newsRepository;
@@ -34,6 +37,7 @@ public class NewsController {
     private static final String noticePathName = "notice/";
 
     @GetMapping("/notice/new")
+    @ApiOperation( value = "获取最新公告")
     public News getCurrentNew() {
         List<News> enableNews = newsRepository.findCurrentNotice( );
         if ( enableNews.isEmpty( ) ) return null;
@@ -41,11 +45,13 @@ public class NewsController {
     }
 
     @GetMapping("/notice/all")
+    @ApiOperation( value = "获取所有有效公告")
     public List<News> getEnableNew() {
         return newsRepository.findCurrentNotice( );
     }
 
-    @PostMapping("/notice/upload")
+    @PostMapping("admin/notice/upload")
+    @ApiOperation( value = "上传公告")
     public String uploadNew( MultipartFile file , String author ) {
         if ( file.isEmpty( ) ) {
             return "error:file is empty";
@@ -74,19 +80,5 @@ public class NewsController {
         }
     }
 
-    @GetMapping("/notice/enable")
-    public String enableNew( Integer Id ) {
-        News notice = newsRepository.findById( Id ).orElse( null );
-        if ( notice == null ) return "notice not found";
-        newsRepository.activeNotice( Id , true );
-        return String.format( "notice %d enable" , Id );
-    }
 
-    @GetMapping("/notice/cancel")
-    public String cancelNew( Integer Id ) {
-        News notice = newsRepository.findById( Id ).orElse( null );
-        if ( notice == null ) return "notice not found";
-        newsRepository.activeNotice( Id , false );
-        return String.format( "notice %d cancel" , Id );
-    }
 }

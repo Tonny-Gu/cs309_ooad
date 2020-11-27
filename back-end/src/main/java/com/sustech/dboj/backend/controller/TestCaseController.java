@@ -9,6 +9,8 @@ import com.sustech.dboj.backend.repository.TestCaseRepository;
 import com.sustech.dboj.backend.util.IOUtil;
 import com.sustech.dboj.backend.util.JsonFormat;
 import com.sustech.dboj.backend.util.MqttUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.util.Base64;
 
 @RestController
+@Api(tags = "测试用例管理")
 public class TestCaseController {
     private static final String envPathName = "env/";//path of testcase environment '.sql'
     @Autowired
@@ -28,6 +31,7 @@ public class TestCaseController {
     private TestCaseRepository testCaseRepository;
 
     @PostMapping("/admin/testcase/upload")
+    @ApiOperation( value = "上传测试用例")
     public String uploadTestcase( MultipartFile initFile , Integer questionId ) throws JsonProcessingException {
         if ( initFile.isEmpty( ) ) {
             return "error: init file is empty";

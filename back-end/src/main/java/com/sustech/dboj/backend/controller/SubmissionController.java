@@ -5,6 +5,8 @@ import com.sustech.dboj.backend.domain.*;
 import com.sustech.dboj.backend.repository.*;
 import com.sustech.dboj.backend.util.JsonFormat;
 import com.sustech.dboj.backend.util.MqttUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
+@Api(tags = "交题管理")
 public class SubmissionController {
     @Autowired
     private UserRepository userRepository;
@@ -32,6 +35,7 @@ public class SubmissionController {
 
 
     @PostMapping("/user/submit")
+    @ApiOperation( value = "交题接口")
     public String submitCode( Integer user_id , Integer question_id , Integer contest_id , String code , String language ) {
         //put into DB
         //reserve check
@@ -67,32 +71,9 @@ public class SubmissionController {
         return submission.getId( ).toString();
     }
 
-    @PostMapping("/admin/submission/rank")
-    public List<Submission> getRank( Integer contest_id , Integer question_id ) {
-        return submissionRepository.getSubmissionRank( contest_id , question_id );
-    }
-
-    @PostMapping("/admin/submission/contest")
-    public List<Submission> getSubmissionByContest( Integer contest_id ) {
-        return submissionRepository.getLogByContest( contest_id );
-    }
-
-    @PostMapping("/admin/submission/question")
-    public List<Submission> getSubmissionByQuestion( Integer question_id ) {
-        return submissionRepository.getLogByQuestion( question_id );
-    }
-
-    @GetMapping("admin/submission/all")
-    public List<Submission> getAllSubmission() {
-        return submissionRepository.findAll( );
-    }
-
-    @GetMapping("admin/submission/all/range")
-    public List<Submission> getSomeSubmission( Integer begin , Integer length ) {
-        return submissionRepository.getSubmissionLimit( begin , length );
-    }
 
     @GetMapping("user/submission/byId")
+    @ApiOperation( value = "用户获取某提交")
     public Submission getSomeSubmission( Integer id ) {
         return submissionRepository.findById( id ).orElse( null );
     }

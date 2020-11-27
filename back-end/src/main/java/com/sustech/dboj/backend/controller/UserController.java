@@ -3,6 +3,8 @@ package com.sustech.dboj.backend.controller;
 import com.sustech.dboj.backend.domain.*;
 import com.sustech.dboj.backend.repository.*;
 import com.sustech.dboj.backend.util.TextChecker;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import java.util.List;
 
 @Configuration
 @RestController
+@Api(tags = "用户操作")
 public class UserController {
     private static final Logger log = LoggerFactory.getLogger( UserController.class );
 
@@ -34,6 +37,7 @@ public class UserController {
     private ScoreRepository scoreRepository;
 
     @PostMapping("/register")
+    @ApiOperation( value = "用户注册")
     public String register( String username , String password , String name , String role ) {
         if ( !TextChecker.userNameChecker( username ) ) return "Invalid username";
         if ( userRepository.findByUsername( username ) != null ) return "Username have been used";
@@ -56,6 +60,7 @@ public class UserController {
     }
 
     @GetMapping("/user/get/contests")
+    @ApiOperation( value = "获取用户参与的所有contest")
     public List<Contest> getContests( Integer id ) {
         User user = userRepository.findById( id ).orElse( null );
         if ( user == null ) return null;
@@ -63,6 +68,7 @@ public class UserController {
     }
 
     @GetMapping("/user/get/submission")
+    @ApiOperation( value = "获取用户所有提交")
     public List<Submission> getSubmissionsByUser( Integer id ) {
         User user = userRepository.findById( id ).orElse( null );
         if ( user == null ) return null;
@@ -70,6 +76,7 @@ public class UserController {
     }
 
     @PostMapping("/user/get/submission")
+    @ApiOperation( value = "获取用户某赛题最近提交")
     public List<Submission> getSubmissions( Integer id , Integer contest_id , Integer question_id, Boolean recent ) {
 //        User user = userRepository.findById( id ).orElse( null );
 //        if ( user == null ) return null;
@@ -88,6 +95,7 @@ public class UserController {
 
     @Transactional
     @PostMapping("/user/joinContest")
+    @ApiOperation( value = "用户加入contest")
     public String joinContest( Integer user_id , Integer contest_id ) {
         // add contest-user
         User myUser = userRepository.findById( user_id ).orElse( null );

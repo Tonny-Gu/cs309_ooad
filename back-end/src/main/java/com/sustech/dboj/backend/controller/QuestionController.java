@@ -10,6 +10,8 @@ import com.sustech.dboj.backend.repository.QuestionRepository;
 import com.sustech.dboj.backend.repository.UserRepository;
 import com.sustech.dboj.backend.util.IOUtil;
 import com.sustech.dboj.backend.util.MarkDown2HtmlWrapper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +28,9 @@ import java.util.*;
 
 
 @RestController
+@Api(tags = "题目控制")
 public class QuestionController {
     private static final Logger log = LoggerFactory.getLogger( UserController.class );
-    private static final String pathName = "questions/";
-
-    private static final String ansPathName = "ans/";//path of standard code '.sql'
     @Autowired
     private QuestionRepository questionRepository;
 
@@ -42,6 +42,7 @@ public class QuestionController {
 
 
     @GetMapping("/question/id")
+    @ApiOperation( value = "通过id获取题目")
     public Question getQuestionById( Integer id ) {
         Optional<Question> questionQuery = questionRepository.findById( id );
         return questionQuery.orElse( null );
@@ -49,6 +50,7 @@ public class QuestionController {
 
 
     @GetMapping("/question")
+    @ApiOperation( value = "获取所有题目")
     public List<Question> getAllQuestion( Boolean withContent ) {
         List<Question> questionList = questionRepository.findAll( );
         if ( !withContent ) {
@@ -61,6 +63,7 @@ public class QuestionController {
 
 
     @GetMapping("/question/contest")
+    @ApiOperation( value = "获取某竞赛所有题目")
     public List<Question> getQuestionByContest( Integer contest_id ) {
         Contest contest = contestRepository.findById( contest_id ).orElse( null );
         if ( contest == null ) return null;
@@ -68,11 +71,13 @@ public class QuestionController {
     }
 
     @GetMapping("/question/name")
+    @ApiOperation( value = "根据名字获取题目")
     public List<Question> getQuestionByName( String name ) {
         return questionRepository.findByName( name );
     }
 
     @GetMapping("/question/author")
+    @ApiOperation( value = "根据出题人获取题目")
     public List<Question> getQuestionByAuthor( Integer user_id ) {
         User user = userRepository.findById( user_id ).orElse( null );
         if ( user == null ) return null;
@@ -80,71 +85,17 @@ public class QuestionController {
     }
 
     @GetMapping("/question/degree")
+    @ApiOperation( value = "根据难度获取题目")
     public List<Question> getQuestionByDegree( String degree ) {
         return questionRepository.findByDegree( degree );
     }
 
     @GetMapping("/question/db")
+    @ApiOperation( value = "根据SQL类型获取题目")
     public List<Question> getQuestionByDbType( String dbType ) {
         return questionRepository.findByDbType( dbType );
     }
 
-    @Transactional
-    @PostMapping("/admin/question/upload")
-    public String uploadQuestion( MultipartFile questionFile , MultipartFile ansFile , Integer author , String degree , String dbType ) throws JsonProcessingException {
-        Question question = new Question( );
-        if ( questionFile.isEmpty( ) ) {
-            return "error: question file is empty";
-        } else if ( ansFile.isEmpty( ) ) {
-            return "error: ans file is empty";
-        } else {
-//            if ( questionFile.getContentType( ) != null && !questionFile.getContentType( ).equals( "text/markdown" ) ) {
-//                return "error: not markdown file";
-//            }
-            User au = userRepository.findById( author ).orElse( null );
-            if ( au == null ) return "error: invalid author";
-            if ( !( degree.equalsIgnoreCase( "Hard" ) || degree.equalsIgnoreCase( "Mid" ) || degree.equalsIgnoreCase( "Easy" ) ) ) {
-                return "error: degree error";
-            }
-            if ( !( dbType.equalsIgnoreCase( "ALL" ) || dbType.equalsIgnoreCase( "SQLite" )
-                    || dbType.equalsIgnoreCase( "MySQL" ) || dbType.equalsIgnoreCase( "PostgreSQL" ) ) ) {
-                return "error: degree error";
-            }
-            MarkDown2HtmlWrapper w2h = new MarkDown2HtmlWrapper( );
-            try {
-                IOUtil.fileStore( questionFile , pathName +
-                        Objects.requireNonNull( questionFile.getOriginalFilename( ) ) );
-                question.setContent( Base64.getEncoder( ).encodeToString( w2h.markdown2Html( questionFile.getInputStream( ) ).getBytes( StandardCharsets.UTF_8 ) ) );
-                IOUtil.fileStore( ansFile , ansPathName + questionFile.getOriginalFilename( ) + ".sql" );
-                question.setAnswerCode( Base64.getEncoder( ).encodeToString( ansFile.getBytes( ) ) );
-            } catch (IOException e) {
-                e.printStackTrace( );
-                return "error: " + e.getMessage( );
-            }
 
-            question.setName( questionFile.getOriginalFilename( ).split( "\\." )[0] );
-            question.setDegree( degree );
-            question.setDbType( dbType );
-            question.setAuthor( au );
-//            if ( !extenFile.isEmpty( ) ) {
-//                try {
-//                    question.setExtension( Base64.getEncoder( ).encodeToString( extenFile.getBytes( ) ) );
-//                } catch (IOException e) {
-//                    e.printStackTrace( );
-//                    return "error: " + e.getMessage( );
-//                }
-//            }
-            questionRepository.save( question );
-
-            return "success: " + question.getId( );
-        }
-
-    }
-
-    @PostMapping("/admin/question/modify")
-    public String modifyQuestion( Question question ) {
-        questionRepository.save( question );
-        return "Success";
-    }
 
 }
