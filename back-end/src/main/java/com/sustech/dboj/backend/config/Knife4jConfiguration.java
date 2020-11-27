@@ -19,8 +19,8 @@ public class Knife4jConfiguration {
                 .apiInfo(new ApiInfoBuilder()
                         //.title("swagger-bootstrap-ui-demo RESTful APIs")
                         .description("# SUSTech DBOJ RESTful APIs")
-                        .termsOfServiceUrl("http://www.xx.com/")
-                        .contact("11811805@sustech.edu.cn")
+                        .termsOfServiceUrl("http://www.glab2.mylab.cc/")
+                        .contact("11811806@sustech.edu.cn")
                         .version("1.0")
                         .build())
                 //分组名称
