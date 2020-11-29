@@ -44,7 +44,7 @@ public class MqttUtil {
         publisher.disconnect( );
     }
 
-    @Bean
+//    @Bean
     public void initListener() throws MqttException {
         String broker = "tcp://192.168.122.10:1883";
         String topic = "env/recv";
@@ -66,7 +66,7 @@ public class MqttUtil {
         } );
     }
 
-    @Bean
+//    @Bean
     public void submitListener() throws MqttException {
         String broker = "tcp://192.168.122.10:1883";
         String topic = "code/recv";

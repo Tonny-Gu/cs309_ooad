@@ -29,6 +29,9 @@ public class User implements UserDetails {
     @JsonIgnore //关掉不重要的一边的序列化，防止循环引用
     private Set<Contest> contests;
 
+    @JsonIgnore
+    private String activeCode;
+
     public User() {
     }
 
@@ -81,6 +84,15 @@ public class User implements UserDetails {
         this.password = password;
     }
 
+    public String getActiveCode() {
+        return activeCode;
+    }
+
+    public void setActiveCode( String activeCode ) {
+        this.activeCode = activeCode;
+    }
+
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -131,6 +143,7 @@ public class User implements UserDetails {
                 ", password='" + password + '\'' +
                 ", role='" + role + '\'' +
                 ", contests=" + contests +
+                ", activeCode='" + activeCode + '\'' +
                 '}';
     }
 }

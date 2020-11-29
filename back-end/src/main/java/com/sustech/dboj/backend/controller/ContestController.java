@@ -5,6 +5,7 @@ import com.sustech.dboj.backend.domain.Question;
 import com.sustech.dboj.backend.domain.Score;
 import com.sustech.dboj.backend.domain.User;
 import com.sustech.dboj.backend.repository.*;
+import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
+@Api(tags = "竞赛管理")
 public class ContestController {
     private static final Logger logger = LoggerFactory.getLogger( UserController.class );
     @Autowired

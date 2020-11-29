@@ -2,6 +2,8 @@ package com.sustech.dboj.backend.controller;
 
 import com.sustech.dboj.backend.domain.*;
 import com.sustech.dboj.backend.repository.*;
+import com.sustech.dboj.backend.util.MailServer;
+import com.sustech.dboj.backend.util.SimpleUtil;
 import com.sustech.dboj.backend.util.TextChecker;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 import java.util.List;
 
@@ -36,8 +39,11 @@ public class UserController {
     @Autowired
     private ScoreRepository scoreRepository;
 
+    @Autowired
+    MailServer mailServer;
+
     @PostMapping("/register")
-    @ApiOperation( value = "用户注册")
+    @ApiOperation(value = "用户注册")
     public String register( String username , String password , String name , String role ) {
         if ( !TextChecker.userNameChecker( username ) ) return "Invalid username";
         if ( userRepository.findByUsername( username ) != null ) return "Username have been used";
@@ -60,7 +66,7 @@ public class UserController {
     }
 
     @GetMapping("/user/get/contests")
-    @ApiOperation( value = "获取用户参与的所有contest")
+    @ApiOperation(value = "获取用户参与的所有contest")
     public List<Contest> getContests( Integer id ) {
         User user = userRepository.findById( id ).orElse( null );
         if ( user == null ) return null;
@@ -68,7 +74,7 @@ public class UserController {
     }
 
     @GetMapping("/user/get/submission")
-    @ApiOperation( value = "获取用户所有提交")
+    @ApiOperation(value = "获取用户所有提交")
     public List<Submission> getSubmissionsByUser( Integer id ) {
         User user = userRepository.findById( id ).orElse( null );
         if ( user == null ) return null;
@@ -76,18 +82,18 @@ public class UserController {
     }
 
     @PostMapping("/user/get/submission")
-    @ApiOperation( value = "获取用户某赛题最近提交")
-    public List<Submission> getSubmissions( Integer id , Integer contest_id , Integer question_id, Boolean recent ) {
+    @ApiOperation(value = "获取用户某赛题最近提交")
+    public List<Submission> getSubmissions( Integer id , Integer contest_id , Integer question_id , Boolean recent ) {
 //        User user = userRepository.findById( id ).orElse( null );
 //        if ( user == null ) return null;
 //        Question question = questionRepository.findById( id ).orElse( null );
 //        if ( question == null ) return null;
 //        Contest contest = contestRepository.findById( contest_id ).orElse( null );
 //        if ( contest == null ) return null;
-        List<Submission> submissionList = submissionRepository.getLog( id , question_id, contest_id );
-        if(recent){
-            while (submissionList.size() > 1){
-                submissionList.remove( submissionList.size() - 1 );
+        List<Submission> submissionList = submissionRepository.getLog( id , question_id , contest_id );
+        if ( recent ) {
+            while (submissionList.size( ) > 1) {
+                submissionList.remove( submissionList.size( ) - 1 );
             }
         }
         return submissionList;
@@ -95,7 +101,7 @@ public class UserController {
 
     @Transactional
     @PostMapping("/user/joinContest")
-    @ApiOperation( value = "用户加入contest")
+    @ApiOperation(value = "用户加入contest")
     public String joinContest( Integer user_id , Integer contest_id ) {
         // add contest-user
         User myUser = userRepository.findById( user_id ).orElse( null );
@@ -114,6 +120,37 @@ public class UserController {
         }
         return "Join contest successfully";
     }
+
+    @PostMapping("/user/send/code")
+    @ApiOperation(value = "发送验证码")
+    public String sendCode( Integer user_id ) throws MessagingException {
+        String activeCode = SimpleUtil.getRandomCode( 6 );
+        User user = userRepository.findById( user_id ).orElse( null );
+        if ( user == null ) return "User Not Found";
+        user.setActiveCode( activeCode );
+        String targetEmail = user.getUsername( ) + "@sustech.edu.cn";
+        String msg = String.format( "[Sustech DBOJ] %s 同学, 你修改密码的验证码为 %s , 请勿泄露" , user.getName( ) , activeCode );
+        mailServer.sendEmail( targetEmail , "Password Modify" , msg );
+        userRepository.save( user );
+        return "Sender Success";
+    }
+
+    @PostMapping("/user/modify/password")
+    @ApiOperation(value = "修改密码")
+    public String modifyCode( Integer user_id , String password, String code){
+        User user = userRepository.findById( user_id ).orElse( null );
+        if ( user == null ) return "User Not Found";
+        if(user.getActiveCode().equals( code )){
+            user.setActiveCode( null );
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder( );
+            user.setPassword( encoder.encode( password ) );
+            userRepository.save( user );
+            return "Modify Success";
+        }else{
+            return "Invalid Code";
+        }
+    }
+
 
 
     @GetMapping("/index")
