@@ -17,19 +17,19 @@ public class ScoreController {
     @Autowired
     private ScoreRepository scoreRepository;
 
-    @PostMapping("/score/update")
-    @ApiOperation( value = "更新成绩表[暂定]")
-    public Score updateScore( User student , Question question , Contest contest , String status ) {
-        boolean pass = status.equals( "AC" );
-        Score now = scoreRepository.findByStudentAndQuestionAndContest( student , question , contest );
-        now.setSubmit( now.getId( ) + 1 );
-        if ( pass && !now.getAc( ) ) {
-            now.setAc( true );
-        } else if ( !pass && !now.getAc( ) ) {
-            now.setWa( now.getWa( ) + 1 );
-        }
-        scoreRepository.save( now );
-        return now;
-    }
+//    @PostMapping("/score/update")
+//    @ApiOperation( value = "更新成绩表[暂定]")
+//    public Score updateScore( User student , Question question , Contest contest , String status ) {
+//        boolean pass = status.equals( "AC" );
+//        Score now = scoreRepository.findByStudentAndQuestionAndContest( student , question , contest );
+//        now.setSubmit( now.getId( ) + 1 );
+//        if ( pass && !now.getAc( ) ) {
+//            now.setAc( true );
+//        } else if ( !pass && !now.getAc( ) ) {
+//            now.setWa( now.getWa( ) + 1 );
+//        }
+//        scoreRepository.save( now );
+//        return now;
+//    }
 
 }

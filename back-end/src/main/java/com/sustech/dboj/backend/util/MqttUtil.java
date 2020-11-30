@@ -2,8 +2,10 @@ package com.sustech.dboj.backend.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.sustech.dboj.backend.domain.Score;
 import com.sustech.dboj.backend.domain.Submission;
 import com.sustech.dboj.backend.domain.TestCase;
+import com.sustech.dboj.backend.repository.ScoreRepository;
 import com.sustech.dboj.backend.repository.SubmissionRepository;
 import com.sustech.dboj.backend.repository.TestCaseRepository;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -28,6 +30,10 @@ public class MqttUtil {
     @Autowired
     private SubmissionRepository submissionRepository;
 
+    @Autowired
+    private ScoreRepository scoreRepository;
+
+
     private static final Logger logger = LoggerFactory.getLogger( MqttUtil.class );
 
     public static void sender( String broker , String topic , int qos , String message ) throws MqttException {
@@ -44,7 +50,7 @@ public class MqttUtil {
         publisher.disconnect( );
     }
 
-//    @Bean
+    @Bean
     public void initListener() throws MqttException {
         String broker = "tcp://192.168.122.10:1883";
         String topic = "env/recv";
@@ -66,7 +72,7 @@ public class MqttUtil {
         } );
     }
 
-//    @Bean
+    @Bean
     public void submitListener() throws MqttException {
         String broker = "tcp://192.168.122.10:1883";
         String topic = "code/recv";
@@ -83,10 +89,22 @@ public class MqttUtil {
             logger.info( "topic: {} msg: {}" , t , msg );
             ObjectNode node = new ObjectMapper( ).readValue( msg.getPayload( ) , ObjectNode.class );
             if ( node.has( "info" ) && node.has( "id" ) ) {
-                String info = node.get( "info" ).asText();
-                String status = node.get( "status" ).asText();//will del
+                String info = node.get( "info" ).asText( );
+                String status = node.get( "status" ).asText( );//will del
                 Integer id = node.get( "id" ).asInt( );
-                submissionRepository.updateInfo( id , info , status);
+                submissionRepository.updateInfo( id , info , status );
+                // change score table
+                boolean pass = status.equals( "Accept" );
+                Submission submission = submissionRepository.findById( id ).orElse( null );
+                assert submission != null;
+                Score now = scoreRepository.findByStudentAndQuestionAndContest( submission.getStudent( ) , submission.getQuestion( ) , submission.getContest( ) );
+                now.setSubmit( now.getId( ) + 1 );
+                if ( pass && !now.getAc( ) ) {
+                    now.setAc( true );
+                } else if ( !pass && !now.getAc( ) ) {
+                    now.setWa( now.getWa( ) + 1 );
+                }
+                scoreRepository.save( now );
             }
         } );
     }
