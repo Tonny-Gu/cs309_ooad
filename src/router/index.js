@@ -4,12 +4,13 @@ import Home from '../views/Home.vue'
 import submission from '../components/submission.vue'
 import main from '../components/main.vue'
 import rate from '../components/rate.vue'
+import studentHome from "@/components/studentHome";
 Vue.use(VueRouter)
 
 const routes = [{
 		path: '/',
 		name: 'Home',
-		component: Home,
+		component: studentHome,
 		children: [{
 				path: '/questionBank',
 				name: 'questionBank',

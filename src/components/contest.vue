@@ -7,8 +7,8 @@
 				</el-carousel-item>
 			</el-carousel>
 		</div>
-		<div id="table-content"  style="overflow: hidden">
-			<el-table :data="pageList" stripe style="width: 100%;top: 20px; height: 90%; ">
+		<div id="table-content"  style="overflow: auto">
+			<el-table :data="pageList" stripe style="width: 100%;top: 20px; height: 80%; ">
 				<el-table-column prop="contestName" label="Contest">
 					<template slot-scope="scope">
 						<el-button type="text" @click="accessAnswerPage(scope.row.contestId)">{{scope.row.contestTitle}}</el-button>
@@ -295,7 +295,7 @@
 <style>
 	#ContestMenu {
 		top: 60px;
-		right: 0px;
+		right: 0;
 		height: 100%;
 		width: 100%;
 		position: fixed;
@@ -327,8 +327,6 @@
     margin-left: 7%;
     overflow: auto;
 	}
-
-	#contestPagination {}
 
 	.el-carousel__item {
 		overflow: auto;
