@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
@@ -20,7 +21,7 @@ public class Knife4jConfiguration {
                         //.title("swagger-bootstrap-ui-demo RESTful APIs")
                         .description("# SUSTech DBOJ RESTful APIs")
                         .termsOfServiceUrl("http://www.glab2.mylab.cc/")
-                        .contact("11811806@sustech.edu.cn")
+                        .contact(new Contact( "Xiongzc","xiongzc.co","11811806@sustech.edu.cn" ))
                         .version("1.0")
                         .build())
                 //分组名称

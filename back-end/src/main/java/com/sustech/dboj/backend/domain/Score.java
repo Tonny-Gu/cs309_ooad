@@ -1,5 +1,7 @@
 package com.sustech.dboj.backend.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import javax.persistence.*;
 
 @Entity
@@ -16,13 +18,13 @@ public class Score {
     private Question question;
 
     @Column(nullable = false)
-    private Integer submit=0;
+    private Integer submit = 0;
 
     @Column(nullable = false)
-    private Boolean ac=false;
+    private Boolean ac = false;
 
     @Column(nullable = false)
-    private Integer wa=0;
+    private Integer wa = 0;
 
     @Column
     private String acTime;

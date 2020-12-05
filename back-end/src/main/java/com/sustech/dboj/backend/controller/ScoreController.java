@@ -34,7 +34,7 @@ public class ScoreController {
 
     @GetMapping("super/score")
     @ApiOperation(value = "按条件获取成绩表(教师)")
-    public List<Score> getScore( @RequestParam(required = false) Integer user_id , @RequestParam(required = false) Integer contest_id , @RequestParam(required = false) Integer question_id ) {
+    public List<Score> getScore( Integer user_id , Integer contest_id , Integer question_id ) {
         User student = null;
         Contest contest = null;
         Question question = null;
@@ -65,7 +65,7 @@ public class ScoreController {
 
     @GetMapping("user/score")
     @ApiOperation(value = "按条件获取成绩表(学生)")
-    public List<Score> getScoreUser( Integer user_id , @RequestParam(required = false) Integer contest_id , @RequestParam(required = false) Integer question_id ) {
+    public List<Score> getScoreUser( Integer user_id ,Integer contest_id , Integer question_id ) {
         User student = userRepository.findById( user_id ).orElse( null );
         assert student != null;
         Contest contest = null;
@@ -79,6 +79,8 @@ public class ScoreController {
             scores = scoreRepository.findByStudentAndQuestion( student, question );
         } else if ( contest != null ) {
             scores = scoreRepository.findByStudentAndContest( student, contest );
+        }else{
+            scores = scoreRepository.findByStudent( student );
         }
         return scores;
     }

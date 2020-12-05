@@ -76,25 +76,27 @@ public class SubmissionController {
     }
 
 
-    @GetMapping("user/submission/byId")
+    @PostMapping("user/submission/byId")
     @ApiOperation(value = "用户获取某提交")
     public Submission getSubmissionById( Integer id ) {
         return submissionRepository.findById( id ).orElse( null );
     }
 
-    @GetMapping("user/submission")
+    @PostMapping("user/submission")
     @ApiOperation(value = "按条件获取提交(用户级别)")
-    public List<Submission> getSubmission( Integer user_id , @RequestParam(required = false) Integer contest_id , @RequestParam(required = false) Integer question_id , Boolean withCode ) {
+    public List<Submission> getSubmission( Integer user_id ,Integer contest_id , Integer question_id , Boolean withCode ) {
         List<Submission> submissions;
-
+        System.out.println( "debug: withCode:" + withCode );
         if ( question_id == null && contest_id == null ) {
             User user = userRepository.findById( user_id ).orElse( null );
-            assert user != null;
+            if(user==null)return null;
             submissions = submissionRepository.getLogByStu( user_id );
         } else if ( question_id == null ) {
             submissions = submissionRepository.getLogByContest( user_id , contest_id );
-        } else {
+        } else if( contest_id == null){
             submissions = submissionRepository.getLogByQuestion( user_id , question_id );
+        }else{
+            submissions = submissionRepository.getLog( user_id , question_id , contest_id );
         }
         if ( !withCode ) {
             for (Submission submission : submissions) {
@@ -104,7 +106,7 @@ public class SubmissionController {
         return submissions;
     }
 
-    @GetMapping("/admin/submission/rank")
+    @PostMapping("/admin/submission/rank")
     @ApiOperation(value = "获取某赛题成功提交排名")
     public List<Submission> getRank( Integer contest_id , Integer question_id , Boolean withCode ) {
         List<Submission> submissions = submissionRepository.getSubmissionRank( contest_id , question_id );
@@ -116,9 +118,9 @@ public class SubmissionController {
         return submissions;
     }
 
-    @GetMapping("/admin/submission/contest")
+    @PostMapping("/admin/submission/contest")
     @ApiOperation(value = "获取某竞赛所有提交")
-    public List<Submission> getSubmissionByContest( @RequestParam(required = false) Integer contest_id , @RequestParam(required = false) String name , Boolean withCode ) {
+    public List<Submission> getSubmissionByContest(Integer contest_id , String name , Boolean withCode ) {
         if ( contest_id == null && name == null ) return null;
         List<Submission> submissions;
         if ( contest_id != null ) {
@@ -136,9 +138,9 @@ public class SubmissionController {
         return submissions;
     }
 
-    @GetMapping("/admin/submission/question")
+    @PostMapping("/admin/submission/question")
     @ApiOperation(value = "获取某题所有提交")
-    public List<Submission> getSubmissionByQuestion( @RequestParam(required = false) Integer question_id , @RequestParam(required = false) String name , Boolean withCode ) {
+    public List<Submission> getSubmissionByQuestion( Integer question_id , String name , Boolean withCode ) {
         if ( question_id == null && name == null ) return null;
         List<Submission> submissions;
         if ( question_id != null ) {
@@ -156,7 +158,7 @@ public class SubmissionController {
         return submissions;
     }
 
-    @GetMapping("admin/submission/all")
+    @PostMapping("admin/submission/all")
     @ApiOperation(value = "获取所有提交")
     public List<Submission> getAllSubmission( Boolean withCode ) {
         List<Submission> submissions = submissionRepository.findAll( );
@@ -168,7 +170,7 @@ public class SubmissionController {
         return submissions;
     }
 
-    @GetMapping("admin/submission/all/range")
+    @PostMapping("admin/submission/all/range")
     @ApiOperation(value = "获取某个范围提交")
     public List<Submission> getSomeSubmission( Integer begin , Integer length , Boolean withCode ) {
         List<Submission> submissions = submissionRepository.getSubmissionLimit( begin , length );
