@@ -52,32 +52,20 @@ public class NewsController {
 
     @PostMapping("admin/notice/upload")
     @ApiOperation( value = "上传公告")
-    public String uploadNew( MultipartFile file , String author ) {
-        if ( file.isEmpty( ) ) {
-            return "error:file is empty";
-        } else {
-//            if ( file.getContentType( ) != null && !file.getContentType( ).equals( "text/markdown" ) ) {
-//                return "error:not markdown file";
-//            }
+    public String uploadNew( String topic, String content , String author ) {
             User au = userRepository.findByUsername( author );
             if ( au == null ) return "error: invalid author";
             MarkDown2HtmlWrapper w2h = new MarkDown2HtmlWrapper( );
             News notice = new News( );
-            try {
-                IOUtil.fileStore( file , noticePathName + Objects.requireNonNull( file.getOriginalFilename( ) ) );
-                notice.setContent( Base64.getEncoder( ).encodeToString( w2h.markdown2Html( file.getInputStream( ) ).getBytes( StandardCharsets.UTF_8 ) ) );
-            } catch (IOException e) {
-                e.printStackTrace( );
-                return "error:" + e.getMessage( );
-            }
-            notice.setTopic( file.getOriginalFilename( ).split( "\\." )[0] );
+            notice.setTopic( topic );
+            notice.setContent( content );
             SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
             notice.setTime( ft.format( new Date( ) ) );
             notice.setEnable( true );
             notice.setAuthor( au );
             newsRepository.save( notice );
             return "upload successful";
-        }
+
     }
 
 

@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface QuestionRepository extends JpaRepository<Question, Integer> {
-    List<Question> findByName(String name);
+    Question findByName(String name);
 
     List<Question> findByAuthor( User author );
 

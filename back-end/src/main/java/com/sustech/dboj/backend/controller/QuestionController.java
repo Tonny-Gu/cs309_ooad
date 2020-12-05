@@ -72,7 +72,7 @@ public class QuestionController {
 
     @GetMapping("/question/name")
     @ApiOperation( value = "根据名字获取题目")
-    public List<Question> getQuestionByName( String name ) {
+    public Question getQuestionByName( String name ) {
         return questionRepository.findByName( name );
     }
 

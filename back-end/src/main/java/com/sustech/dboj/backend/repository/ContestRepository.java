@@ -14,4 +14,6 @@ public interface ContestRepository extends JpaRepository<Contest, Integer> {
     @Modifying
     @Query(value = "update notice set en_able=?2 where id=?1",nativeQuery=true)
     void activeContest( Integer id, Boolean status );
+
+    Contest findByName( String name );
 }

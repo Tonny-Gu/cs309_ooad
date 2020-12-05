@@ -67,7 +67,7 @@ public class AdminController {
             }
             if ( !( dbType.equalsIgnoreCase( "ALL" ) || dbType.equalsIgnoreCase( "SQLite" )
                     || dbType.equalsIgnoreCase( "MySQL" ) || dbType.equalsIgnoreCase( "PostgreSQL" ) ) ) {
-                return "error: degree error";
+                return "error: dbType error";
             }
             MarkDown2HtmlWrapper w2h = new MarkDown2HtmlWrapper( );
             try {
@@ -80,8 +80,9 @@ public class AdminController {
                 e.printStackTrace( );
                 return "error: " + e.getMessage( );
             }
-
-            question.setName( questionFile.getOriginalFilename( ).split( "\\." )[0] );
+            String questionName = questionFile.getOriginalFilename( ).split( "\\." )[0];
+            if(questionRepository.findByName( questionName )!=null)return "error: duplicate question name";
+            question.setName( questionName );
             question.setDegree( degree );
             question.setDbType( dbType );
             question.setAuthor( au );

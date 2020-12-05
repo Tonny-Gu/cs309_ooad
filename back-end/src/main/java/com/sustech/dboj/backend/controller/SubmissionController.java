@@ -118,8 +118,16 @@ public class SubmissionController {
 
     @GetMapping("/admin/submission/contest")
     @ApiOperation(value = "获取某竞赛所有提交")
-    public List<Submission> getSubmissionByContest( Integer contest_id , Boolean withCode ) {
-        List<Submission> submissions = submissionRepository.getLogByContest( contest_id );
+    public List<Submission> getSubmissionByContest( @RequestParam(required = false) Integer contest_id , @RequestParam(required = false) String name , Boolean withCode ) {
+        if ( contest_id == null && name == null ) return null;
+        List<Submission> submissions;
+        if ( contest_id != null ) {
+            submissions = submissionRepository.getLogByContest( contest_id );
+        } else {
+            Contest contest = contestRepository.findByName( name );
+            assert contest != null;
+            submissions = submissionRepository.findByContest( contest );
+        }
         if ( !withCode ) {
             for (Submission submission : submissions) {
                 submission.setCode( null );
@@ -130,8 +138,16 @@ public class SubmissionController {
 
     @GetMapping("/admin/submission/question")
     @ApiOperation(value = "获取某题所有提交")
-    public List<Submission> getSubmissionByQuestion( Integer question_id , Boolean withCode ) {
-        List<Submission> submissions = submissionRepository.getLogByQuestion( question_id );
+    public List<Submission> getSubmissionByQuestion( @RequestParam(required = false) Integer question_id , @RequestParam(required = false) String name , Boolean withCode ) {
+        if ( question_id == null && name == null ) return null;
+        List<Submission> submissions;
+        if ( question_id != null ) {
+            submissions = submissionRepository.getLogByQuestion( question_id );
+        } else {
+            Question question = questionRepository.findByName( name );
+            assert question != null;
+            submissions = submissionRepository.findByQuestion( question );
+        }
         if ( !withCode ) {
             for (Submission submission : submissions) {
                 submission.setCode( null );
