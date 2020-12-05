@@ -19,9 +19,11 @@ public interface SubmissionRepository extends JpaRepository<Submission, Integer>
     @Query(value = "select * from submit_log where contest_id=?1", nativeQuery = true)
     List<Submission> getLogByContest( Integer contest );
 
-
     @Query(value = "select * from submit_log where student_id=?1 and question_id=?2", nativeQuery = true)
-    List<Submission> getLog( Integer student , Integer question );
+    List<Submission> getLogByQuestion( Integer student , Integer question );
+
+    @Query(value = "select * from submit_log where student_id=?1 and contest_id=?2", nativeQuery = true)
+    List<Submission> getLogByContest( Integer student , Integer contest );
 
     @Query(value = "select * from submit_log where student_id=?1 and question_id=?2 and contest_id=?3 order by id desc ", nativeQuery = true)
     List<Submission> getLog( Integer student , Integer question, Integer contest );

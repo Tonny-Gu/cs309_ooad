@@ -24,6 +24,9 @@ public class Score {
     @Column(nullable = false)
     private Integer wa=0;
 
+    @Column
+    private String acTime;
+
     public Score() {
     }
 
@@ -83,6 +86,15 @@ public class Score {
         this.wa = wa;
     }
 
+
+    public String getAcTime() {
+        return acTime;
+    }
+
+    public void setAcTime( String acTime ) {
+        this.acTime = acTime;
+    }
+
     @Override
     public String toString() {
         return "Score{" +
@@ -93,6 +105,7 @@ public class Score {
                 ", submit=" + submit +
                 ", ac=" + ac +
                 ", wa=" + wa +
+                ", acTime='" + acTime + '\'' +
                 '}';
     }
 }

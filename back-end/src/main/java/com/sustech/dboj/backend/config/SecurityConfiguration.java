@@ -46,6 +46,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests( )
                 .antMatchers( "/user/**" ).hasAnyRole( "STU" , "TA" , "SA" )
                 .antMatchers( "/admin/**" ).hasAnyRole( "TA" , "SA" )
+                .antMatchers( "/super/**" ).hasAnyRole( "TA" )
                 .anyRequest( ).permitAll( )
 //                .and()
 //                .antMatchers("/**").hasIpAddress("127.0.0.1")

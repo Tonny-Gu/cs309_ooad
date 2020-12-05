@@ -48,35 +48,7 @@ public class AdminController {
         this.newsRepository = newsRepository;
     }
 
-    @PostMapping("/admin/submission/rank")
-    @ApiOperation(value = "获取某赛题成功提交排名")
-    public List<Submission> getRank( Integer contest_id , Integer question_id ) {
-        return submissionRepository.getSubmissionRank( contest_id , question_id );
-    }
 
-    @PostMapping("/admin/submission/contest")
-    @ApiOperation(value = "获取某竞赛所有提交")
-    public List<Submission> getSubmissionByContest( Integer contest_id ) {
-        return submissionRepository.getLogByContest( contest_id );
-    }
-
-    @PostMapping("/admin/submission/question")
-    @ApiOperation(value = "获取某题所有提交")
-    public List<Submission> getSubmissionByQuestion( Integer question_id ) {
-        return submissionRepository.getLogByQuestion( question_id );
-    }
-
-    @GetMapping("admin/submission/all")
-    @ApiOperation(value = "获取所有提交")
-    public List<Submission> getAllSubmission() {
-        return submissionRepository.findAll( );
-    }
-
-    @GetMapping("admin/submission/all/range")
-    @ApiOperation(value = "获取某个范围提交")
-    public List<Submission> getSomeSubmission( Integer begin , Integer length ) {
-        return submissionRepository.getSubmissionLimit( begin , length );
-    }
 
     @Transactional
     @PostMapping("/admin/question/upload")
@@ -132,7 +104,16 @@ public class AdminController {
     @ApiOperation(value = "修改题目")
     public String modifyQuestion( Question question ) {
         questionRepository.save( question );
-        return "Success";
+        return "Success: " + question.getId();
+    }
+
+    @PostMapping("/admin/question/cancel")
+    @ApiOperation(value = "删除题目")
+    public String cancelQuestion( Question question ) {
+        question.setEnable( false );
+        questionRepository.save( question );
+        // TODO: 删除关联的testcase
+        return "Success: " + question.getId();
     }
 
     @PostMapping("admin/notice/enable")

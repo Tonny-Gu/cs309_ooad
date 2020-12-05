@@ -1,5 +1,7 @@
 package com.sustech.dboj.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -12,8 +14,10 @@ public class Submission {
     @ManyToOne(cascade = CascadeType.PERSIST)
     private User student;
     @ManyToOne(cascade = CascadeType.PERSIST)
+    @JsonIgnore
     private Contest contest;
     @ManyToOne(cascade = CascadeType.PERSIST)
+    @JsonIgnore
     private Question question;
 
     @Column(nullable = false)

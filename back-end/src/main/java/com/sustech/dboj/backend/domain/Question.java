@@ -23,8 +23,10 @@ public class Question {
     @Column(nullable = false)
     private String degree;// Hard/Mid/Easy
     @Column(nullable = false, columnDefinition = "text")
+    @JsonIgnore
     private String answerCode; // standard ans
-
+    @Column( name = "en_able")
+    private Boolean enable;
     @Column
     private String extension;// Judge rules
 
@@ -112,6 +114,14 @@ public class Question {
         this.dbType = dbType;
     }
 
+    public Boolean getEnable() {
+        return enable;
+    }
+
+    public void setEnable( Boolean enable ) {
+        this.enable = enable;
+    }
+
     @Override
     public String toString() {
         return "Question{" +
@@ -122,6 +132,7 @@ public class Question {
                 ", content='" + content + '\'' +
                 ", degree='" + degree + '\'' +
                 ", answerCode='" + answerCode + '\'' +
+                ", enable=" + enable +
                 ", extension='" + extension + '\'' +
                 ", dbType='" + dbType + '\'' +
                 '}';

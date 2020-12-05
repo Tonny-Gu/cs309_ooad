@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.UUID;
 
@@ -51,6 +52,7 @@ public class MqttUtil {
     }
 
     @Bean
+    @Lazy
     public void initListener() throws MqttException {
         String broker = "tcp://192.168.122.10:1883";
         String topic = "env/recv";
@@ -73,6 +75,7 @@ public class MqttUtil {
     }
 
     @Bean
+    @Lazy
     public void submitListener() throws MqttException {
         String broker = "tcp://192.168.122.10:1883";
         String topic = "code/recv";
@@ -98,9 +101,11 @@ public class MqttUtil {
                 Submission submission = submissionRepository.findById( id ).orElse( null );
                 assert submission != null;
                 Score now = scoreRepository.findByStudentAndQuestionAndContest( submission.getStudent( ) , submission.getQuestion( ) , submission.getContest( ) );
-                now.setSubmit( now.getId( ) + 1 );
+                now.setSubmit( now.getSubmit( ) + 1 );
                 if ( pass && !now.getAc( ) ) {
                     now.setAc( true );
+                    String acTime = node.get( "submitTime" ).asText( );
+                    now.setAcTime( acTime );
                 } else if ( !pass && !now.getAc( ) ) {
                     now.setWa( now.getWa( ) + 1 );
                 }

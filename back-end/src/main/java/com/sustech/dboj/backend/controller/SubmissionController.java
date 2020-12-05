@@ -11,6 +11,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.transaction.Transactional;
@@ -22,20 +23,23 @@ import java.util.List;
 @RestController
 @Api(tags = "交题管理")
 public class SubmissionController {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private SubmissionRepository submissionRepository;
-    @Autowired
-    private QuestionRepository questionRepository;
-    @Autowired
-    private ContestRepository contestRepository;
-    @Autowired
-    private TestCaseRepository testCaseRepository;
+    private final UserRepository userRepository;
+    private final SubmissionRepository submissionRepository;
+    private final QuestionRepository questionRepository;
+    private final ContestRepository contestRepository;
+    private final TestCaseRepository testCaseRepository;
+
+    public SubmissionController( UserRepository userRepository , SubmissionRepository submissionRepository , QuestionRepository questionRepository , ContestRepository contestRepository , TestCaseRepository testCaseRepository ) {
+        this.userRepository = userRepository;
+        this.submissionRepository = submissionRepository;
+        this.questionRepository = questionRepository;
+        this.contestRepository = contestRepository;
+        this.testCaseRepository = testCaseRepository;
+    }
 
 
     @PostMapping("/user/submit")
-    @ApiOperation( value = "交题接口")
+    @ApiOperation(value = "交题接口")
     public String submitCode( Integer user_id , Integer question_id , Integer contest_id , String code , String language ) {
         //put into DB
         //reserve check
@@ -55,7 +59,7 @@ public class SubmissionController {
         submissionRepository.submitToDB( code , status , language , submit_time , contest_id , question_id , user_id , "" );
         Submission submission = submissionRepository.findByStudentAndSubmitTime( student , submit_time );
         Question question = questionRepository.findById( question_id ).orElse( null );
-        if ( question==null )return "err: Question Not Found";
+        if ( question == null ) return "err: Question Not Found";
         //push to MQTT
 
         List<TestCase> testCases = testCaseRepository.findByQuestion( question );
@@ -68,15 +72,95 @@ public class SubmissionController {
         } catch (JsonProcessingException | MqttException e) {
             e.printStackTrace( );
         }
-        return submission.getId( ).toString();
+        return submission.getId( ).toString( );
     }
 
 
     @GetMapping("user/submission/byId")
-    @ApiOperation( value = "用户获取某提交")
-    public Submission getSomeSubmission( Integer id ) {
+    @ApiOperation(value = "用户获取某提交")
+    public Submission getSubmissionById( Integer id ) {
         return submissionRepository.findById( id ).orElse( null );
     }
 
+    @GetMapping("user/submission")
+    @ApiOperation(value = "按条件获取提交(用户级别)")
+    public List<Submission> getSubmission( Integer user_id , @RequestParam(required = false) Integer contest_id , @RequestParam(required = false) Integer question_id , Boolean withCode ) {
+        List<Submission> submissions;
 
+        if ( question_id == null && contest_id == null ) {
+            User user = userRepository.findById( user_id ).orElse( null );
+            assert user != null;
+            submissions = submissionRepository.getLogByStu( user_id );
+        } else if ( question_id == null ) {
+            submissions = submissionRepository.getLogByContest( user_id , contest_id );
+        } else {
+            submissions = submissionRepository.getLogByQuestion( user_id , question_id );
+        }
+        if ( !withCode ) {
+            for (Submission submission : submissions) {
+                submission.setCode( null );
+            }
+        }
+        return submissions;
+    }
+
+    @GetMapping("/admin/submission/rank")
+    @ApiOperation(value = "获取某赛题成功提交排名")
+    public List<Submission> getRank( Integer contest_id , Integer question_id , Boolean withCode ) {
+        List<Submission> submissions = submissionRepository.getSubmissionRank( contest_id , question_id );
+        if ( !withCode ) {
+            for (Submission submission : submissions) {
+                submission.setCode( null );
+            }
+        }
+        return submissions;
+    }
+
+    @GetMapping("/admin/submission/contest")
+    @ApiOperation(value = "获取某竞赛所有提交")
+    public List<Submission> getSubmissionByContest( Integer contest_id , Boolean withCode ) {
+        List<Submission> submissions = submissionRepository.getLogByContest( contest_id );
+        if ( !withCode ) {
+            for (Submission submission : submissions) {
+                submission.setCode( null );
+            }
+        }
+        return submissions;
+    }
+
+    @GetMapping("/admin/submission/question")
+    @ApiOperation(value = "获取某题所有提交")
+    public List<Submission> getSubmissionByQuestion( Integer question_id , Boolean withCode ) {
+        List<Submission> submissions = submissionRepository.getLogByQuestion( question_id );
+        if ( !withCode ) {
+            for (Submission submission : submissions) {
+                submission.setCode( null );
+            }
+        }
+        return submissions;
+    }
+
+    @GetMapping("admin/submission/all")
+    @ApiOperation(value = "获取所有提交")
+    public List<Submission> getAllSubmission( Boolean withCode ) {
+        List<Submission> submissions = submissionRepository.findAll( );
+        if ( !withCode ) {
+            for (Submission submission : submissions) {
+                submission.setCode( null );
+            }
+        }
+        return submissions;
+    }
+
+    @GetMapping("admin/submission/all/range")
+    @ApiOperation(value = "获取某个范围提交")
+    public List<Submission> getSomeSubmission( Integer begin , Integer length , Boolean withCode ) {
+        List<Submission> submissions = submissionRepository.getSubmissionLimit( begin , length );
+        if ( !withCode ) {
+            for (Submission submission : submissions) {
+                submission.setCode( null );
+            }
+        }
+        return submissions;
+    }
 }
