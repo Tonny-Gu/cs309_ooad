@@ -151,11 +151,21 @@ public class UserController {
         }
     }
 
+    @PostMapping("/user/modify/nickname")
+    @ApiOperation(value = "修改花名")
+    public String modifyNickName( Integer user_id , String nickname){
+        User user = userRepository.findById( user_id ).orElse( null );
+        if ( user == null ) return "User Not Found";
+        user.setNickname( nickname );
+        userRepository.save( user );
+        return "Modify Success";
+    }
+
 
 
     @GetMapping("/index")
     public String index() {
-        return "index";
+        return "index with /";
     }
 
 }

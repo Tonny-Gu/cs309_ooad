@@ -14,10 +14,8 @@ public class Submission {
     @ManyToOne(cascade = CascadeType.PERSIST)
     private User student;
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JsonIgnore
     private Contest contest;
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JsonIgnore
     private Question question;
 
     @Column(nullable = false)

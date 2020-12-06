@@ -117,22 +117,6 @@ public class AdminController {
         return "Success: " + question.getId();
     }
 
-    @PostMapping("admin/notice/enable")
-    @ApiOperation(value = "使某公告有效")
-    public String enableNew( Integer Id ) {
-        News notice = newsRepository.findById( Id ).orElse( null );
-        if ( notice == null ) return "notice not found";
-        newsRepository.activeNotice( Id , true );
-        return String.format( "notice %d enable" , Id );
-    }
 
-    @PostMapping("/notice/cancel")
-    @ApiOperation(value = "取消某公告")
-    public String cancelNew( Integer Id ) {
-        News notice = newsRepository.findById( Id ).orElse( null );
-        if ( notice == null ) return "notice not found";
-        newsRepository.activeNotice( Id , false );
-        return String.format( "notice %d cancel" , Id );
-    }
 
 }

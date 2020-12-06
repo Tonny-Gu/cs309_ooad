@@ -50,7 +50,7 @@ public class NewsController {
         return newsRepository.findCurrentNotice( );
     }
 
-    @PostMapping("admin/notice/upload")
+    @PostMapping("/admin/notice/upload")
     @ApiOperation( value = "上传公告")
     public String uploadNew( String topic, String content , String author ) {
             User au = userRepository.findByUsername( author );
@@ -65,7 +65,24 @@ public class NewsController {
             notice.setAuthor( au );
             newsRepository.save( notice );
             return "upload successful";
+    }
 
+    @PostMapping("/admin/notice/enable")
+    @ApiOperation(value = "使某公告有效")
+    public String enableNew( Integer Id ) {
+        News notice = newsRepository.findById( Id ).orElse( null );
+        if ( notice == null ) return "notice not found";
+        newsRepository.activeNotice( Id , true );
+        return String.format( "notice %d enable" , Id );
+    }
+
+    @PostMapping("/admin/notice/cancel")
+    @ApiOperation(value = "取消某公告")
+    public String cancelNew( Integer Id ) {
+        News notice = newsRepository.findById( Id ).orElse( null );
+        if ( notice == null ) return "notice not found";
+        newsRepository.activeNotice( Id , false );
+        return String.format( "notice %d cancel" , Id );
     }
 
 

@@ -32,7 +32,7 @@ public class ScoreController {
         this.scoreRepository = scoreRepository;
     }
 
-    @GetMapping("super/score")
+    @GetMapping("/super/score")
     @ApiOperation(value = "按条件获取成绩表(教师)")
     public List<Score> getScore( Integer user_id , Integer contest_id , Integer question_id ) {
         User student = null;
@@ -63,7 +63,7 @@ public class ScoreController {
         return scores;
     }
 
-    @GetMapping("user/score")
+    @GetMapping("/user/score")
     @ApiOperation(value = "按条件获取成绩表(学生)")
     public List<Score> getScoreUser( Integer user_id ,Integer contest_id , Integer question_id ) {
         User student = userRepository.findById( user_id ).orElse( null );
@@ -85,7 +85,7 @@ public class ScoreController {
         return scores;
     }
 
-    @GetMapping("user/contest/rank")
+    @GetMapping("/user/contest/rank")
     @ApiOperation(value = "竞赛排名(登陆可见)")
     public List<Object[]> getRank(Integer contest_id){
         return scoreRepository.getContestRank( contest_id );

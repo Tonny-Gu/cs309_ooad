@@ -86,7 +86,6 @@ public class SubmissionController {
     @ApiOperation(value = "按条件获取提交(用户级别)")
     public List<Submission> getSubmission( Integer user_id ,Integer contest_id , Integer question_id , Boolean withCode ) {
         List<Submission> submissions;
-        System.out.println( "debug: withCode:" + withCode );
         if ( question_id == null && contest_id == null ) {
             User user = userRepository.findById( user_id ).orElse( null );
             if(user==null)return null;

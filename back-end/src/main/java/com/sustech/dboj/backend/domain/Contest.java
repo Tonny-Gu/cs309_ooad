@@ -21,6 +21,7 @@ public class Contest {
 
 
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
+    @JsonIgnore
     private Set<Question> questions;
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
     @JsonIgnore //for security
