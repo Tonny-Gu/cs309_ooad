@@ -20,5 +20,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query(value = "insert into contest_users (users_id, contests_id) values (?1,?2)",nativeQuery=true)
     void joinContest( Integer user_id, Integer contest_id);
 
+    List<User> findAllByRole( String role );
 
 }
