@@ -53,7 +53,7 @@ public class AdminController {
     @Transactional
     @PostMapping("/admin/question/upload")
     @ApiOperation(value = "上传题目")
-    public String uploadQuestion( MultipartFile questionFile , MultipartFile ansFile , Integer author , String degree , String dbType ) throws JsonProcessingException {
+    public String uploadQuestion( MultipartFile questionFile , MultipartFile extenFile , MultipartFile ansFile , Integer author , String degree , String dbType ) throws JsonProcessingException {
         Question question = new Question( );
         if ( questionFile.isEmpty( ) ) {
             return "error: question file is empty";
@@ -86,14 +86,14 @@ public class AdminController {
             question.setDegree( degree );
             question.setDbType( dbType );
             question.setAuthor( au );
-//            if ( !extenFile.isEmpty( ) ) {
-//                try {
-//                    question.setExtension( Base64.getEncoder( ).encodeToString( extenFile.getBytes( ) ) );
-//                } catch (IOException e) {
-//                    e.printStackTrace( );
-//                    return "error: " + e.getMessage( );
-//                }
-//            }
+            if ( extenFile!=null && !extenFile.isEmpty( ) ) {
+                try {
+                    question.setExtension( Base64.getEncoder( ).encodeToString( extenFile.getBytes( ) ) );
+                } catch (IOException e) {
+                    e.printStackTrace( );
+                    return "error: " + e.getMessage( );
+                }
+            }
             questionRepository.save( question );
 
             return "success: " + question.getId( );

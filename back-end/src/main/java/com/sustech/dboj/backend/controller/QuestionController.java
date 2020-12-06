@@ -49,7 +49,7 @@ public class QuestionController {
     }
 
 
-    @GetMapping("/question")
+    @PostMapping("/question")
     @ApiOperation( value = "获取所有题目")
     public List<Question> getAllQuestion( Boolean withContent ) {
         List<Question> questionList = questionRepository.findAll( );
