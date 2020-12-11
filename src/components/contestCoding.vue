@@ -3,84 +3,120 @@
     <NavHeader></NavHeader>
     <div id='Main'>
       <div id="contest_questions">
-        <el-button type="info" plain style="position: fixed; top: 45%; left: 0; height: 15%;" @click="drawer=true"><div id="question_list_button">Problems</div></el-button>
+        <el-button type="info" plain style="position: fixed; top: 45%; left: 0; height: 15%;" @click="drawer=true">
+          <div id="question_list_button">Problems</div>
+        </el-button>
         <el-drawer
             title="我是标题"
             :visible.sync="drawer"
             :with-header="false"
             direction="ltr"
-        style="width: 1000px;">
+            style="width: 1000px;">
           <span>
             <el-menu default-active="1" class="el-menu-vertical-demo" style="height: 100%;">
-            <el-menu-item v-for="contest_question in questionsInContest" :key="contest_question.name" @click="handleOpen(contest_question)"><template slot="title"><span>{{contest_question.name}}</span></template></el-menu-item>
+            <el-menu-item v-for="contest_question in questionsInContest" :key="contest_question.name"
+                          @click="handleOpen(contest_question)"><template
+                slot="title"><span>{{ contest_question.name }}</span></template></el-menu-item>
             </el-menu>
           </span>
         </el-drawer>
       </div>
       <div id='question_block'>
-        <el-menu class="el-menu-demo" mode="horizontal" >
-          <el-menu-item @click="Show=true">
+        <el-menu class="el-menu-demo" mode="horizontal">
+          <el-menu-item @click="Show=1">
             Question Description
           </el-menu-item>
           <el-menu-item @click="handleSubmissionRecord">
             Submission Record
           </el-menu-item>
+          <el-menu-item @click="handleRank">
+            Contest Rank
+          </el-menu-item>
         </el-menu>
-        <div id='question_description' v-html="questionContent" v-if="Show" style="text-align: left;margin-left: 2%;">
+        <div id='question_description' v-html="questionContent" v-if="Show === 1" style="text-align: left;margin-left: 2%;">
 
         </div>
-        <div v-else>
-          <el-table :data="pageList" stripe style="width: 100%; text-align-all: center;">
-            <el-table-column prop="QuestionId" label="题目号">
-            </el-table-column>
-            <el-table-column prop="StudentId" label="用户名">
-            </el-table-column>
-            <el-table-column prop="submitTime" label="提交时间">
-            </el-table-column>
-            <el-table-column prop="runTime" label="运行时间">
-            </el-table-column>
-            <el-table-column prop="statusName" label="结果">
+        <div v-if="Show === 2">
+          <el-dialog title="Detail" :visible.sync="DetailVisible" :append-to-body="true">
+            <div>{{this.Detail.info}}</div>
+            <el-divider></el-divider>
+            <div>{{this.Detail.code}}</div>
+          </el-dialog>
+<!--          <el-table :data="pageList" stripe style="width: 100%; text-align-all: center;">-->
+<!--            <el-table-column prop="id" label="Submission Id">-->
+<!--            </el-table-column>-->
+<!--            <el-table-column prop="status" label="Status">-->
+<!--              <template slot-scope="scope">-->
+<!--                <span v-html="formateStatus( scope.row.status )"></span>-->
+<!--              </template>-->
+<!--            </el-table-column>-->
+<!--            <el-table-column prop="submitTime" label="Submit Time">-->
+<!--            </el-table-column>-->
+<!--            <el-table-column prop="questionTitle" label="Question">-->
+<!--            </el-table-column>-->
+<!--          </el-table>-->
+          <el-table :data="pageList" tooltip-effect="dark"
+                    style="width: 100%;overflow: auto;text-align-all: center">
+            <el-table-column property="id" label="Submit Id" align="center" sortable></el-table-column>
+            <el-table-column property="status" label="Statue" align="center" sortable>
               <template slot-scope="scope">
-                <span v-html="formateStatus( scope.row.statusName )"></span>
+                <el-button type="primary" v-if="scope.row.status === 'Accept'" style="background-color: #67C23A;width: 100px;border: black" size="small">{{ scope.row.status }}</el-button>
+                <el-button type="primary" v-else-if="scope.row.status === 'Wrong Answer'" style="background-color: #F56C6C;width: 100px;border: black" size="small">Wrong</el-button>
+                <el-button type="primary" size="small" v-else style="background-color: rgb(245,187,1);width: 100px; border: black">Waiting</el-button>
+              </template>
+            </el-table-column>
+            <el-table-column property="submitTime" label="Submit Time" align="center" sortable></el-table-column>
+            <el-table-column property="contest" label="Contest" align="center"></el-table-column>
+            <el-table-column property="questionTitle" label="Question" align="center"></el-table-column>
+            <el-table-column label="Code/Info" align="center">
+              <template slot-scope="scope">
+                <el-button type="primary" @click="showDetail(scope.row)">Detail</el-button>
               </template>
             </el-table-column>
           </el-table>
           <div class="block">
-            <el-pagination id='PageControl' @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage1"
-                           :page-sizes="[10, 20, 30, 40]" :page-size="10" layout="total, sizes, prev, pager, next, jumper" :total="rawList.length"></el-pagination>
+            <el-pagination id='PageControl' @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                           :current-page="currentPage1"
+                           :page-sizes="[10, 20, 30, 40]" :page-size="10"
+                           layout="total, sizes, prev, pager, next, jumper" :total="rawList.length"></el-pagination>
           </div>
         </div>
+      </div>
+      <div v-if="Show === 3">
       </div>
       <div id='edit_block' style="text-align: -webkit-auto;">
         <div id="edit_header">
           <div id="language">
-            <el-select v-model="language" filterable placeholder="Please choose the language you use" style="width: 130px;margin-top: 10px;margin-right: 10px;"
+            <el-select v-model="language" filterable placeholder="Please choose the language you use"
+                       style="width: 130px;margin-top: 10px;margin-right: 10px;"
                        size="large">
               <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
               </el-option>
             </el-select>
           </div>
           <div id='format_div'>
-            <el-tooltip class="item" effect="dark" content="Format you code" placement="top-start" style="margin-top: 10px;">
+            <el-tooltip class="item" effect="dark" content="Format you code" placement="top-start"
+                        style="margin-top: 10px;">
               <el-button plain v-on:click='format()'>Format</el-button>
             </el-tooltip>
           </div>
           <div id='upload' style="margin-top: 1%;">
             <el-tooltip class="item" effect="dark" content="Submit you Code" placement="top-start">
-               <el-button style="width: 90px;" @click="submitCode">Submit<i class="el-icon-upload el-icon-right"></i></el-button>
-<!--              <el-link style='font-size: 20px; margin-top: 20px;margin-left: 8px;color: greenyellow;'><i class='el-icon-upload'></i>Submit</el-link>-->
+              <el-button style="width: 90px;" @click="submitCode">Submit<i class="el-icon-upload el-icon-right"></i>
+              </el-button>
+              <!--              <el-link style='font-size: 20px; margin-top: 20px;margin-left: 8px;color: greenyellow;'><i class='el-icon-upload'></i>Submit</el-link>-->
             </el-tooltip>
           </div>
           <div id='load_history' style="margin-top: 1%;">
             <el-tooltip class="item" effect="dark" content="Reload the last code" placement="top-start">
-               <el-button icon="el-icon-edit"></el-button>
-<!--              <el-link style='font-size: 20px; margin-top: 20px;margin-left: 8px;color: blue;'><i class='el-icon-info'></i>Reload</el-link>-->
+              <el-button icon="el-icon-edit" @click="getLatestCode"></el-button>
+              <!--              <el-link style='font-size: 20px; margin-top: 20px;margin-left: 8px;color: blue;'><i class='el-icon-info'></i>Reload</el-link>-->
             </el-tooltip>
           </div>
           <div id='clear' style="margin-top: 1%;">
             <el-tooltip class="item" effect="dark" content="Clear the code" placement="top-start">
-               <el-button icon="el-icon-delete"></el-button>
-<!--              <el-link style='font-size: 20px; margin-top: 20px; color: red;'><i class='el-icon-delete'></i>Clear</el-link>-->
+              <el-button icon="el-icon-delete" @click="clear()"></el-button>
+              <!--              <el-link style='font-size: 20px; margin-top: 20px; color: red;'><i class='el-icon-delete'></i>Clear</el-link>-->
             </el-tooltip>
           </div>
         </div>
@@ -90,9 +126,9 @@
         </div>
       </div>
     </div>
-    <el-dialog :visible.sync="returnDialog" >
+    <el-dialog :visible.sync="returnDialog">
       <span slot="title" class="dialog-footer">
-        #{{this.chosenTitle}} | {{this.$store.state.myUser.nickname}}'s solution
+        #{{ this.chosenTitle }} | {{ this.$store.state.myUser.nickname }}'s solution
       </span>
 
       <el-table :data="submitData">
@@ -103,7 +139,7 @@
       </el-table>
       <el-card class="box-card">
         <div class="text item" style="text-align: left">
-          {{submitData[0].returnContent}}
+          {{ submitData[0].returnContent }}
         </div>
       </el-card>
       <div style="margin-top: 20px; height: 20px;">
@@ -119,10 +155,12 @@ import NavHeader from '../components/NavHeader.vue'
 import questionDescription from '../components/questionDescr.vue'
 import sqlFormatter from "sql-formatter";
 import "codemirror/theme/ambiance.css";
+import "codemirror/theme/idea.css";
 import "codemirror/lib/codemirror.css";
 import "codemirror/addon/hint/show-hint.css";
 import api from '@/views/api'
 import Qs from 'qs'
+
 let CodeMirror = require("codemirror/lib/codemirror");
 require("codemirror/addon/edit/matchbrackets");
 require("codemirror/addon/selection/active-line");
@@ -134,8 +172,17 @@ export default {
 
   name: 'answer',
   methods: {
-    handleYes(){
-      this.returnDialog=false
+    clear(){
+      this.editor.setValue('');
+    },
+    handleRank(){
+      this.Show = 3;
+      api.getContestRank(this.$route.params.contestId).then(res =>{
+        console.log(res)
+      })
+    },
+    handleYes() {
+      this.returnDialog = false
       this.submitData = [{
         status: 'running',
         language: '',
@@ -144,14 +191,16 @@ export default {
         returnContent: ''
       }]
     },
-    handleSubmissionRecord: function(){
-      this.Show = false;
+    handleSubmissionRecord: function () {
+      this.Show = 2;
+      this.getQuestionSubmissionInContest()
+
     },
-    handleSizeChange: function(pageSize) {
+    handleSizeChange: function (pageSize) {
       this.pageSize = pageSize;
       this.handleCurrentChange(this.currentPage1);
     },
-    handleCurrentChange: function(currentPage) {
+    handleCurrentChange: function (currentPage) {
       this.currentPage1 = currentPage;
       this.currentChangePage(this.rawList, currentPage);
     },
@@ -170,7 +219,7 @@ export default {
         return (`<span style="color: #4bfe20">${statusName}</span>`)
       return (`<span style="color: #f30112">${statusName}</span>`)
     },
-    handleOpen(contest_question){
+    handleOpen(contest_question) {
       this.questionContent = contest_question.content;
       this.chosenId = contest_question.id
       this.chosenTitle = contest_question.name
@@ -194,16 +243,16 @@ export default {
       /*将sql内容进行格式后放入编辑器中*/
       this.editor.setValue(sqlFormatter.format(sqlContent));
     },
-    getQuestionInContest(){
-      api.getQuestionByContest(this.$route.params.contestId).then(res =>{
+    getQuestionInContest() {
+      api.getQuestionByContest(this.$route.params.contestId).then(res => {
         console.log(res)
-        for(let i = 0; i < res.data.length;i++){
+        for (let i = 0; i < res.data.length; i++) {
           let data = {
-            name:res.data[i].name,
-            degree:res.data[i].degree,
+            name: res.data[i].name,
+            degree: res.data[i].degree,
             dbType: res.data[i].dbType,
-            content:atob(res.data[i].content),
-            id:res.data[i].id
+            content: atob(res.data[i].content),
+            id: res.data[i].id
           }
           this.questionsInContest.push(data)
         }
@@ -212,30 +261,30 @@ export default {
         this.chosenTitle = this.questionsInContest[0]['name']
       })
     },
-    submitCode(){
+    submitCode() {
       let data = {
         user_id: this.$store.state.myUser.id,
         question_id: this.chosenId,
         contest_id: this.$route.params.contestId,
-        code:this.editor.getValue(),
-        language:this.language
+        code: this.editor.getValue(),
+        language: this.language
       }
-      api.submitCode(Qs.stringify(data)).then(res=>{
+      api.submitCode(Qs.stringify(data)).then(res => {
         this.submissionId = res.data;
         this.returnDialog = true;
         this.lopQuest()
       })
     },
-    lopQuest(){
+    lopQuest() {
       timer = window.setInterval(() => {
         setTimeout(this.getResult(), 0)
       }, 1000)
     },
-    getResult(){
-      api.getResult(this.submissionId).then(res =>{
+    getResult() {
+      api.getResult(this.submissionId).then(res => {
         console.log(res)
         this.submissionStatus = res.data.status;
-        if(this.submissionStatus!=='Submit'){
+        if (this.submissionStatus !== 'Submit') {
           this.submitData[0].status = this.submissionStatus
           this.submitData[0].language = res.data.language
           this.submitData[0].submissionTime = res.data.submitTime
@@ -245,8 +294,55 @@ export default {
         }
       })
     },
-    stopTimer(){
+    stopTimer() {
       window.clearInterval(timer)
+    },
+    getLatestCode(){
+      let data = {
+        contest_id: this.$route.params.contestId,
+        id: this.$store.state.myUser.id,
+        question_id: this.chosenId,
+        recent: true,
+      }
+      api.getLatestSubmitCode(Qs.stringify(data)).then(res =>{
+        if(res.status === 200){
+          console.log(res.data.code)
+           this.latestCode = window.atob(res.data[0].code);
+          this.editor.setValue(this.latestCode);
+        }
+      })
+    },
+    getQuestionSubmissionInContest(){
+      let data = {
+        contest_id: this.$route.params.contestId,
+        user_id: this.$store.state.myUser.id,
+        question_id: this.chosenId,
+        withCode: true,
+      }
+      this.rawList = []
+      api.getSubmissionCondi(Qs.stringify(data)).then(res =>{
+        console.log(res)
+        for(let i = 0; i < res.data.length ; i++){
+          let unit = {
+            id : res.data[i].id,
+            status: res.data[i].status,
+            submitTime: res.data[i].submitTime,
+            contest: res.data[i].contest.name,
+            questionTitle: res.data[i].question.name,
+            info:res.data[i].info,
+            code:atob(res.data[i].code),
+          }
+          this.rawList.push(unit)
+          this.handleCurrentChange(this.currentPage1);
+        }
+      })
+    },
+    showDetail(row){
+      this.Detail = {}
+      this.Detail['code'] = row.code;
+      this.Detail['info'] = row.info;
+      console.log(row)
+      this.DetailVisible = true
     }
   },
   components: {
@@ -255,9 +351,12 @@ export default {
   },
   data() {
     return {
+      Detail:{},
+      DetailVisible: false,
       returnDialog: false,
-      submissionId:'',
-      submissionStatus:'',
+      submissionId: '',
+      submissionStatus: '',
+      latestCode:'',
       submitData: [{
         status: 'running',
         language: '',
@@ -265,205 +364,16 @@ export default {
         runId: '',
         returnContent: ''
       }]
-      ,rawList: [{
-        QuestionId: '321',
-        StudentId: '123',
-        submitTime: '2020-11-19 10:30',
-        runTime: '10ms',
-        statusName: "Pass"
-      },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '123',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        },
-        {
-          QuestionId: '23',
-          StudentId: '123',
-          submitTime: '2020-11-19 10:30',
-          runTime: '10ms',
-          statusName: "TLE"
-        }
-      ],
+      , rawList: [],
       currentQuestion: '',
       currentPage1: 1,
       pageSize: 10,
       pageList: [],
       current_activity: 1,
-      chosenId:'',
-      chosenTitle:'',
+      chosenId: '',
+      chosenTitle: '',
       drawer: false,
-      Show: true,
+      Show: 1,
       editor: null,
       options: [{
         value: 'PostgreSQL',
@@ -477,8 +387,7 @@ export default {
       }],
       language: 'PostgreSQL',
       questionContent: '',
-      questionsInContest: [
-      ]
+      questionsInContest: []
     }
   },
   props: {
@@ -521,7 +430,7 @@ export default {
     let contest_questions = document.getElementById('contest_questions');
     contest_questions.style.height = (window.innerHeight - 60) + 'px';
     let mime = 'text/x-mariadb'
-    //let theme = 'ambiance'//设置主题，不设置的会使用默认主题
+    let theme = 'idea'//设置主题，不设置的会使用默认主题
     this.editor = CodeMirror.fromTextArea(this.$refs.mycode, {
       value: this.value,
       mode: mime, //选择对应代码编辑器的语言，我这边选的是数据库，根据个人情况自行设置即可
@@ -533,7 +442,7 @@ export default {
       cursorHeight: 1,
       lineWrapping: true,
       readOnly: this.readOnly,
-      //theme: '',
+      theme: 'idea',
       // autofocus: true,
       extraKeys: {
         'Ctrl': 'autocomplete'
@@ -559,12 +468,12 @@ export default {
   float: left;
 }
 
-#question_list_button{
+#question_list_button {
   margin: 0 auto;
   height: 140px;
   font-size: 30px;
-  writing-mode: vertical-lr;/*从左向右 从右向左是 writing-mode: vertical-rl;*/
-  writing-mode: tb-lr;/*IE浏览器的从左向右 从右向左是 writing-mode: tb-rl；*/
+  writing-mode: vertical-lr; /*从左向右 从右向左是 writing-mode: vertical-rl;*/
+  writing-mode: tb-lr; /*IE浏览器的从左向右 从右向左是 writing-mode: tb-rl；*/
 }
 
 #user_choice {
@@ -585,7 +494,7 @@ export default {
   overflow: hidden;
 }
 
-#contest_questions{
+#contest_questions {
 }
 
 #edit_block {
@@ -636,8 +545,14 @@ export default {
 }
 
 .CodeMirror {
+  font-family: Consolas, monospace;
   border: 1px solid #eee;
   height: calc(100vh - 90px);
   font-size: 20px;
+}
+
+@font-face {
+  font-family: Consolas;
+  src: url("../assets/consola-1.ttf");
 }
 </style>

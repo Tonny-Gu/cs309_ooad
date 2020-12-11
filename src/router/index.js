@@ -36,11 +36,6 @@ const routes = [{
 				path: '/contest',
 				name: 'contest',
 				component: () => import('../components/contest')
-			},
-			{
-				path: '/forum',
-				name: 'forum',
-				component: () => import('../components/forum')
 			}
 		]
 	},
@@ -58,15 +53,16 @@ const routes = [{
 		path: '/adminMain',
 		name: 'adminMain',
 		component: () => import('../views/adminMain.vue'),
-		children: [{
-			path: '/adminMain/adminUpload',
-			name: 'adminUpload',
-			component: () => import('../components/adminUpload.vue')
-		},
+		children: [
 			{
 				path: '/adminMain/createContest',
 				name: 'createContest',
 				component: () => import('../components/createContest')
+			},
+			{
+				path: '/adminMain/submissionRecord',
+				name: 'submissionRecord',
+				component: () => import('../components/AdminSubmissionRecord')
 			}]
 	},
 	{

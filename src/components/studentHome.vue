@@ -4,7 +4,29 @@
     <div style="padding: 0;margin: 0;" v-if="this.$route.fullPath === '/'">
       <div id="studentHeader" style="padding: 1px;"
            :style="'height: ' + clientHeight * 50 / 100 + 'px;width: ' + clientWidth + 'px;'">
-        <div class="vintage" style="font-size: 50px;" :style="'margin-top:' + clientHeight * 20 / 100 + 'px;'">Welcome to DBOJ!</div>
+        <div id="login" :style="'height: ' + clientHeight * 50 / 100 + 'px;width: ' + clientWidth + 'px;'">
+        <vue-particles
+          class="login-bg"
+          color="#39AFFD"
+          :particleOpacity="0.7"
+          :particlesNumber="100"
+          shapeType="circle"
+          :particleSize="4"
+          linesColor="#8DD1FE"
+          :linesWidth="1"
+          :lineLinked="true"
+          :lineOpacity="0.4"
+          :linesDistance="150"
+          :moveSpeed="3"
+          :hoverEffect="true"
+          hoverMode="grab"
+          :clickEffect="true"
+          clickMode="push"
+          :style="'height: ' + clientHeight * 50 / 100 + 'px;width: ' + clientWidth + 'px;'"
+      >
+      </vue-particles>
+        </div>
+        <div class="vintage" style="font-size: 50px;" :style="'margin-top:-' + clientHeight * 20 / 100 + 'px;'">Welcome to DBOJ!</div>
       </div>
       <div style="position: absolute">
         <div id="zyq" class="teacher_card"
@@ -144,7 +166,7 @@ html, body {
 }
 
 #studentHeader {
-  background-image: url(../assets/background.jpg);
+  /*background-image: url(../assets/background.jpg);*/
   background-size: cover;
   margin: 0;
 }
@@ -155,4 +177,6 @@ html, body {
   text-shadow : rgba(255,255,255,0.5) 0 5px 6px, rgba(255,255,255,0.2) 1px 3px 3px;
   -webkit-background-clip : text;
 }
+
+
 </style>

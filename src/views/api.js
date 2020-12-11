@@ -24,12 +24,8 @@ export default {
     createContest(data){
         return common_interact('admin/contest/create','post',{data})
     },
-    getAllQuestion(withContent){
-        return common_interact('question','get',{
-            params: {
-                withContent: withContent
-            }
-    })},
+    getAllQuestion(data){
+        return common_interact('question','post',{data})},
     getQuestionByName(name){
         return common_interact('/question/name','get',{
             params: {
@@ -69,6 +65,54 @@ export default {
                 id: id
             }
         })
+    },
+    modifyContest(data){
+        return common_interact('admin/contest/modify','post',{data})
+    },
+    uploadTestcase(data){
+        return common_interact('admin/testcase/upload','post',{data})
+    },
+    joinContest(data){
+        return common_interact('user/joinContest','post',{data})
+    },
+    getusersContest(id){
+        return common_interact('user/get/contests','get',{
+            params: {
+                id: id
+            }
+        })
+    },
+    getAllsubmission(){
+        return common_interact('admin/submission/all','get')
+    },
+    getMySubmission(id) {
+        return common_interact('user/get/submission','get',{
+            params: {
+                id: id,
+            }
+        })
+    },
+    uploadNotice(data){
+        return common_interact('admin/notice/upload','post',{data})
+    },
+    getAllNotice(){
+        return common_interact('notice/all','get')
+    },
+    deleteNotice(data){
+        return common_interact('admin/notice/cancel','post',{data})
+    },
+    getContestRank(id){
+        return common_interact('user/contest/rank','get',{
+            params: {
+                contest_id: id
+            }
+        })
+    },
+    getLatestSubmitCode(data){
+        return common_interact('user/get/submission','post',{data})
+    },
+    getSubmissionCondi(data){
+        return common_interact('user/submission','post',{data})
     }
 
 

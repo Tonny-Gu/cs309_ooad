@@ -1,6 +1,6 @@
 <template>
-  <div id="createContest">
-    <div id="contest_name" style="width: 20%;margin-left: 20%; float: left;" class="demo-input-suffix">
+  <div id="createContest" style="align-items: center">
+    <div id="contest_name" style="width: 20%;float: left; margin-left: 17%;" class="demo-input-suffix">
       <el-form label-width="130px">
         <el-form-item label="Contest's Name: ">
           <el-input v-model="contestData.name"></el-input>
@@ -21,14 +21,10 @@
         </el-form-item>
       </el-form>
     </div>
-    <div id="addQuestion" style="float: left; margin-left: 20%; margin-top: 5%; width: 100%;">
-      <el-form label-width="130px">
-        <el-form-item label="Choose questions: ">
-          <el-transfer filterable :filter-method="filterMethod" filter-placeholder="Please input the id and title" v-model="value" :data="data" :titles="['question bank', 'contest']" style="text-align: left"></el-transfer>
-        </el-form-item>
-      </el-form>
-      <el-button @click="create">Create</el-button>
+    <div id="transfer" style="width: 100%; margin-left: 25%; float: left; margin-top: 5%;">
+      <el-transfer filterable :filter-method="filterMethod" filter-placeholder="Please input the id and title" v-model="value" :data="data" :titles="['question bank', 'contest']" style="text-align: left;"></el-transfer>
     </div>
+    <el-button @click="create" type="primary" style="margin-left: 50%; margin-top: 5%;">create</el-button>
 
   </div>
 </template>
@@ -40,7 +36,10 @@ export default {
   data() {
     const generateData = _ => {
       let data = [];
-      api.getAllQuestion('false').then(res =>{
+      let tmpdata = {
+        withContent:false
+      }
+      api.getAllQuestion(Qs.stringify(tmpdata)).then(res =>{
         for(let i = 0; i < res.data.length;i++){
           let tmpdata = {
             questionId:res.data[i].id,
@@ -95,7 +94,23 @@ export default {
   margin-top: 70px;
 }
 
+
 .el-transfer-panel{
   width: 20%;
+  margin-right: 0;
+  margin-left: 0;
+  right: 0;
+  left: 0;
+  padding: 0;
+}
+
+.el-transfer__buttons{
+  width: 10%;
+  margin-left: 0;
+  margin-right: 0;
+  right: 0;
+  left: 0;
+  padding: 0;
+  text-align: center;
 }
 </style>

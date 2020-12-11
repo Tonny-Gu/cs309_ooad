@@ -31,6 +31,7 @@
 <script>
 	import susfoot from "./susfoot.vue"
   import api from "@/views/api";
+	import Qs from  'qs';
 	export default {
 		data() {
 			return {
@@ -72,7 +73,10 @@
 				}
 			},
       getAllQuestion(){
-        api.getAllQuestion(false).then(res =>{
+			  let data = {
+          withContent:false
+        }
+        api.getAllQuestion(Qs.stringify(data)).then(res =>{
           for (let i = 0 ; i < res.data.length; i++){
             let tmpdata = {
               questionId:res.data[i].id,

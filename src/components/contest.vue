@@ -1,46 +1,77 @@
 <template>
   <div id='ContestMenu'>
-    {{clientHeight}}
-    <div id='Annoucement'>
+    <div id='Annoucement' :style="'margin-top: ' + (clientHeight / 100) + 'px'">
       <el-carousel :interval="6000" height="150px" id='annoucementText'>
         <el-carousel-item v-for="item in annoucement" :key="item">
           <h3 class="medium" style="word-wrap:break-word;" v-html="item"></h3>
         </el-carousel-item>
       </el-carousel>
     </div>
-    <div id="table-content" style="overflow: auto">
-      <el-table :data="pageList" stripe style="width: 100%;top: 20px;" :style="'height: ' + (clientHeight - 60 - 150) + 'px'">
-        <el-table-column prop="contestName" label="Contest">
+    <div id="table-content" :style="'height: ' + (clientHeight * 99 / 100 - 230) + 'px;padding:0;margin-bottom: 0; margin-top: 0; top: 0; bottom: 0; overflow: auto;'">
+      <div :style="'height: ' + (tableHeight) + 'px; padding: 0; margin: 0;'">
+      <el-table :data="pageList" stripe style="width: 100%;top: 20px;"  >
+        <el-table-column prop="contestName" label="Contest" align="center">
           <template slot-scope="scope">
-            <el-button type="text" @click="accessAnswerPage(scope.row.contestId)">{{ scope.row.contestTitle }}
-            </el-button>
+            <div style="font-size: 20px">{{scope.row.contestTitle}}</div>
           </template>
         </el-table-column>
-        <el-table-column prop="StartTime" label="DeadLine"></el-table-column>
-        <el-table-column prop="EndTime" label="Start time"></el-table-column>
+        <el-table-column prop="StartTime" label="Start Time" ></el-table-column>
+        <el-table-column prop="EndTime" label="End Time"></el-table-column>
+        <el-table-column label="Access" align="center"><template slot-scope="scope">
+          <el-button @click="accessAnswerPage(scope.row.contestId)" type="primary" v-if="participatedContestId.indexOf(scope.row.contestId) > -1 && Object.keys($store.state.myUser).length !== 0" style="background-color: #67C23A;width: 100px" size="small">Enter</el-button>
+          <el-button @click="handleClick(scope.row)" type="primary" size="small" v-else style="width: 100px">Join</el-button>
+        </template></el-table-column>
       </el-table>
-      <br/>
-      <div class="block">
+      </div>
+      <div id="block">
         <el-pagination id='PageControl' @size-change="handleSizeChange" @current-change="handleCurrentChange"
                        :current-page="currentPage1"
                        :page-sizes="[10, 20, 30, 40]" :page-size="10" layout="total, sizes, prev, pager, next, jumper"
                        :total="rawList.length"></el-pagination>
       </div>
-      <br/>
     </div>
-
     <div class="selfInfo">
       <br/>
-      <div style="text-align: left; margin-left: 5%;">User Name: {{ this.$store.state.myUser.nickname }}</div>
+      <div style="text-align: left; margin-left: 5%; font-family: 'Microsoft JhengHei';">User Name: {{ this.$store.state.myUser.nickname }}</div>
       <br/>
-      <div style="text-align: left; margin-left: 5%;">Account Number: {{ this.$store.state.myUser.username }}</div>
+      <div style="text-align: left; margin-left: 5%; font-family: 'Microsoft JhengHei';">Account Number: {{ this.$store.state.myUser.username }}</div>
       <br/>
-      <div style="text-align: left; margin-left: 5%;">Role: {{ this.$store.state.myUser.role }}</div>
+      <div style="text-align: left; margin-left: 5%; font-family: 'Microsoft JhengHei';">Role: {{ this.$store.state.myUser.role }}</div>
+      <br/>
+      <el-button type="primary" style="background-color: green;" @click="getMySubmission">Submission Record</el-button>
       <br/>
       <br/>
-      <div id='susRate' style="width: 100%;height: 60%;margin-top: 10%;"></div>
+      <div style="text-align: left; margin-left: 5%; font-family: 'Microsoft JhengHei';">Submit Rate:</div>
+      <div id='susRate' style="width: 100%;height: 60%;"></div>
       <!--			<div id='SubmitTime' style="width: 100%;height: 40%;"></div>-->
     </div>
+
+    <el-dialog title="Submit Record" :visible.sync="SubmissionRecordVisible" :append-to-body= true >
+      <el-table :data="record" tooltip-effect="dark"
+                style="width: 100%;overflow: auto;" :style="'height:' + clientHeight / 2 + 'px'">
+        <el-table-column property="id" label="Submit Id" align="center" sortable></el-table-column>
+        <el-table-column property="status" label="Statue" align="center" sortable>
+          <template slot-scope="scope">
+              <el-button type="primary" v-if="scope.row.status === 'Accept'" style="background-color: #67C23A;width: 100px;border: black" size="small">{{ scope.row.status }}</el-button>
+            <el-button type="primary" v-else-if="scope.row.status === 'Wrong Answer'" style="background-color: #F56C6C;width: 100px;border: black" size="small">Wrong</el-button>
+              <el-button type="primary" size="small" v-else style="background-color: rgb(245,187,1);width: 100px; border: black">Waiting</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column property="submitTime" label="Submit Time" align="center" sortable></el-table-column>
+        <el-table-column property="contest" label="Contest" align="center"></el-table-column>
+        <el-table-column property="questionTitle" label="Question" align="center"></el-table-column>
+        <el-table-column label="Code/Info" align="center">
+          <template slot-scope="scope">
+            <el-button type="primary" @click="showDetail(scope.row)">Detail</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-dialog title="Detail" :visible.sync="DetailVisible" :append-to-body="true">
+        <div>{{this.Detail.info}}</div>
+        <el-divider></el-divider>
+        <div>{{this.Detail.code}}</div>
+      </el-dialog>
+    </el-dialog>
 
   </div>
 </template>
@@ -49,10 +80,20 @@
 import susfoot from "./susfoot.vue"
 import echarts from 'echarts'
 import api from '@/views/api'
+import qs from 'qs'
 
 export default {
   data() {
     return {
+      DetailVisible: false,
+      SubmissionRecordVisible: false,
+      Detail:{
+        info: '',
+        code: ''
+      },
+      record: [
+
+      ],
       clientHeight: document.documentElement.clientHeight,
       annoucement: [
         'Here is the first announcement.',
@@ -135,18 +176,23 @@ export default {
           value: 10,
           name: '22:00 - 00:00'
         }
-      ]
+      ],
+      participatedContestId: [],
+      tableHeight: 0
     }
   },
   components: {
     susfoot
   },
+  beforeCreate() {
+
+  },
   mounted: function () {
-    const _this = this
-    window.onresize = function temp() {
-      _this.clientHeight = document.documentElement.clientHeight;
-    };
+    this.tableHeight = document.documentElement.clientHeight * 99 / 100 - document.getElementById('block').offsetHeight - 230;
+    window.addEventListener('resize', () => this.clientHeight = document.documentElement.clientHeight, false)
     this.getAllContest();
+    this.initNotices();
+    this.getusersContest();
     let table = document.getElementById('table-content')
     table.style.height = (window.innerHeight - 210) + 'px'
     this.$nextTick(function () {
@@ -154,7 +200,23 @@ export default {
       // this.drawSubmitTime('SubmitTime');
     });
   },
+  watch: {
+    clientHeight(val) {
+      this.clientHeight = val;
+      this.tableHeight = document.documentElement.clientHeight * 99 / 100 - document.getElementById('block').offsetHeight - 230;
+    },
+    '$store.state.myUser': function (val) {
+      this.getusersContest()
+    }
+  },
   methods: {
+    showDetail(row){
+      this.Detail = {}
+      this.Detail['code'] = row.code;
+      this.Detail['info'] = row.info;
+      console.log(row)
+      this.DetailVisible = true
+    },
     drawPassRate(id) {
       let colors = ['rgb(156,212,125)', 'rgb(205,205,205)', 'rgb(245,145,142)'];
       let i = 0;
@@ -162,9 +224,6 @@ export default {
       this.resultcharts.setOption({
         tooltip: {
           trigger: 'item',
-        },
-        title: {
-          text: 'submit result'
         },
         series: [{
           name: 'Results',
@@ -267,7 +326,6 @@ export default {
     },
     getAllContest() {
       api.getAllContest().then(res => {
-        console.log(res)
         for (let i = 1; i < res.data.length; i++) {
           let tmpdata = {
             contestId: res.data[i].id,
@@ -278,14 +336,61 @@ export default {
           this.rawList.push(tmpdata);
         }
         this.handleCurrentChange(1);
-        console.log(this.rawList);
       })
     },
     accessAnswerPage(contestId) {
       this.$router.push({
         path: '/contestCoding/' + contestId
       })
-    }
+    },
+    handleClick(row) {
+      let data = {
+        contest_id: row.contestId,
+        user_id: this.$store.state.myUser.id
+      }
+      api.joinContest(qs.stringify(data)).then(res => {
+      })
+      this.getusersContest()
+    },
+    getusersContest() {
+      api.getusersContest(this.$store.state.myUser.id).then(res => {
+        this.participatedContestId = []
+        for (let i = 0; i < res.data.length; i++) {
+          this.participatedContestId[i] = res.data[i].id
+        }
+      })
+
+
+    },
+    getMySubmission() {
+      this.SubmissionRecordVisible = true
+      api.getMySubmission(this.$store.state.myUser.id).then(res => {
+        if(res.status === 200){
+          console.log(res)
+          this.record = []
+          for(let i = 0;i<res.data.length;i++){
+            let unit = {
+                id : res.data[i].id,
+                status: res.data[i].status,
+                submitTime: res.data[i].submitTime,
+                contest: res.data[i].contest.name,
+                questionTitle: res.data[i].question.name,
+                info:res.data[i].info,
+                code:atob(res.data[i].code),
+            }
+            this.record.push(unit)
+          }
+        }
+      })
+    },
+    initNotices() {
+      this.annoucement = []
+      api.getAllNotice().then(res=>{
+        for (let i = 0; i < res.data.length; i++) {
+          this.annoucement.push(res.data[i].content)
+        }
+      })
+    },
   },
   filters: {
     ellipsis(value) {
@@ -295,8 +400,7 @@ export default {
       }
       return value
     }
-  },
-
+  }
 }
 </script>
 
@@ -324,7 +428,7 @@ export default {
 #Annoucement {
   width: 60%;
   margin-left: 7%;
-  margin-top: 1%;
+  padding: 0;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
@@ -333,6 +437,8 @@ export default {
   width: 60%;
   height: 100%;
   margin-left: 7%;
+  padding: 0;
+  margin-bottom: 0;
   overflow: auto;
 }
 
@@ -357,5 +463,9 @@ export default {
 
 .el-table .success-row {
   background: #f0f9eb;
+}
+
+.el-pagination{
+  padding-bottom: 0;
 }
 </style>

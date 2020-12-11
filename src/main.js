@@ -5,9 +5,13 @@ import store from './store'
 import Element from 'element-ui'
 import axios from 'axios'
 import "element-ui/lib/theme-chalk/index.css"
+axios.defaults.withCredentials = true
+import VueParticles from 'vue-particles'
+Vue.use(VueParticles)
 
 Vue.use(Element)
 Vue.prototype.$axios = axios
+
 Vue.config.productionTip = false
 
 new Vue({

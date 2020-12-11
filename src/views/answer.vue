@@ -63,6 +63,7 @@
 	import "codemirror/lib/codemirror.css";
 	import "codemirror/addon/hint/show-hint.css";
 	import api from '@/views/api'
+  import Qs from "qs";
 	let CodeMirror = require("codemirror/lib/codemirror");
 	require("codemirror/addon/edit/matchbrackets");
 	require("codemirror/addon/selection/active-line");
@@ -97,7 +98,21 @@
 			    this.questionContent = atob(res.data.content)
         })
 
-      }
+      },
+      submitCode() {
+        let data = {
+          user_id: this.$store.state.myUser.id,
+          question_id: this.chosenId,
+          contest_id: this.$route.params.contestId,
+          code: this.editor.getValue(),
+          language: this.language
+        }
+        api.submitCode(Qs.stringify(data)).then(res => {
+          this.submissionId = res.data;
+          this.returnDialog = true;
+          this.lopQuest()
+        })
+      },
 		},
 		components: {
 			NavHeader,
