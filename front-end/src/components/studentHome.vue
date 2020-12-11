@@ -26,7 +26,7 @@
       >
       </vue-particles>
         </div>
-        <div class="vintage" style="font-size: 50px;" :style="'margin-top:-' + clientHeight * 20 / 100 + 'px;'">Sustech SQLitz</div>
+        <div class="vintage" style="font-size: 50px;" :style="'margin-top:-' + clientHeight * 20 / 100 + 'px;'">SQLitz 专业团队</div>
       </div>
       <div style="position: absolute">
 <!-- :style="'margin-left: ' + clientWidth * 20 / 100+ 'px; margin-top: ' + clientHeight * 5 / 100 + 'px;'" -->
