@@ -1,15 +1,10 @@
 package com.sustech.dboj.backend.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.sustech.dboj.backend.domain.Score;
-import com.sustech.dboj.backend.domain.Submission;
-import com.sustech.dboj.backend.domain.TestCase;
-import com.sustech.dboj.backend.domain.User;
-import com.sustech.dboj.backend.repository.ScoreRepository;
-import com.sustech.dboj.backend.repository.SubmissionRepository;
-import com.sustech.dboj.backend.repository.TestCaseRepository;
-import com.sustech.dboj.backend.repository.UserRepository;
+import com.sustech.dboj.backend.domain.*;
+import com.sustech.dboj.backend.repository.*;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -39,6 +34,9 @@ public class MqttUtil {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private JudgeLogRepository judgeLogRepository;
 
     @Autowired
     private MailServer mailServer;
@@ -77,8 +75,8 @@ public class MqttUtil {
             // ... payload handling omitted
             logger.info( "topic: {} msg:{}" , t , msg );
             ObjectMapper objectMapper = new ObjectMapper( );
-            TestCase testCase = objectMapper.readValue( msg.getPayload( ) , TestCase.class );
-            testCaseRepository.initEnv( testCase.getId( ) , testCase.getEnv( ) );
+            ObjectNode testCase = objectMapper.readValue( msg.getPayload( ) , ObjectNode.class );
+            testCaseRepository.initEnv( testCase.get( "id" ).asInt() , testCase.get( "env" ).asText() );
         } );
     }
 
@@ -99,13 +97,32 @@ public class MqttUtil {
             // ... payload handling omitted
             logger.info( "topic: {} msg: {}" , t , msg );
             ObjectNode node = new ObjectMapper( ).readValue( msg.getPayload( ) , ObjectNode.class );
-            if ( node.has( "info" ) && node.has( "id" ) ) {
-                String info = node.get( "info" ).asText( );
-                String status = node.get( "status" ).asText( );//will del
+            if ( node.has( "info" ) && node.has( "id" ) && node.has( "testCase" ) ) {
+                String totInfo;
+                String totStatus = "submit";
                 Integer id = node.get( "id" ).asInt( );
-                submissionRepository.updateInfo( id , info , status );
+                int caseLen = node.get( "testCase" ).size( );
+                boolean pass = true;
+                ObjectMapper infoMapper = new ObjectMapper( );
+                ArrayNode root = infoMapper.createArrayNode( );
+                for (int i = 0; i < caseLen; i++) {
+                    String status = node.get( "testCase" ).get( i ).get( "status" ).asText( );
+                    String info = node.get( "testCase" ).get( i ).get( "info" ).asText( );
+                    JudgeLog judgeLog = new JudgeLog( );
+                    judgeLog.setInfo( info );
+                    judgeLogRepository.save( judgeLog );
+                    if ( !status.equals( "Accept" ) ) {
+                        pass = false;
+                        totStatus = status;
+                    }
+                    ObjectNode nowCase = infoMapper.createObjectNode( );
+                    nowCase.put( "id" , i );
+                    nowCase.put( "status" , status );
+                    root.add( nowCase );
+                }
+                totInfo = infoMapper.writeValueAsString( root );
+                submissionRepository.updateInfo( id , totInfo , totStatus );
                 // change score table
-                boolean pass = status.equals( "Accept" );
                 Submission submission = submissionRepository.findById( id ).orElse( null );
                 assert submission != null;
                 Score now = scoreRepository.findByStudentAndQuestionAndContest( submission.getStudent( ) , submission.getQuestion( ) , submission.getContest( ) );
@@ -142,7 +159,7 @@ public class MqttUtil {
             if ( node.has( "code" ) && node.has( "msg" ) ) {
                 String code = node.get( "code" ).asText( );
                 String message = node.get( "msg" ).asText( );
-                String mailMsg = String.format( "[Warning] SQLitz 判题系统预警\n警告码[%s]\n预警信息: %s",code,message );
+                String mailMsg = String.format( "[Warning] SQLitz 判题系统预警\n警告码[%s]\n预警信息: %s" , code , message );
                 List<User> SAs = userRepository.findAllByRole( "ROLE_SA" );
                 for (User sa : SAs) {
                     String targetEmail = sa.getUsername( ) + "@mail.sustech.edu.cn";
