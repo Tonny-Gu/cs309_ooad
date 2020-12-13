@@ -117,6 +117,10 @@ public class AdminController {
         return "Success: " + question.getId();
     }
 
-
+    @PostMapping("/admin/getUser")
+    @ApiOperation(value = "通过用户名获取用户" )
+    public User getUser( String username ) {
+        return userRepository.findByUsername( username );
+    }
 
 }
