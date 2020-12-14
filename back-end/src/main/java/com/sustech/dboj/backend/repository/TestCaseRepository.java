@@ -17,4 +17,9 @@ public interface TestCaseRepository extends JpaRepository<TestCase, Integer> {
     @Modifying
     @Query(value = "update test_case set env=?2 where id=?1",nativeQuery=true)
     void initEnv( Integer id, String env );
+
+    @Transactional
+    @Modifying
+    @Query(value = "update test_case set question_id=?2 where id=?1",nativeQuery=true)
+    void updateQuestion( Integer id, int question );
 }

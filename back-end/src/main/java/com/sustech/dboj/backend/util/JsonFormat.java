@@ -40,7 +40,6 @@ public class JsonFormat {
         ObjectMapper objectMapper = new ObjectMapper( );
         objectMapper.setSerializationInclusion( JsonInclude.Include.NON_NULL );
         String language = testCase.getQuestion( ).getDbType( );
-        testCase.setQuestion( null );
         String testCaseJson = objectMapper.writeValueAsString( testCase );
         testCaseJson = testCaseJson.substring( 0 , testCaseJson.length( ) - 1 ) + ",\"language\":\"" + language + "\"}";
         return testCaseJson;

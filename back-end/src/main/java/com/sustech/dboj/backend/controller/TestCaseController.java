@@ -49,12 +49,12 @@ public class TestCaseController {
         String fileName =  UUID.randomUUID().toString();
         try {
             IOUtil.fileStore( initFile, envPathName + fileName + ".sql" );
-            testCase.setInitDB( Arrays.toString( initFile.getBytes( ) ) );
+            testCase.setInitDB( new String( initFile.getBytes( ) ) );
         } catch (IOException e) {
             e.printStackTrace( );
             return "error: " + e.getMessage( );
         }
-        testCase.setQuestion( question );
+//        testCase.setQuestion( question );
         //push to MQTT
         String broker = "tcp://192.168.122.10:1883" ;
         String topic =  "env/send";
@@ -67,6 +67,7 @@ public class TestCaseController {
         }
         testCase.setInitDB( envPathName + fileName + ".sql" );
         testCaseRepository.save( testCase );
+        testCaseRepository.updateQuestion( testCase.getId() , questionId );
         return "success: " + testCase.getId();
      }
 }
