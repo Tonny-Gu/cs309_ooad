@@ -18,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Base64;
+import java.util.Arrays;
+import java.util.UUID;
 
 @RestController
 @Api(tags = "测试用例管理")
@@ -32,7 +33,7 @@ public class TestCaseController {
 
     @PostMapping("/admin/testcase/upload")
     @ApiOperation( value = "上传测试用例")
-    public String uploadTestcase( MultipartFile initFile , Integer questionId ) throws JsonProcessingException {
+    public String uploadTestcase( MultipartFile initFile , Integer questionId ) {
         if ( initFile.isEmpty( ) ) {
             return "error: init file is empty";
         }
@@ -45,9 +46,10 @@ public class TestCaseController {
 //            return "error: ansFile not sql file";
 //        }
         TestCase testCase = new TestCase( );
+        String fileName =  UUID.randomUUID().toString();
         try {
-            IOUtil.fileStore( initFile, envPathName + questionId + ".sql" );
-            testCase.setInitDB( Base64.getEncoder( ).encodeToString(initFile.getBytes()) );
+            IOUtil.fileStore( initFile, envPathName + fileName + ".sql" );
+            testCase.setInitDB( Arrays.toString( initFile.getBytes( ) ) );
         } catch (IOException e) {
             e.printStackTrace( );
             return "error: " + e.getMessage( );
@@ -63,7 +65,7 @@ public class TestCaseController {
         } catch (JsonProcessingException | MqttException e) {
             e.printStackTrace( );
         }
-        testCase.setInitDB( envPathName + questionId + ".sql" );
+        testCase.setInitDB( envPathName + fileName + ".sql" );
         testCaseRepository.save( testCase );
         return "success: " + testCase.getId();
      }

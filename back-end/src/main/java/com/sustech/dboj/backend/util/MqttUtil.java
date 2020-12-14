@@ -58,7 +58,6 @@ public class MqttUtil {
     }
 
     @Bean
-    @Lazy
     public void initListener() throws MqttException {
         String broker = "tcp://192.168.122.10:1883";
         String topic = "env/recv";
@@ -76,12 +75,16 @@ public class MqttUtil {
             logger.info( "topic: {} msg:{}" , t , msg );
             ObjectMapper objectMapper = new ObjectMapper( );
             ObjectNode testCase = objectMapper.readValue( msg.getPayload( ) , ObjectNode.class );
+            if(!testCase.get( "status" ).asText().equalsIgnoreCase( "success" )){
+                String targetEmail = "11811905@mail.sustech.edu.cn";
+                String alertMsg =  "[Sustech DBOJ] 李逸飞 同学, 你的测试样例上传失败，请找顾同舟击剑。";
+                mailServer.sendEmail( targetEmail , "Password Modify" , alertMsg );
+            }
             testCaseRepository.initEnv( testCase.get( "id" ).asInt() , testCase.get( "env" ).asText() );
         } );
     }
 
     @Bean
-    @Lazy
     public void submitListener() throws MqttException {
         String broker = "tcp://192.168.122.10:1883";
         String topic = "code/recv";
@@ -140,7 +143,6 @@ public class MqttUtil {
     }
 
     @Bean
-    @Lazy
     public void mailListener() throws MqttException {
         String broker = "tcp://192.168.122.10:1883";
         String topic = "mail";

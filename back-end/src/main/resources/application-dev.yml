@@ -41,7 +41,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   servlet:
     multipart:
-      max-file-size: 2000000
+      max-file-size: 10000000
   mail:
     username: xiongzc2017@126.com
     host: smtp.126.com

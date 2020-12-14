@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.sustech.dboj.backend.domain.Question;
+import com.sustech.dboj.backend.domain.TestCase;
+import com.sustech.dboj.backend.util.JsonFormat;
 import org.junit.Test;
 
 public class JsonTest {
@@ -65,5 +68,18 @@ public class JsonTest {
             root.add( node );
         }
         System.out.println( mapper.writeValueAsString( root )  );
+    }
+
+    @Test
+    public void test04() throws JsonProcessingException {
+        TestCase ts = new TestCase();
+        ts.setId( 111 );
+        ts.setEnv( "xxx" );
+        Question qs = new Question();
+        ts.setInitDB( "yyy" );
+        qs.setDbType( "postgresql" );
+        ts.setQuestion( qs );
+        System.out.println(JsonFormat.initFormat( ts  ));
+
     }
 }
