@@ -55,7 +55,7 @@ public class DataController {
         }
         map.put( "Accept" , acCnt );
         map.put( "Wrong Answer" , waCnt );
-        map.put( "Wait" , waCnt );
+        map.put( "Wait" , waitCnt );
         map.put( "Timeout" , tleCnt );
         map.put( "totSubmit" , submitCnt );
         return map;
