@@ -10,8 +10,6 @@ import com.sustech.dboj.backend.util.IOUtil;
 import com.sustech.dboj.backend.util.MarkDown2HtmlWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +18,6 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.List;
 import java.util.Objects;
 
 
@@ -65,18 +62,20 @@ public class AdminController {
             if ( !( degree.equalsIgnoreCase( "Hard" ) || degree.equalsIgnoreCase( "Mid" ) || degree.equalsIgnoreCase( "Easy" ) ) ) {
                 return "error: degree error";
             }
-            if ( !( dbType.equalsIgnoreCase( "ALL" ) || dbType.equalsIgnoreCase( "SQLite" )
+            if ( !( dbType.equalsIgnoreCase( "SQLite" )
                     || dbType.equalsIgnoreCase( "MySQL" ) || dbType.equalsIgnoreCase( "PostgreSQL" ) ) ) {
                 return "error: dbType error";
             }
             MarkDown2HtmlWrapper w2h = new MarkDown2HtmlWrapper( );
             try {
+                String fileName = Objects.requireNonNull( questionFile.getOriginalFilename( ) ).split( "." )[0].replace( " ","-" );
                 IOUtil.fileStore( questionFile , pathName +
-                        Objects.requireNonNull( questionFile.getOriginalFilename( ) ) );
+                        fileName + ".md" );
                 question.setContent( Base64.getEncoder( ).encodeToString( w2h.markdown2Html( questionFile.getInputStream( ) ).getBytes( StandardCharsets.UTF_8 ) ) );
-                IOUtil.fileStore( ansFile , ansPathName + questionFile.getOriginalFilename( ) + ".sql" );
+
+                IOUtil.fileStore( ansFile , ansPathName + fileName + ".sql" );
                 question.setAnswerCode( Base64.getEncoder( ).encodeToString( ansFile.getBytes( ) ) );
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace( );
                 return "error: " + e.getMessage( );
             }

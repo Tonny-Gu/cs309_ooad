@@ -121,11 +121,11 @@ public class UserController {
         return "Join contest successfully";
     }
 
-    @PostMapping("/user/send/code")
-    @ApiOperation(value = "发送验证码")
-    public String sendCode( Integer user_id ) throws MessagingException {
+    @PostMapping("/send/code")
+    @ApiOperation(value = "发送验证码(无需登录)")
+    public String sendCode( String username ) throws MessagingException {
         String activeCode = SimpleUtil.getRandomCode( 6 );
-        User user = userRepository.findById( user_id ).orElse( null );
+        User user = userRepository.findByUsername( username );
         if ( user == null ) return "User Not Found";
         user.setActiveCode( activeCode );
         String targetEmail = user.getUsername( ) + "@mail.sustech.edu.cn";
@@ -137,8 +137,8 @@ public class UserController {
 
     @PostMapping("/user/modify/password")
     @ApiOperation(value = "修改密码")
-    public String modifyCode( Integer user_id , String password, String code){
-        User user = userRepository.findById( user_id ).orElse( null );
+    public String modifyCode( String username , String password, String code){
+        User user = userRepository.findByUsername( username );
         if ( user == null ) return "User Not Found";
         if(user.getActiveCode().equals( code )){
             user.setActiveCode( null );
