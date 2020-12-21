@@ -46,6 +46,9 @@ public interface SubmissionRepository extends JpaRepository<Submission, Integer>
     @Query(value = "select * from submit_log limit ?2 offset ?1", nativeQuery = true)
     List<Submission> getSubmissionLimit( Integer begin , Integer length );
 
+    @Query(value = "select * from submit_log where submit_time between ?1 and ?2", nativeQuery = true)
+    List<Submission> getSubmissionBetweenTime( String beginTime, String endTime );
+
     Submission findByStudentAndSubmitTime( User student , String submitTime );
 
     @Transactional

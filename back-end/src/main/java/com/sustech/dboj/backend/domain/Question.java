@@ -26,7 +26,7 @@ public class Question {
     @JsonIgnore
     private String answerCode; // standard ans
     @Column( name = "en_able")
-    private Boolean enable;
+    private Boolean enable = true;
     @Column
     private String extension;// Judge rules
 

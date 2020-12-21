@@ -1,6 +1,5 @@
 package com.sustech.dboj.backend.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sustech.dboj.backend.domain.Submission;
 import com.sustech.dboj.backend.domain.User;
 import com.sustech.dboj.backend.repository.SubmissionRepository;
@@ -11,9 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @RestController
 @Api(tags = "数据收集")
@@ -59,5 +57,24 @@ public class DataController {
         map.put( "Timeout" , tleCnt );
         map.put( "totSubmit" , submitCnt );
         return map;
+    }
+
+
+    @PostMapping("/user/data/time")
+    @ApiOperation(value = "提交时间汇总")
+    public List<String[]> getSubmissions() {
+        SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+        Calendar c = Calendar.getInstance();
+        c.setTime( new  Date());
+        String nowTime = ft.format( c.getTime() );
+        c.add( Calendar.DATE, -  7 );
+        Date d = c.getTime();
+        String sevenAgo = ft.format(d);
+        List<Submission> submissionList = submissionRepository.getSubmissionBetweenTime( sevenAgo, nowTime );
+        List<String[]> result = new ArrayList<>(  );
+        for (Submission submission : submissionList){
+            result.add( new String[]{submission.getStatus(),submission.getSubmitTime()} );
+        }
+        return result;
     }
 }

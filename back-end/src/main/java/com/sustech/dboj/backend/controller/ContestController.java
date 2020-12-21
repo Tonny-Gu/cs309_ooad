@@ -2,7 +2,6 @@ package com.sustech.dboj.backend.controller;
 
 import com.sustech.dboj.backend.domain.Contest;
 import com.sustech.dboj.backend.domain.Question;
-import com.sustech.dboj.backend.domain.Score;
 import com.sustech.dboj.backend.domain.User;
 import com.sustech.dboj.backend.repository.*;
 import io.swagger.annotations.Api;

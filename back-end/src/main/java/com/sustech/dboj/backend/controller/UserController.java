@@ -135,8 +135,8 @@ public class UserController {
         return "Sender Success";
     }
 
-    @PostMapping("/user/modify/password")
-    @ApiOperation(value = "修改密码")
+    @PostMapping("/modify/password")
+    @ApiOperation(value = "修改密码(无需登录)")
     public String modifyCode( String username , String password, String code){
         User user = userRepository.findByUsername( username );
         if ( user == null ) return "User Not Found";

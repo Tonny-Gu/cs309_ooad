@@ -8,13 +8,9 @@ import com.sustech.dboj.backend.util.MqttUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
@@ -84,17 +80,17 @@ public class SubmissionController {
 
     @PostMapping("user/submission")
     @ApiOperation(value = "按条件获取提交(用户级别)")
-    public List<Submission> userGetSubmission( Integer user_id ,Integer contest_id , Integer question_id , Boolean withCode ) {
+    public List<Submission> userGetSubmission( Integer user_id , Integer contest_id , Integer question_id , Boolean withCode ) {
         List<Submission> submissions;
         if ( question_id == null && contest_id == null ) {
             User user = userRepository.findById( user_id ).orElse( null );
-            if(user==null)return null;
+            if ( user == null ) return null;
             submissions = submissionRepository.getLogByStu( user_id );
         } else if ( question_id == null ) {
             submissions = submissionRepository.getLogByContest( user_id , contest_id );
-        } else if( contest_id == null){
+        } else if ( contest_id == null ) {
             submissions = submissionRepository.getLogByQuestion( user_id , question_id );
-        }else{
+        } else {
             submissions = submissionRepository.getLog( user_id , question_id , contest_id );
         }
         if ( !withCode ) {
@@ -119,7 +115,7 @@ public class SubmissionController {
 
     @PostMapping("/admin/submission/contest")
     @ApiOperation(value = "获取某竞赛所有提交")
-    public List<Submission> getSubmissionByContest(Integer contest_id , String name , Boolean withCode ) {
+    public List<Submission> getSubmissionByContest( Integer contest_id , String name , Boolean withCode ) {
         if ( contest_id == null && name == null ) return null;
         List<Submission> submissions;
         if ( contest_id != null ) {
@@ -159,23 +155,23 @@ public class SubmissionController {
 
     @PostMapping("admin/submission/all")
     @ApiOperation(value = "按条件获取提交(管理员级别)")
-    public List<Submission> adminGetSubmission( Integer user_id ,Integer contest_id , Integer question_id , Boolean withCode ) {
+    public List<Submission> adminGetSubmission( Integer user_id , Integer contest_id , Integer question_id , Boolean withCode ) {
         List<Submission> submissions;
-        if ( user_id==null && question_id == null && contest_id == null ) {
-            submissions = submissionRepository.findAll();
-        } else if ( question_id == null && contest_id == null) {
-            submissions = submissionRepository.getLogByStu( user_id  );
-        }else if ( user_id == null && contest_id == null) {
+        if ( user_id == null && question_id == null && contest_id == null ) {
+            submissions = submissionRepository.findAll( );
+        } else if ( question_id == null && contest_id == null ) {
+            submissions = submissionRepository.getLogByStu( user_id );
+        } else if ( user_id == null && contest_id == null ) {
             submissions = submissionRepository.getLogByQuestion( question_id );
-        }else if ( user_id == null && question_id == null){
+        } else if ( user_id == null && question_id == null ) {
             submissions = submissionRepository.getLogByContest( contest_id );
-        }else if ( question_id == null ) {
+        } else if ( question_id == null ) {
             submissions = submissionRepository.getLogByContest( user_id , contest_id );
-        } else if( contest_id == null){
+        } else if ( contest_id == null ) {
             submissions = submissionRepository.getLogByQuestion( user_id , question_id );
-        }else if( user_id == null){
-            submissions = submissionRepository.getLogByQuestionAndContest( question_id, contest_id );
-        }else{
+        } else if ( user_id == null ) {
+            submissions = submissionRepository.getLogByQuestionAndContest( question_id , contest_id );
+        } else {
             submissions = submissionRepository.getLog( user_id , question_id , contest_id );
         }
         if ( !withCode ) {

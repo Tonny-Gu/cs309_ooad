@@ -1,7 +1,6 @@
 package com.sustech.dboj.backend.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sustech.dboj.backend.domain.Question;
 import com.sustech.dboj.backend.domain.TestCase;
 import com.sustech.dboj.backend.repository.QuestionRepository;
