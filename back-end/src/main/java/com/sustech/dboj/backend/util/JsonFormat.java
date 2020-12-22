@@ -1,13 +1,13 @@
 package com.sustech.dboj.backend.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sustech.dboj.backend.domain.Question;
 import com.sustech.dboj.backend.domain.Submission;
 import com.sustech.dboj.backend.domain.TestCase;
 
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -36,10 +36,10 @@ public class JsonFormat {
         return submissionJson;
     }
 
-    public static String initFormat( TestCase testCase ) throws JsonProcessingException {
+    public static String initFormat( TestCase testCase, String language ) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper( );
         objectMapper.setSerializationInclusion( JsonInclude.Include.NON_NULL );
-        String language = testCase.getQuestion( ).getDbType( );
+        objectMapper.configure( JsonGenerator.Feature.ESCAPE_NON_ASCII, true);
         String testCaseJson = objectMapper.writeValueAsString( testCase );
         testCaseJson = testCaseJson.substring( 0 , testCaseJson.length( ) - 1 ) + ",\"language\":\"" + language + "\"}";
         return testCaseJson;

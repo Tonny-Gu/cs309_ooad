@@ -64,7 +64,7 @@ public class DataController {
     }
 
 
-    @PostMapping("/user/data/time")
+    @PostMapping("/data/time")
     @ApiOperation(value = "提交时间汇总")
     public List<String[]> getSubmissions() {
         SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
@@ -84,10 +84,10 @@ public class DataController {
 
     @PostMapping("/user/data/question")
     @ApiOperation(value = "做题统计")
-    public Map<String, Integer> getQuestion( Integer user_id ) {
-        Map<String, Integer> map = new HashMap<>( );
-        map.put( "done" , submissionRepository.doneQuestion( user_id ) );
-        map.put( "all" , questionRepository.getQuestionsNum( ) );
+    public Map<String, Object> getQuestion( Integer user_id ) {
+        Map<String, Object> map = new HashMap<>( );
+        map.put( "done" , submissionRepository.doneQuestion( user_id ).get( 0 )[0] );
+        map.put( "all" , questionRepository.getQuestionsNum( ).get( 0 )[0] );
         return map;
     }
 }

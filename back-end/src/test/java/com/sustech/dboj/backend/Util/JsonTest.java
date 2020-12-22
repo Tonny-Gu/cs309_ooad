@@ -79,7 +79,7 @@ public class JsonTest {
         ts.setInitDB( "yyy" );
         qs.setDbType( "postgresql" );
         ts.setQuestion( qs );
-        System.out.println(JsonFormat.initFormat( ts  ));
+        System.out.println(JsonFormat.initFormat( ts ,qs.getDbType() ));
 
     }
 }

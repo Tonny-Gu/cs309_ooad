@@ -161,6 +161,18 @@ public class UserController {
         return "Modify Success";
     }
 
+    @PostMapping("/admin/modify/role")
+    @ApiOperation(value = "权限更改")
+    public String modifyRole( String username , String role){
+        User user = userRepository.findByUsername( username );
+        if ( user == null ) return "User Not Found";
+        if ( ( !role.equals( "TA" ) ) && ( !role.equals( "SA" ) ) && ( !role.equals( "STU" ) ) )
+            return "Invalid role";
+        user.setRole( "ROLE_" + role );
+        userRepository.save( user );
+        return "Modify Success";
+    }
+
 
 
     @GetMapping("/index")

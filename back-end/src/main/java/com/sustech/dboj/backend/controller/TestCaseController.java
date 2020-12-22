@@ -11,18 +11,23 @@ import com.sustech.dboj.backend.util.MqttUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.UUID;
 
 @RestController
 @Api(tags = "测试用例管理")
 public class TestCaseController {
+    private static final Logger logger = LoggerFactory.getLogger( TestCaseController.class );
     private static final String envPathName = "env/";//path of testcase environment '.sql'
     @Autowired
     private QuestionRepository questionRepository;
@@ -45,21 +50,22 @@ public class TestCaseController {
 //            return "error: ansFile not sql file";
 //        }
         TestCase testCase = new TestCase( );
+        testCaseRepository.save( testCase );
         String fileName =  UUID.randomUUID().toString();
         try {
             IOUtil.fileStore( initFile, envPathName + fileName + ".sql" );
-            testCase.setInitDB( new String( initFile.getBytes( ) ) );
+            testCase.setInitDB( new String(initFile.getBytes( ),  StandardCharsets.UTF_8) );
         } catch (IOException e) {
             e.printStackTrace( );
             return "error: " + e.getMessage( );
         }
-//        testCase.setQuestion( question );
+
         //push to MQTT
         String broker = "tcp://192.168.122.10:1883" ;
         String topic =  "env/send";
         int qos  = 2;
         try {
-            String messageJson = JsonFormat.initFormat( testCase );
+            String messageJson = JsonFormat.initFormat( testCase, question.getDbType() );
             MqttUtil.sender( broker,topic,qos, messageJson );
         } catch (JsonProcessingException | MqttException e) {
             e.printStackTrace( );

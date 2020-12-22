@@ -26,6 +26,6 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     List<Question> contestGetQuestions( Integer id);
 
     @Query(value = "select count(*) from question",nativeQuery=true)
-    int getQuestionsNum();
+    List<Object[]> getQuestionsNum();
 
 }

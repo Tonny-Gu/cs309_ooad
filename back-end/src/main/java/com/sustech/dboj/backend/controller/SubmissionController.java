@@ -38,20 +38,13 @@ public class SubmissionController {
     @ApiOperation(value = "交题接口")
     public String submitCode( Integer user_id , Integer question_id , Integer contest_id , String code , String language ) {
         //put into DB
-        //reserve check
-//        Submission submission = new Submission();
-//        User student = userRepository.findById( user_id ).orElse( null );
-//        if ( student == null )return "err: Invalid User";
-//        Question question = questionRepository.findById( question_id ).orElse( null );
-//        if ( question == null )return "err: Question Not Found";
-//        Contest contest = contestRepository.findById( contest_id ).orElse( null );
-//        if ( contest == null )return "err: contest Not Found";
+        if(language.equals( "Mysql" ))language = "MySQL";
         String status = "Submit";
-        code = Base64.getEncoder( ).encodeToString( code.getBytes( ) );
         SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
         String submit_time = ft.format( new Date( ) );
         User student = userRepository.findById( user_id ).orElse( null );
         if ( student == null ) return "err: student not found";
+        code = Base64.getEncoder( ).encodeToString( code.getBytes( ) );
         submissionRepository.submitToDB( code , status , language , submit_time , contest_id , question_id , user_id , "" );
         Submission submission = submissionRepository.findByStudentAndSubmitTime( student , submit_time );
         Question question = questionRepository.findById( question_id ).orElse( null );

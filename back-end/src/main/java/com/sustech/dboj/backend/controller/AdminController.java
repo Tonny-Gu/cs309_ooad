@@ -8,6 +8,8 @@ import com.sustech.dboj.backend.util.IOUtil;
 import com.sustech.dboj.backend.util.MarkDown2HtmlWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +24,7 @@ import java.util.Objects;
 @RestController
 @Api(tags = "管理员接口")
 public class AdminController {
+    private static final Logger log = LoggerFactory.getLogger( AdminController.class );
     private final UserRepository userRepository;
     private final SubmissionRepository submissionRepository;
     private final QuestionRepository questionRepository;
@@ -42,7 +45,6 @@ public class AdminController {
         this.testCaseRepository = testCaseRepository;
         this.newsRepository = newsRepository;
     }
-
 
 
     @Transactional
@@ -66,7 +68,7 @@ public class AdminController {
             }
             MarkDown2HtmlWrapper w2h = new MarkDown2HtmlWrapper( );
             try {
-                String fileName = Objects.requireNonNull( questionFile.getOriginalFilename( ) ).split( "." )[0].replace( " ","-" );
+                String fileName = Objects.requireNonNull( questionFile.getOriginalFilename( ) ).split( "\\." )[0].replace( " " , "-" );
                 IOUtil.fileStore( questionFile , pathName +
                         fileName + ".md" );
                 question.setContent( Base64.getEncoder( ).encodeToString( w2h.markdown2Html( questionFile.getInputStream( ) ).getBytes( StandardCharsets.UTF_8 ) ) );
@@ -78,14 +80,14 @@ public class AdminController {
                 return "error: " + e.getMessage( );
             }
             String questionName = questionFile.getOriginalFilename( ).split( "\\." )[0];
-            if(questionRepository.findByName( questionName )!=null)return "error: duplicate question name";
+            if ( questionRepository.findByName( questionName ) != null ) return "error: duplicate question name";
             question.setName( questionName );
             question.setDegree( degree );
             question.setDbType( dbType );
             question.setAuthor( au );
-            if ( extenFile!=null && !extenFile.isEmpty( ) ) {
+            if ( extenFile != null && !extenFile.isEmpty( ) ) {
                 try {
-                    question.setExtension( Base64.getEncoder( ).encodeToString( extenFile.getBytes( ) ) );
+                    question.setExtension( new String( extenFile.getBytes( ) ) );
                 } catch (IOException e) {
                     e.printStackTrace( );
                     return "error: " + e.getMessage( );
@@ -102,7 +104,7 @@ public class AdminController {
     @ApiOperation(value = "修改题目")
     public String modifyQuestion( Question question ) {
         questionRepository.save( question );
-        return "Success: " + question.getId();
+        return "Success: " + question.getId( );
     }
 
     @PostMapping("/admin/question/cancel")
@@ -111,11 +113,11 @@ public class AdminController {
         question.setEnable( false );
         questionRepository.save( question );
         // TODO: 删除关联的testcase
-        return "Success: " + question.getId();
+        return "Success: " + question.getId( );
     }
 
     @PostMapping("/admin/getUser")
-    @ApiOperation(value = "通过用户名获取用户" )
+    @ApiOperation(value = "通过用户名获取用户")
     public User getUser( String username ) {
         return userRepository.findByUsername( username );
     }

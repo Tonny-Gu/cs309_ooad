@@ -56,6 +56,6 @@ public interface SubmissionRepository extends JpaRepository<Submission, Integer>
     @Query(value = "update submit_log set info=?2, status=?3 where id=?1",nativeQuery=true)
     void updateInfo( Integer id, String info, String status );
 
-    @Query(value = "select count(distinct question_id) from submit_log where student_id=?1;", nativeQuery = true)
-    int doneQuestion( Integer user_id );
+    @Query(value = "select count(distinct question_id) from submit_log where student_id=?1", nativeQuery = true)
+    List<Object[]> doneQuestion( Integer user_id );
 }

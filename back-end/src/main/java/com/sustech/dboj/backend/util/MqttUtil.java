@@ -13,11 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
 @Configuration
 public class MqttUtil {
+    private final static String[] topics = {"env/recv", "code/recv", "mail"};
 
     @Autowired
     private TestCaseRepository testCaseRepository;
@@ -47,7 +49,7 @@ public class MqttUtil {
         connOpts.setCleanSession( true );
         MqttMessage mqttMessage = new MqttMessage( );
         mqttMessage.setQos( qos );
-        mqttMessage.setPayload( message.getBytes( ) );
+        mqttMessage.setPayload( Base64.getEncoder().encode( message.getBytes() ) );
         publisher.connect( );
         publisher.publish( topic , mqttMessage );
         publisher.disconnect( );
@@ -67,20 +69,28 @@ public class MqttUtil {
             logger.info( "Connecting to broker: " + broker );
             sampleClient.connect( connOpts );
             logger.info( broker + ":Connected Successful" );
-            sampleClient.subscribe( topic , ( t , msg ) -> {
-                // ... payload handling omitted
-                logger.info( "topic: {} msg:{}" , t , msg );
-                ObjectMapper objectMapper = new ObjectMapper( );
-                ObjectNode testCase = objectMapper.readValue( msg.getPayload( ) , ObjectNode.class );
-                if ( !testCase.get( "status" ).asText( ).equalsIgnoreCase( "success" ) ) {
-                    String targetEmail = "11811905@mail.sustech.edu.cn";
-                    String alertMsg = "[Sustech DBOJ] 李逸飞 同学, 你的测试样例上传失败，请找顾同舟击剑。";
-                    mailServer.sendEmail( targetEmail , "Password Modify" , alertMsg );
+            ObjectMapper objectMapper = new ObjectMapper( );
+            sampleClient.subscribe( topic , 2, ( t , msg ) -> {
+                try {
+                    // ... payload handling omitted
+                    logger.info( "topic: {} msg:{}" , t , msg );
+                    String msgInfo = new String( Base64.getDecoder( ).decode( msg.getPayload( ) ) );
+                    ObjectNode testCase = objectMapper.readValue( msgInfo , ObjectNode.class );
+                    if ( !testCase.get( "status" ).asText( ).equalsIgnoreCase( "success" ) ) {
+                        String targetEmail = "11811905@mail.sustech.edu.cn";
+                        String alertMsg = "[Sustech DBOJ] 李逸飞 同学, 你的测试样例上传失败，请找顾同舟击剑。";
+                        mailServer.sendEmail( targetEmail , "Upload Failed" , alertMsg );
+                    }
+                    testCaseRepository.initEnv( testCase.get( "id" ).asInt( ) , testCase.get( "env" ).asText( ) );
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
-                testCaseRepository.initEnv( testCase.get( "id" ).asInt( ) , testCase.get( "env" ).asText( ) );
-            } );
-        } catch (MqttException e) {
-            logger.info( e.getMessage( ) );
+                } );
+        } catch (Exception e) {
+            initListener();
+
+            logger.info( "Upload error: "  );
+            e.printStackTrace();
         }
     }
 
@@ -97,48 +107,55 @@ public class MqttUtil {
             logger.info( "Connecting to broker: " + broker );
             sampleClient.connect( connOpts );
             logger.info( broker + ":Connected Successful" );
-            sampleClient.subscribe( topic , ( t , msg ) -> {
-                // ... payload handling omitted
-                logger.info( "topic: {} msg: {}" , t , msg );
-                ObjectNode node = new ObjectMapper( ).readValue( msg.getPayload( ) , ObjectNode.class );
-                if ( node.has( "info" ) && node.has( "id" ) && node.has( "testCase" ) ) {
-                    String totInfo;
-                    String totStatus = "submit";
-                    Integer id = node.get( "id" ).asInt( );
-                    int caseLen = node.get( "testCase" ).size( );
-                    boolean pass = true;
-                    ObjectMapper infoMapper = new ObjectMapper( );
-                    ArrayNode root = infoMapper.createArrayNode( );
-                    for (int i = 0; i < caseLen; i++) {
-                        String status = node.get( "testCase" ).get( i ).get( "status" ).asText( );
-                        String info = node.get( "testCase" ).get( i ).get( "info" ).asText( );
-                        JudgeLog judgeLog = new JudgeLog( );
-                        judgeLog.setInfo( info );
-                        judgeLogRepository.save( judgeLog );
-                        if ( !status.equals( "Accept" ) ) {
-                            pass = false;
-                            totStatus = status;
+            sampleClient.subscribe( topic , 2, ( t , msg ) -> {
+                try {
+                    // ... payload handling omitted
+                    logger.info( "topic: {} msg: {}" , t , msg );
+                    String msgInfo = new String( Base64.getDecoder( ).decode( msg.getPayload( ) ) );
+                    ObjectNode node = new ObjectMapper( ).readValue( msgInfo , ObjectNode.class );
+                    if ( node.has( "info" ) && node.has( "id" ) && node.has( "testCases" ) ) {
+                        String totInfo;
+                        String totStatus = "submit";
+                        Integer id = node.get( "id" ).asInt( );
+                        int caseLen = node.get( "testCases" ).size( );
+                        boolean pass = true;
+                        ObjectMapper infoMapper = new ObjectMapper( );
+                        ArrayNode root = infoMapper.createArrayNode( );
+                        for (int i = 0; i < caseLen; i++) {
+                            String status = node.get( "testCases" ).get( i ).get( "status" ).asText( );
+                            String info = node.get( "testCases" ).get( i ).get( "info" ).asText( );
+                            if(info.contains( "time out" )) status = "Timout";
+                            JudgeLog judgeLog = new JudgeLog( );
+                            judgeLog.setInfo( info );
+                            judgeLogRepository.save( judgeLog );
+                            if ( !status.equals( "Accepted" ) ) {
+                                pass = false;
+                                totStatus = status;
+                            }
+                            ObjectNode nowCase = infoMapper.createObjectNode( );
+                            nowCase.put( "id" , i );
+
+                            nowCase.put( "status" , status );
+                            root.add( nowCase );
                         }
-                        ObjectNode nowCase = infoMapper.createObjectNode( );
-                        nowCase.put( "id" , i );
-                        nowCase.put( "status" , status );
-                        root.add( nowCase );
+                        totInfo = infoMapper.writeValueAsString( root );
+                        submissionRepository.updateInfo( id , totInfo , totStatus );
+                        // change score table
+                        Submission submission = submissionRepository.findById( id ).orElse( null );
+                        assert submission != null;
+                        Score now = scoreRepository.findByStudentAndQuestionAndContest( submission.getStudent( ) , submission.getQuestion( ) , submission.getContest( ) );
+                        now.setSubmit( now.getSubmit( ) + 1 );
+                        if ( pass && !now.getAc( ) ) {
+                            now.setAc( true );
+                            String acTime = node.get( "submitTime" ).asText( );
+                            now.setAcTime( acTime );
+                        } else if ( !pass && !now.getAc( ) ) {
+                            now.setWa( now.getWa( ) + 1 );
+                        }
+                        scoreRepository.save( now );
                     }
-                    totInfo = infoMapper.writeValueAsString( root );
-                    submissionRepository.updateInfo( id , totInfo , totStatus );
-                    // change score table
-                    Submission submission = submissionRepository.findById( id ).orElse( null );
-                    assert submission != null;
-                    Score now = scoreRepository.findByStudentAndQuestionAndContest( submission.getStudent( ) , submission.getQuestion( ) , submission.getContest( ) );
-                    now.setSubmit( now.getSubmit( ) + 1 );
-                    if ( pass && !now.getAc( ) ) {
-                        now.setAc( true );
-                        String acTime = node.get( "submitTime" ).asText( );
-                        now.setAcTime( acTime );
-                    } else if ( !pass && !now.getAc( ) ) {
-                        now.setWa( now.getWa( ) + 1 );
-                    }
-                    scoreRepository.save( now );
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
             } );
 
@@ -160,10 +177,11 @@ public class MqttUtil {
             logger.info( "Connecting to broker: " + broker );
             sampleClient.connect( connOpts );
             logger.info( broker + ":Connected Successful" );
-            sampleClient.subscribe( topic , ( t , msg ) -> {
+            sampleClient.subscribe( topic , 2, ( t , msg ) -> {
                 // ... payload handling omitted
                 logger.info( "topic: {} msg: {}" , t , msg );
-                ObjectNode node = new ObjectMapper( ).readValue( msg.getPayload( ) , ObjectNode.class );
+                String msgInfo = new String( Base64.getDecoder( ).decode( msg.getPayload( ) ) );
+                ObjectNode node = new ObjectMapper( ).readValue( msgInfo , ObjectNode.class );
                 if ( node.has( "code" ) && node.has( "msg" ) ) {
                     String code = node.get( "code" ).asText( );
                     String message = node.get( "msg" ).asText( );
