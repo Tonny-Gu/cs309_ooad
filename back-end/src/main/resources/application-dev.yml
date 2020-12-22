@@ -45,7 +45,7 @@ spring:
   mail:
     username: xiongzc2017@126.com
     host: smtp.126.com
-    password: QFAQPLFQZRZBMVWQ # secret
+    password:  # secret
     port: 25
     default-encoding: gbk
 

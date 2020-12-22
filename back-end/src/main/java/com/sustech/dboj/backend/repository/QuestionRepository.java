@@ -25,4 +25,7 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @Query(value = "select * from question where question.id in (select questions_id from contest_questions where contests_id=?1)",nativeQuery=true)
     List<Question> contestGetQuestions( Integer id);
 
+    @Query(value = "select count(*) from question",nativeQuery=true)
+    int getQuestionsNum();
+
 }
