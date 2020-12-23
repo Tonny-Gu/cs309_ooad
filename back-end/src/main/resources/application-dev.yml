@@ -37,7 +37,7 @@ spring:
     hibernate:
       ddl-auto: update #if use create, we will build new table and clean all the date.
     open-in-view: false
-    show-sql: true
+    show-sql: false
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   servlet:
     multipart:

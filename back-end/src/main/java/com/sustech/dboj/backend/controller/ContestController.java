@@ -2,6 +2,7 @@ package com.sustech.dboj.backend.controller;
 
 import com.sustech.dboj.backend.domain.Contest;
 import com.sustech.dboj.backend.domain.Question;
+import com.sustech.dboj.backend.domain.Score;
 import com.sustech.dboj.backend.domain.User;
 import com.sustech.dboj.backend.repository.*;
 import io.swagger.annotations.Api;
@@ -30,6 +31,8 @@ public class ContestController {
     private ContestRepository contestRepository;
     @Autowired
     private QuestionRepository questionRepository;
+    @Autowired
+    private ScoreRepository scoreRepository;
 
     @PostMapping("/admin/contest/stu")
     @ApiOperation(value = "获取竞赛的参与者")
@@ -39,9 +42,14 @@ public class ContestController {
         return userRepository.contestGetUsers( id );
     }
 
-    @GetMapping("/contest")
-    public List<Contest> getAllContests() {
+    @GetMapping("admin/contest")
+    public List<Contest> getAdminAllContests() {
         return contestRepository.findAll( );
+    }
+
+    @GetMapping("user/contest")
+    public List<Contest> getUserAllContests() {
+        return contestRepository.findByEnable( true );
     }
 
     @GetMapping("/contest/id")
@@ -52,6 +60,7 @@ public class ContestController {
     @PostMapping("/admin/contest/create")
     @ApiOperation(value = "创建竞赛")
     public Contest createContest( String name , String beginTime , String endTime ) {
+        if(contestRepository.findByName( name )!=null)return null;
         Contest contest = new Contest( );
         contest.setBeginTime( beginTime );
         contest.setEndTime( endTime );
@@ -71,6 +80,13 @@ public class ContestController {
         if ( question == null ) return String.format( "question:%s not found" , question_id );
         if ( myContest == null ) return String.format( "contest:%s not found" , contest_id );
         questionRepository.addQuestion( contest_id , question_id );
+        for (User myUser : userRepository.contestGetUsers( contest_id )){
+            Score score = new Score( );
+            score.setContest( myContest );
+            score.setQuestion( question );
+            score.setStudent( myUser );
+            scoreRepository.save( score );
+        }
         logger.info( "Question: {} was added into Contest: {}" , question.getName( ) , myContest.getName( ) );
         return String.format( "success: add relation->contest %d, question: %d" , contest_id , question_id );
     }

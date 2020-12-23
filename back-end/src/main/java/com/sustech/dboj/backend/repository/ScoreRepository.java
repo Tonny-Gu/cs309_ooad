@@ -29,7 +29,7 @@ public interface ScoreRepository extends JpaRepository<Score, Integer> {
             "from\n" +
             "(select student_id, sum(ac\\:\\:int) as ac_num, max(ac_time) as last_ac_time\n" +
             "from score\n" +
-            "where contest_id = 6\n" +
+            "where contest_id = ?1\n" +
             "group by student_id\n" +
             "order by last_ac_time) a\n" +
             "join user_info\n" +

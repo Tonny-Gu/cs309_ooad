@@ -78,7 +78,8 @@ public class AdminController {
                 question.setContent( Base64.getEncoder( ).encodeToString( w2h.markdown2Html( questionFile.getInputStream( ) ).getBytes( StandardCharsets.UTF_8 ) ) );
 
                 FileUtil.fileStore( ansFile , ansPathName + fileName + ".sql" );
-                question.setAnswerCode( Base64.getEncoder( ).encodeToString( ansFile.getBytes( ) ) );
+                String ans = new String (ansFile.getBytes()).replace( "\r\n", "\n" );
+                question.setAnswerCode( Base64.getEncoder( ).encodeToString( ans.getBytes() ) );
             } catch (Exception e) {
                 e.printStackTrace( );
                 return "error: " + e.getMessage( );
@@ -98,7 +99,6 @@ public class AdminController {
                 }
             }
             questionRepository.save( question );
-
             return "success: " + question.getId( );
         }
 

@@ -5,9 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sustech.dboj.backend.domain.Question;
+import com.sustech.dboj.backend.domain.Submission;
 import com.sustech.dboj.backend.domain.TestCase;
 import com.sustech.dboj.backend.util.JsonFormat;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class JsonTest {
 
@@ -80,6 +84,23 @@ public class JsonTest {
         qs.setDbType( "postgresql" );
         ts.setQuestion( qs );
         System.out.println(JsonFormat.initFormat( ts ,qs.getDbType() ));
+
+    }
+
+    @Test
+    public void test5() throws JsonProcessingException {
+        TestCase ts = new TestCase();
+        Submission sb = new Submission();
+        Question question = new Question();
+        question.setAnswerCode( "aW5zZXJ0IGludG8gc3R1ZmYgdmFsdWVzICgnc2FtcGxlJyk7CnNlbGVjdCAqIGZyb20gc3R1ZmY7" );
+        question.setExtension( "def judger(sample_code:str, testee_code:str, form:dict, db_warp) -> bool:\n" +
+                "    before = db_warp.exec_sql(sample_code)\n" +
+                "    db_warp.exec_sql(testee_code, ret=False)\n" +
+                "    after = db_warp.exec_sql(sample_code)\n" +
+                "    return before == after" );
+        List<TestCase> testCaseList = new ArrayList<>(  );
+        testCaseList.add( ts );
+        System.out.println( JsonFormat.submitFormat( sb, question, testCaseList) );
 
     }
 }
