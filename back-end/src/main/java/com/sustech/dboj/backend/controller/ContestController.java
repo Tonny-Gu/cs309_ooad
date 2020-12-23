@@ -53,15 +53,7 @@ public class ContestController {
         contest.setBeginTime( beginTime );
         contest.setEndTime( endTime );
         contest.setName( name );
-        SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
-        String now = ft.format( new Date( ) );
-        if ( contest.getBeginTime( ).compareTo( now ) < 0 && contest.getEndTime( ).compareTo( now ) > 0 ) {
-            contest.setEnable( true );
-            logger.info( "Contest:{} is enable" , contest.getName( ) );
-        } else {
-            contest.setEnable( false );
-            logger.info( "Contest:{} is disable" , contest.getName( ) );
-        }
+        contest.setEnable( checkEnable( contest ) );
         contestRepository.save( contest );
         return contest;
     }
@@ -86,6 +78,7 @@ public class ContestController {
         if ( name != null ) contest.setName( name );
         if ( beginTime != null ) contest.setBeginTime( beginTime );
         if ( endTime != null ) contest.setEndTime( endTime );
+        contest.setEnable( checkEnable( contest ) );
         contestRepository.save( contest );
         return "success: " + contest_id;
     }
@@ -94,6 +87,12 @@ public class ContestController {
     public String delQuestion( Integer contest_id , Integer question_id ) {
         questionRepository.delQuestion( contest_id , question_id );
         return String.format( "success: delete relation->contest %d, question: %d" , contest_id , question_id );
+    }
+
+    private boolean checkEnable(Contest contest){
+        SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+        String now = ft.format( new Date( ) );
+        return contest.getBeginTime( ).compareTo( now ) < 0 && contest.getEndTime( ).compareTo( now ) > 0;
     }
 
 }
