@@ -46,21 +46,21 @@ public class DataController {
                 case "Submit":
                     waitCnt++;
                     break;
-                case "Accept":
+                case "Accepted":
                     acCnt++;
                     break;
                 case "Wrong Answer":
                     waCnt++;
                     break;
-                case "Timout": // not sure
+                case "Time Limited": // not sure
                     tleCnt++;
                     break;
             }
         }
-        map.put( "Accept" , acCnt );
+        map.put( "Accepted" , acCnt );
         map.put( "Wrong Answer" , waCnt );
-        map.put( "Wait" , waitCnt );
-        map.put( "Timeout" , tleCnt );
+        map.put( "Waiting" , waitCnt );
+        map.put( "Time Limited" , tleCnt );
         map.put( "totSubmit" , submitCnt );
         return map;
     }

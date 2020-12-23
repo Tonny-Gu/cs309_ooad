@@ -19,18 +19,18 @@ public class JsonFormat {
         submission.setStudent( null );
         submission.setContest( null );
         submission.setQuestion( null );
-        submission.setCode( new String( Base64.getDecoder( ).decode( submission.getCode( ) ) ) );// Will del
         String submissionJson = objectMapper.writeValueAsString( submission );
         String ansCode = question.getAnswerCode();
-        ansCode = ( new String( Base64.getDecoder( ).decode( ansCode ) ) );// Will del
+        ansCode = ( new String( Base64.getDecoder( ).decode( ansCode ) ) );
         String ansCodeJson = ",\"ansCode\":\"" + ansCode + "\"";
         StringBuilder Cases = new StringBuilder( ",\"testCases\":[" );
         for (TestCase testCase : testCases) {
             testCase.setInitDB( null );
             testCase.setQuestion( null );
             testCase.setQuestion( null );
-            Cases.append( objectMapper.writeValueAsString( testCase ) );
+            Cases.append( objectMapper.writeValueAsString( testCase ) ).append( "," );
         }
+        Cases.deleteCharAt( Cases.length()-1 );
         Cases.append( "]" );
         submissionJson = submissionJson.substring( 0 , submissionJson.length( ) - 1 ) + ansCodeJson + Cases + "}";
         return submissionJson;

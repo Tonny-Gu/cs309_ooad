@@ -5,6 +5,7 @@ import com.sustech.dboj.backend.domain.Question;
 import com.sustech.dboj.backend.domain.User;
 import com.sustech.dboj.backend.repository.*;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ public class ContestController {
     private QuestionRepository questionRepository;
 
     @PostMapping("/admin/contest/stu")
+    @ApiOperation(value = "获取竞赛的参与者")
     public List<User> getUserByContest( Integer id ) {
         Contest contest = contestRepository.findById( id ).orElse( null );
         if ( contest == null ) return null;
@@ -48,6 +50,7 @@ public class ContestController {
     }
 
     @PostMapping("/admin/contest/create")
+    @ApiOperation(value = "创建竞赛")
     public Contest createContest( String name , String beginTime , String endTime ) {
         Contest contest = new Contest( );
         contest.setBeginTime( beginTime );
@@ -60,6 +63,7 @@ public class ContestController {
 
 
     @PostMapping("/admin/contest/addquestion")
+    @ApiOperation(value = "添加题目")
     public String addQuestion( Integer contest_id , Integer question_id ) {
         // add contest-user
         Question question = questionRepository.findById( question_id ).orElse( null );
@@ -72,6 +76,7 @@ public class ContestController {
     }
 
     @PostMapping("/admin/contest/modify")
+    @ApiOperation(value = "修改竞赛")
     public String modifyContest( Integer contest_id , String name , String beginTime , String endTime ) {
         Contest contest = contestRepository.findById( contest_id ).orElse( null );
         if ( contest == null ) return "error: Contest Not Found";
@@ -84,6 +89,7 @@ public class ContestController {
     }
 
     @PostMapping("/admin/contest/delquestion")
+    @ApiOperation(value = "删除题目")
     public String delQuestion( Integer contest_id , Integer question_id ) {
         questionRepository.delQuestion( contest_id , question_id );
         return String.format( "success: delete relation->contest %d, question: %d" , contest_id , question_id );

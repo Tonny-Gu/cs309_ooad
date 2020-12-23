@@ -1,6 +1,7 @@
 package com.sustech.dboj.backend.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.sustech.dboj.backend.domain.JudgeLog;
 import com.sustech.dboj.backend.domain.Question;
 import com.sustech.dboj.backend.domain.User;
 import com.sustech.dboj.backend.repository.*;
@@ -18,6 +19,7 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -31,19 +33,21 @@ public class AdminController {
     private final ContestRepository contestRepository;
     private final TestCaseRepository testCaseRepository;
     private final NewsRepository newsRepository;
+    private final JudgeLogRepository judgeLogRepository;
 
 
     private static final String pathName = "questions/";
 
     private static final String ansPathName = "ans/";//path of standard code '.sql'
 
-    public AdminController( UserRepository userRepository , SubmissionRepository submissionRepository , QuestionRepository questionRepository , ContestRepository contestRepository , TestCaseRepository testCaseRepository , NewsRepository newsRepository ) {
+    public AdminController( UserRepository userRepository , SubmissionRepository submissionRepository , QuestionRepository questionRepository , ContestRepository contestRepository , TestCaseRepository testCaseRepository , NewsRepository newsRepository , JudgeLogRepository judgeLogRepository) {
         this.userRepository = userRepository;
         this.submissionRepository = submissionRepository;
         this.questionRepository = questionRepository;
         this.contestRepository = contestRepository;
         this.testCaseRepository = testCaseRepository;
         this.newsRepository = newsRepository;
+        this.judgeLogRepository = judgeLogRepository;
     }
 
 
@@ -112,8 +116,13 @@ public class AdminController {
     public String cancelQuestion( Question question ) {
         question.setEnable( false );
         questionRepository.save( question );
-        // TODO: 删除关联的testcase
         return "Success: " + question.getId( );
+    }
+
+    @PostMapping("/admin/judge/log")
+    @ApiOperation(value = "查找某个提交的评测报告")
+    public List<JudgeLog> cancelQuestion( Integer submission ) {
+        return judgeLogRepository.findBySubmission( submission );
     }
 
     @PostMapping("/admin/getUser")

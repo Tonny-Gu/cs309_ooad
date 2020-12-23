@@ -19,7 +19,7 @@ import java.util.UUID;
 
 @Configuration
 public class MqttUtil {
-    private final static String[] topics = {"env/recv", "code/recv", "mail"};
+    private final static String[] topics = {"env/recv" , "code/recv" , "mail"};
 
     @Autowired
     private TestCaseRepository testCaseRepository;
@@ -49,7 +49,7 @@ public class MqttUtil {
         connOpts.setCleanSession( true );
         MqttMessage mqttMessage = new MqttMessage( );
         mqttMessage.setQos( qos );
-        mqttMessage.setPayload( Base64.getEncoder().encode( message.getBytes() ) );
+        mqttMessage.setPayload( Base64.getEncoder( ).encode( message.getBytes( ) ) );
         publisher.connect( );
         publisher.publish( topic , mqttMessage );
         publisher.disconnect( );
@@ -70,7 +70,7 @@ public class MqttUtil {
             sampleClient.connect( connOpts );
             logger.info( broker + ":Connected Successful" );
             ObjectMapper objectMapper = new ObjectMapper( );
-            sampleClient.subscribe( topic , 2, ( t , msg ) -> {
+            sampleClient.subscribe( topic , 2 , ( t , msg ) -> {
                 try {
                     // ... payload handling omitted
                     logger.info( "topic: {} msg:{}" , t , msg );
@@ -82,15 +82,15 @@ public class MqttUtil {
                         mailServer.sendEmail( targetEmail , "Upload Failed" , alertMsg );
                     }
                     testCaseRepository.initEnv( testCase.get( "id" ).asInt( ) , testCase.get( "env" ).asText( ) );
-                }catch (Exception e){
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace( );
                 }
-                } );
+            } );
         } catch (Exception e) {
-            initListener();
+            initListener( );
 
-            logger.info( "Upload error: "  );
-            e.printStackTrace();
+            logger.info( "Upload error: " );
+            e.printStackTrace( );
         }
     }
 
@@ -107,7 +107,7 @@ public class MqttUtil {
             logger.info( "Connecting to broker: " + broker );
             sampleClient.connect( connOpts );
             logger.info( broker + ":Connected Successful" );
-            sampleClient.subscribe( topic , 2, ( t , msg ) -> {
+            sampleClient.subscribe( topic , 2 , ( t , msg ) -> {
                 try {
                     // ... payload handling omitted
                     logger.info( "topic: {} msg: {}" , t , msg );
@@ -122,13 +122,19 @@ public class MqttUtil {
                         ObjectMapper infoMapper = new ObjectMapper( );
                         ArrayNode root = infoMapper.createArrayNode( );
                         for (int i = 0; i < caseLen; i++) {
-                            String status = node.get( "testCases" ).get( i ).get( "status" ).asText( );
+                            String status;
                             String stdout = node.get( "testCases" ).get( i ).get( "info" ).get( "stdout" ).asText( );
                             String stderr = node.get( "testCases" ).get( i ).get( "info" ).get( "stderr" ).asText( );
-                            if(stderr.contains( "Exited with exit code 1" )) status = "Wrong Answer";
-                            if(stderr.contains( "run time limit" )) status = "Timout";
+                            if ( stdout.contains( "\'isAccepted\': True" ) ) status = "Accepted";
+                            else if ( stdout.contains( "run time limit" ) ) status = "Time Limited";
+                            else {
+                                status = "Wrong Answer";
+                            }
+//                            if ( stdout.contains( "\'isAccepted\': False" ) || stdout.contains( "Exited with exit code 1" ) )
+//                                status = "Wrong Answer";
                             JudgeLog judgeLog = new JudgeLog( );
-                            judgeLog.setInfo( String.format( "{\"stdout\":\"%s\",\"stderr\":\"%s\"}", stdout,stderr ) );
+                            judgeLog.setInfo( String.format( "{\"stdout\":\"%s\",\"stderr\":\"%s\"}" , stdout , stderr ) );
+                            judgeLog.setSubmission( id );
                             judgeLogRepository.save( judgeLog );
                             if ( !status.equals( "Accepted" ) ) {
                                 pass = false;
@@ -155,8 +161,8 @@ public class MqttUtil {
                         }
                         scoreRepository.save( now );
                     }
-                }catch (Exception e){
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace( );
                 }
             } );
 
@@ -166,7 +172,7 @@ public class MqttUtil {
     }
 
     @Bean
-    public void mailListener() throws MqttException {
+    public void mailListener() {
         try {
             String broker = "tcp://192.168.122.10:1883";
             String topic = "mail";
@@ -178,7 +184,7 @@ public class MqttUtil {
             logger.info( "Connecting to broker: " + broker );
             sampleClient.connect( connOpts );
             logger.info( broker + ":Connected Successful" );
-            sampleClient.subscribe( topic , 2, ( t , msg ) -> {
+            sampleClient.subscribe( topic , 2 , ( t , msg ) -> {
                 // ... payload handling omitted
                 logger.info( "topic: {} msg: {}" , t , msg );
                 String msgInfo = new String( Base64.getDecoder( ).decode( msg.getPayload( ) ) );

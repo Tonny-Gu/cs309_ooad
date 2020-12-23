@@ -51,7 +51,6 @@ public class SubmissionController {
         if ( question == null ) return "err: Question Not Found";
         Contest contest = contestRepository.findById( contest_id ).orElse( null );
         if ( contest == null ) return "err: Contest Not Found";
-        code = Base64.getEncoder( ).encodeToString( code.getBytes( ) );
         Submission submission = new Submission();
         submission.setCode( code );
         submission.setStatus( status );
@@ -59,6 +58,7 @@ public class SubmissionController {
         submission.setLanguage( language );
         submission.setInfo( "" );
         submissionRepository.save( submission );
+        code = Base64.getEncoder( ).encodeToString( code.getBytes( ) );
 //        submissionRepository.submitToDB( code , status , language , submit_time , contest_id , question_id , user_id , "" );
 //        Submission submission = submissionRepository.findByStudentAndSubmitTime( student , submit_time );
 
@@ -75,6 +75,7 @@ public class SubmissionController {
             e.printStackTrace( );
         }
         submissionRepository.updateContestAndUserAndQuestion( submission.getId(), contest_id, user_id,question_id );
+        submissionRepository.updateCode( submission.getId(), code );
         return submission.getId( ).toString( );
     }
 

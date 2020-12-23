@@ -11,6 +11,9 @@ public class JudgeLog {
     @Column(nullable = false, columnDefinition = "text")
     private String info;
 
+    @Column
+    private Integer submission;
+
     public JudgeLog(  ) {
     }
 
@@ -28,6 +31,14 @@ public class JudgeLog {
 
     public void setInfo( String info ) {
         this.info = info;
+    }
+
+    public Integer getSubmission() {
+        return submission;
+    }
+
+    public void setSubmission( Integer submission ) {
+        this.submission = submission;
     }
 
     @Override

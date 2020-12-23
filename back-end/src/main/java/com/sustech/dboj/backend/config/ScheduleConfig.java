@@ -1,7 +1,5 @@
 package com.sustech.dboj.backend.config;
 
-
-import com.sustech.dboj.backend.controller.UserController;
 import com.sustech.dboj.backend.domain.Contest;
 import com.sustech.dboj.backend.repository.ContestRepository;
 import org.slf4j.Logger;
