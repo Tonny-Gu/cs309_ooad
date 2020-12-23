@@ -38,17 +38,30 @@ public class SubmissionController {
     @ApiOperation(value = "交题接口")
     public String submitCode( Integer user_id , Integer question_id , Integer contest_id , String code , String language ) {
         //put into DB
-        if(language.equals( "Mysql" ))language = "MySQL";
+        if(language.equalsIgnoreCase( "mysql" ))language = "MySQL";
+        else if(language.equalsIgnoreCase( "postgresql" ))language = "PostgreSQL";
+        else if(language.equalsIgnoreCase( "sqlite" ))language = "SQLite";
+        else return "err: Language Error";
         String status = "Submit";
         SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
         String submit_time = ft.format( new Date( ) );
         User student = userRepository.findById( user_id ).orElse( null );
         if ( student == null ) return "err: student not found";
-        code = Base64.getEncoder( ).encodeToString( code.getBytes( ) );
-        submissionRepository.submitToDB( code , status , language , submit_time , contest_id , question_id , user_id , "" );
-        Submission submission = submissionRepository.findByStudentAndSubmitTime( student , submit_time );
         Question question = questionRepository.findById( question_id ).orElse( null );
         if ( question == null ) return "err: Question Not Found";
+        Contest contest = contestRepository.findById( contest_id ).orElse( null );
+        if ( contest == null ) return "err: Contest Not Found";
+        code = Base64.getEncoder( ).encodeToString( code.getBytes( ) );
+        Submission submission = new Submission();
+        submission.setCode( code );
+        submission.setStatus( status );
+        submission.setSubmitTime( submit_time );
+        submission.setLanguage( language );
+        submission.setInfo( "" );
+        submissionRepository.save( submission );
+//        submissionRepository.submitToDB( code , status , language , submit_time , contest_id , question_id , user_id , "" );
+//        Submission submission = submissionRepository.findByStudentAndSubmitTime( student , submit_time );
+
         //push to MQTT
 
         List<TestCase> testCases = testCaseRepository.findByQuestion( question );
@@ -61,6 +74,7 @@ public class SubmissionController {
         } catch (JsonProcessingException | MqttException e) {
             e.printStackTrace( );
         }
+        submissionRepository.updateContestAndUserAndQuestion( submission.getId(), contest_id, user_id,question_id );
         return submission.getId( ).toString( );
     }
 
