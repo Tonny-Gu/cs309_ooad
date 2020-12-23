@@ -46,8 +46,6 @@ public interface SubmissionRepository extends JpaRepository<Submission, Integer>
     @Query(value = "select * from submit_log limit ?2 offset ?1", nativeQuery = true)
     List<Submission> getSubmissionLimit( Integer begin , Integer length );
 
-    @Query(value = "select * from submit_log where submit_time between ?1 and ?2", nativeQuery = true)
-    List<Submission> getSubmissionBetweenTime( String beginTime, String endTime );
 
     Submission findByStudentAndSubmitTime( User student , String submitTime );
 
@@ -58,4 +56,10 @@ public interface SubmissionRepository extends JpaRepository<Submission, Integer>
 
     @Query(value = "select count(distinct question_id) from submit_log where student_id=?1", nativeQuery = true)
     List<Object[]> doneQuestion( Integer user_id );
+
+    @Query(value = "select substr(submit_time,0,11), status, count(substr(submit_time,0,11)) from submit_log where submit_time between ?1 and ?2 group by substr(submit_time,0,11),status order by substr(submit_time,0,11)", nativeQuery = true)
+    List<Object[]> dataBetweenTime7d (String beginTime, String endTime );
+
+    @Query(value = "select substr(submit_time,0,14), status, count(substr(submit_time,0,14)) from submit_log where submit_time between ?1 and ?2 group by substr(submit_time,0,14),status order by substr(submit_time,0,14)", nativeQuery = true)
+    List<Object[]> dataBetweenTime24h( String begin, String end );
 }
