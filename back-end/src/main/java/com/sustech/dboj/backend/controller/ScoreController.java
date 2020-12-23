@@ -32,34 +32,18 @@ public class ScoreController {
 
     @PostMapping("/super/score")
     @ApiOperation(value = "按条件获取成绩表(教师)")
-    public List<Score> getScore( Integer user_id , Integer contest_id , Integer question_id ) {
-        User student = null;
-        Contest contest = null;
-        Question question = null;
-        List<Score> scores = new ArrayList<>( );
-        if ( user_id != null ) student = userRepository.findById( user_id ).orElse( null );
-        if ( question_id != null ) question = questionRepository.findById( question_id ).orElse( null );
-        if ( contest_id != null ) contest = contestRepository.findById( contest_id ).orElse( null );
-        if ( student != null && question != null && contest != null ) {
-            scores.add( scoreRepository.findByStudentAndQuestionAndContest( student , question , contest ) );
-
-        } else if ( student != null && question != null ) {
-            scores = scoreRepository.findByStudentAndQuestion( student , question );
-        } else if ( student != null && contest != null ) {
-            scores = scoreRepository.findByStudentAndContest( student , contest );
-        } else if ( question != null && contest != null ) {
-            scores = scoreRepository.findByContestAndQuestion( contest , question );
-        } else if ( student != null ) {
-            scores = scoreRepository.findByStudent( student );
-        } else if ( question != null ) {
-            scores = scoreRepository.findByQuestion( question );
-        } else if ( contest != null ) {
-            scores = scoreRepository.findByContest( contest );
-        } else {
-            scores = scoreRepository.findAll( );
-        }
-        return scores;
+    public List<Score> getScoreTech( Integer user_id , Integer contest_id , Integer question_id ) {
+        return getScore( user_id, contest_id, question_id );
     }
+
+    @PostMapping("/super/score/download")
+    @ApiOperation(value = "按条件下载成绩表(教师)")
+    public List<Score> getScoreDownload( Integer user_id , Integer contest_id , Integer question_id ) {
+        List<Score> scoreList = getScore( user_id, contest_id, question_id );
+        return null;
+    }
+
+
 
     @PostMapping("/user/score")
     @ApiOperation(value = "按条件获取成绩表(学生)")
@@ -87,5 +71,34 @@ public class ScoreController {
     @ApiOperation(value = "竞赛排名(登陆可见)")
     public List<Object[]> getRank(Integer contest_id){
         return scoreRepository.getContestRank( contest_id );
+    }
+
+    private List<Score> getScore( Integer user_id , Integer contest_id , Integer question_id ) {
+        User student = null;
+        Contest contest = null;
+        Question question = null;
+        List<Score> scores = new ArrayList<>( );
+        if ( user_id != null ) student = userRepository.findById( user_id ).orElse( null );
+        if ( question_id != null ) question = questionRepository.findById( question_id ).orElse( null );
+        if ( contest_id != null ) contest = contestRepository.findById( contest_id ).orElse( null );
+        if ( student != null && question != null && contest != null ) {
+            scores.add( scoreRepository.findByStudentAndQuestionAndContest( student , question , contest ) );
+
+        } else if ( student != null && question != null ) {
+            scores = scoreRepository.findByStudentAndQuestion( student , question );
+        } else if ( student != null && contest != null ) {
+            scores = scoreRepository.findByStudentAndContest( student , contest );
+        } else if ( question != null && contest != null ) {
+            scores = scoreRepository.findByContestAndQuestion( contest , question );
+        } else if ( student != null ) {
+            scores = scoreRepository.findByStudent( student );
+        } else if ( question != null ) {
+            scores = scoreRepository.findByQuestion( question );
+        } else if ( contest != null ) {
+            scores = scoreRepository.findByContest( contest );
+        } else {
+            scores = scoreRepository.findAll( );
+        }
+        return scores;
     }
 }

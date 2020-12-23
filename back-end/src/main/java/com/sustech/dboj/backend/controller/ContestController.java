@@ -66,7 +66,7 @@ public class ContestController {
         return contest;
     }
 
-    @Transactional
+
     @PostMapping("/admin/contest/addquestion")
     public String addQuestion( Integer contest_id , Integer question_id ) {
         // add contest-user
@@ -76,13 +76,24 @@ public class ContestController {
         if ( myContest == null ) return String.format( "contest:%s not found" , contest_id );
         questionRepository.addQuestion( contest_id , question_id );
         logger.info( "Question: {} was added into Contest: {}" , question.getName( ) , myContest.getName( ) );
-        return "question add successfully";
+        return String.format( "success: add relation->contest %d, question: %d" , contest_id , question_id );
     }
 
     @PostMapping("/admin/contest/modify")
-    public Contest modifyContest( Contest contest ) {
+    public String modifyContest( Integer contest_id , String name , String beginTime , String endTime ) {
+        Contest contest = contestRepository.findById( contest_id ).orElse( null );
+        if ( contest == null ) return "error: Contest Not Found";
+        if ( name != null ) contest.setName( name );
+        if ( beginTime != null ) contest.setBeginTime( beginTime );
+        if ( endTime != null ) contest.setEndTime( endTime );
         contestRepository.save( contest );
-        return contestRepository.findById( contest.getId( ) ).orElse( null );
+        return "success: " + contest_id;
+    }
+
+    @PostMapping("/admin/contest/delquestion")
+    public String delQuestion( Integer contest_id , Integer question_id ) {
+        questionRepository.delQuestion( contest_id , question_id );
+        return String.format( "success: delete relation->contest %d, question: %d" , contest_id , question_id );
     }
 
 }

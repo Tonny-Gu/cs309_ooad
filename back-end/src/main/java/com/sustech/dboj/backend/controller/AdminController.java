@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sustech.dboj.backend.domain.Question;
 import com.sustech.dboj.backend.domain.User;
 import com.sustech.dboj.backend.repository.*;
-import com.sustech.dboj.backend.util.IOUtil;
+import com.sustech.dboj.backend.util.FileUtil;
 import com.sustech.dboj.backend.util.MarkDown2HtmlWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -69,11 +69,11 @@ public class AdminController {
             MarkDown2HtmlWrapper w2h = new MarkDown2HtmlWrapper( );
             try {
                 String fileName = Objects.requireNonNull( questionFile.getOriginalFilename( ) ).split( "\\." )[0].replace( " " , "-" );
-                IOUtil.fileStore( questionFile , pathName +
+                FileUtil.fileStore( questionFile , pathName +
                         fileName + ".md" );
                 question.setContent( Base64.getEncoder( ).encodeToString( w2h.markdown2Html( questionFile.getInputStream( ) ).getBytes( StandardCharsets.UTF_8 ) ) );
 
-                IOUtil.fileStore( ansFile , ansPathName + fileName + ".sql" );
+                FileUtil.fileStore( ansFile , ansPathName + fileName + ".sql" );
                 question.setAnswerCode( Base64.getEncoder( ).encodeToString( ansFile.getBytes( ) ) );
             } catch (Exception e) {
                 e.printStackTrace( );

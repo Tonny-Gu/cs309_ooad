@@ -5,7 +5,7 @@ import com.sustech.dboj.backend.domain.Question;
 import com.sustech.dboj.backend.domain.TestCase;
 import com.sustech.dboj.backend.repository.QuestionRepository;
 import com.sustech.dboj.backend.repository.TestCaseRepository;
-import com.sustech.dboj.backend.util.IOUtil;
+import com.sustech.dboj.backend.util.FileUtil;
 import com.sustech.dboj.backend.util.JsonFormat;
 import com.sustech.dboj.backend.util.MqttUtil;
 import io.swagger.annotations.Api;
@@ -20,8 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.UUID;
 
 @RestController
@@ -53,7 +51,7 @@ public class TestCaseController {
         testCaseRepository.save( testCase );
         String fileName =  UUID.randomUUID().toString();
         try {
-            IOUtil.fileStore( initFile, envPathName + fileName + ".sql" );
+            FileUtil.fileStore( initFile, envPathName + fileName + ".sql" );
             testCase.setInitDB( new String(initFile.getBytes( ),  StandardCharsets.UTF_8) );
         } catch (IOException e) {
             e.printStackTrace( );
