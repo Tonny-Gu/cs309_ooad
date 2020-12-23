@@ -70,7 +70,12 @@ public class TestCaseController {
         } catch (JsonProcessingException | MqttException e) {
             e.printStackTrace( );
         }
-        testCase.setInitDB( envPathName + fileName + ".sql" );
+        if(question.getDbType().equalsIgnoreCase( "SQLite" )){
+            testCase.setInitDB( envPathName + fileName + ".sqlite" );
+        }else{
+            testCase.setInitDB( envPathName + fileName + ".sql" );
+        }
+
         testCaseRepository.save( testCase );
         testCaseRepository.updateQuestion( testCase.getId() , questionId );
         return "success: " + testCase.getId();

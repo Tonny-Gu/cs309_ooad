@@ -115,7 +115,7 @@ public class MqttUtil {
                     ObjectNode node = new ObjectMapper( ).readValue( msgInfo , ObjectNode.class );
                     if ( node.has( "info" ) && node.has( "id" ) && node.has( "testCases" ) ) {
                         String totInfo;
-                        String totStatus = "submit";
+                        String totStatus = "Accepted";
                         Integer id = node.get( "id" ).asInt( );
                         int caseLen = node.get( "testCases" ).size( );
                         boolean pass = true;
@@ -123,10 +123,12 @@ public class MqttUtil {
                         ArrayNode root = infoMapper.createArrayNode( );
                         for (int i = 0; i < caseLen; i++) {
                             String status = node.get( "testCases" ).get( i ).get( "status" ).asText( );
-                            String info = node.get( "testCases" ).get( i ).get( "info" ).asText( );
-                            if(info.contains( "time out" )) status = "Timout";
+                            String stdout = node.get( "testCases" ).get( i ).get( "info" ).get( "stdout" ).asText( );
+                            String stderr = node.get( "testCases" ).get( i ).get( "info" ).get( "stderr" ).asText( );
+                            if(stderr.contains( "Exited with exit code 1" )) status = "Wrong Answer";
+                            if(stderr.contains( "run time limit" )) status = "Timout";
                             JudgeLog judgeLog = new JudgeLog( );
-                            judgeLog.setInfo( info );
+                            judgeLog.setInfo( String.format( "{\"stdout\":\"%s\",\"stderr\":\"%s\"}", stdout,stderr ) );
                             judgeLogRepository.save( judgeLog );
                             if ( !status.equals( "Accepted" ) ) {
                                 pass = false;
@@ -134,7 +136,6 @@ public class MqttUtil {
                             }
                             ObjectNode nowCase = infoMapper.createObjectNode( );
                             nowCase.put( "id" , i );
-
                             nowCase.put( "status" , status );
                             root.add( nowCase );
                         }

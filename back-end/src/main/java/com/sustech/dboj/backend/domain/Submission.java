@@ -18,7 +18,7 @@ public class Submission {
     @ManyToOne(cascade = CascadeType.PERSIST)
     private Question question;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "text")
     private String code;
     @Column(nullable = false)
     private String language;

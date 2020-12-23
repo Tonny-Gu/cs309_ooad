@@ -8,7 +8,7 @@ public class JudgeLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer Id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "text")
     private String info;
 
     public JudgeLog(  ) {
