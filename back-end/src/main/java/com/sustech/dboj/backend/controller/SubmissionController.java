@@ -8,13 +8,9 @@ import com.sustech.dboj.backend.util.MqttUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
@@ -42,24 +38,31 @@ public class SubmissionController {
     @ApiOperation(value = "交题接口")
     public String submitCode( Integer user_id , Integer question_id , Integer contest_id , String code , String language ) {
         //put into DB
-        //reserve check
-//        Submission submission = new Submission();
-//        User student = userRepository.findById( user_id ).orElse( null );
-//        if ( student == null )return "err: Invalid User";
-//        Question question = questionRepository.findById( question_id ).orElse( null );
-//        if ( question == null )return "err: Question Not Found";
-//        Contest contest = contestRepository.findById( contest_id ).orElse( null );
-//        if ( contest == null )return "err: contest Not Found";
+        if(language.equalsIgnoreCase( "mysql" ))language = "MySQL";
+        else if(language.equalsIgnoreCase( "postgresql" ))language = "PostgreSQL";
+        else if(language.equalsIgnoreCase( "sqlite" ))language = "SQLite";
+        else return "err: Language Error";
         String status = "Submit";
-        code = Base64.getEncoder( ).encodeToString( code.getBytes( ) );
         SimpleDateFormat ft = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
         String submit_time = ft.format( new Date( ) );
         User student = userRepository.findById( user_id ).orElse( null );
         if ( student == null ) return "err: student not found";
-        submissionRepository.submitToDB( code , status , language , submit_time , contest_id , question_id , user_id , "" );
-        Submission submission = submissionRepository.findByStudentAndSubmitTime( student , submit_time );
         Question question = questionRepository.findById( question_id ).orElse( null );
         if ( question == null ) return "err: Question Not Found";
+        Contest contest = contestRepository.findById( contest_id ).orElse( null );
+        if ( contest == null ) return "err: Contest Not Found";
+
+        if(student.getRole().equals( "ROLE_STU" ) && !contest.getEnable())
+            return "err: Contest Not Start";
+        Submission submission = new Submission();
+        submission.setCode( code );
+        submission.setStatus( status );
+        submission.setSubmitTime( submit_time );
+        submission.setLanguage( language );
+        submission.setInfo( "" );
+        submissionRepository.save( submission );
+        code = Base64.getEncoder( ).encodeToString( code.getBytes( ) );
+
         //push to MQTT
 
         List<TestCase> testCases = testCaseRepository.findByQuestion( question );
@@ -72,6 +75,8 @@ public class SubmissionController {
         } catch (JsonProcessingException | MqttException e) {
             e.printStackTrace( );
         }
+        submissionRepository.updateContestAndUserAndQuestion( submission.getId(), contest_id, user_id,question_id );
+        submissionRepository.updateCode( submission.getId(), code );
         return submission.getId( ).toString( );
     }
 
@@ -84,17 +89,17 @@ public class SubmissionController {
 
     @PostMapping("user/submission")
     @ApiOperation(value = "按条件获取提交(用户级别)")
-    public List<Submission> getSubmission( Integer user_id ,Integer contest_id , Integer question_id , Boolean withCode ) {
+    public List<Submission> userGetSubmission( Integer user_id , Integer contest_id , Integer question_id , Boolean withCode ) {
         List<Submission> submissions;
         if ( question_id == null && contest_id == null ) {
             User user = userRepository.findById( user_id ).orElse( null );
-            if(user==null)return null;
+            if ( user == null ) return null;
             submissions = submissionRepository.getLogByStu( user_id );
         } else if ( question_id == null ) {
             submissions = submissionRepository.getLogByContest( user_id , contest_id );
-        } else if( contest_id == null){
+        } else if ( contest_id == null ) {
             submissions = submissionRepository.getLogByQuestion( user_id , question_id );
-        }else{
+        } else {
             submissions = submissionRepository.getLog( user_id , question_id , contest_id );
         }
         if ( !withCode ) {
@@ -119,7 +124,7 @@ public class SubmissionController {
 
     @PostMapping("/admin/submission/contest")
     @ApiOperation(value = "获取某竞赛所有提交")
-    public List<Submission> getSubmissionByContest(Integer contest_id , String name , Boolean withCode ) {
+    public List<Submission> getSubmissionByContest( Integer contest_id , String name , Boolean withCode ) {
         if ( contest_id == null && name == null ) return null;
         List<Submission> submissions;
         if ( contest_id != null ) {
@@ -158,6 +163,35 @@ public class SubmissionController {
     }
 
     @PostMapping("admin/submission/all")
+    @ApiOperation(value = "按条件获取提交(管理员级别)")
+    public List<Submission> adminGetSubmission( Integer user_id , Integer contest_id , Integer question_id , Boolean withCode ) {
+        List<Submission> submissions;
+        if ( user_id == null && question_id == null && contest_id == null ) {
+            submissions = submissionRepository.findAll( );
+        } else if ( question_id == null && contest_id == null ) {
+            submissions = submissionRepository.getLogByStu( user_id );
+        } else if ( user_id == null && contest_id == null ) {
+            submissions = submissionRepository.getLogByQuestion( question_id );
+        } else if ( user_id == null && question_id == null ) {
+            submissions = submissionRepository.getLogByContest( contest_id );
+        } else if ( question_id == null ) {
+            submissions = submissionRepository.getLogByContest( user_id , contest_id );
+        } else if ( contest_id == null ) {
+            submissions = submissionRepository.getLogByQuestion( user_id , question_id );
+        } else if ( user_id == null ) {
+            submissions = submissionRepository.getLogByQuestionAndContest( question_id , contest_id );
+        } else {
+            submissions = submissionRepository.getLog( user_id , question_id , contest_id );
+        }
+        if ( !withCode ) {
+            for (Submission submission : submissions) {
+                submission.setCode( null );
+            }
+        }
+        return submissions;
+    }
+
+    @PostMapping("admin/submission")
     @ApiOperation(value = "获取所有提交")
     public List<Submission> getAllSubmission( Boolean withCode ) {
         List<Submission> submissions = submissionRepository.findAll( );

@@ -15,7 +15,7 @@ public class TestCase {
     @Column
     private String env; // docker id
 
-    @Column(nullable = false)
+    @Column
     private String initDB;
 
 

@@ -16,4 +16,6 @@ public interface ContestRepository extends JpaRepository<Contest, Integer> {
     void activeContest( Integer id, Boolean status );
 
     Contest findByName( String name );
+
+    List<Contest> findByEnable(Boolean enable);
 }

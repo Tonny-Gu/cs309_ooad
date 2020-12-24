@@ -1,11 +1,12 @@
 package com.sustech.dboj.backend.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.Data;
 
 import javax.persistence.*;
 
 @Entity
-public class Score {
+@Data
+public class Score  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer Id;
@@ -28,6 +29,9 @@ public class Score {
 
     @Column
     private String acTime;
+
+    @Column
+    private Integer submissionId;
 
     public Score() {
     }
@@ -88,7 +92,6 @@ public class Score {
         this.wa = wa;
     }
 
-
     public String getAcTime() {
         return acTime;
     }
@@ -97,17 +100,23 @@ public class Score {
         this.acTime = acTime;
     }
 
+    public Integer getSubmissionId() {
+        return submissionId;
+    }
+
+    public void setSubmissionId( Integer submission ) {
+        this.submissionId = submission;
+    }
+
     @Override
     public String toString() {
-        return "Score{" +
-                "Id=" + Id +
-                ", student=" + student +
-                ", contest=" + contest +
-                ", question=" + question +
-                ", submit=" + submit +
-                ", ac=" + ac +
-                ", wa=" + wa +
-                ", acTime='" + acTime + '\'' +
-                '}';
+        return  Id +
+                "," + student.getUsername() +
+                "," + contest.getName() +
+                "," + question.getName() +
+                "," + submit +
+                "," + ac +
+                "," + wa +
+                "," + acTime;
     }
 }

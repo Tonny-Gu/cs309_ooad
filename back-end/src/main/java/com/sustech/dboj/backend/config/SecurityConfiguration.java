@@ -31,25 +31,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         //加入数据库验证类，下面的语句实际上在验证链中加入了一个DaoAuthenticationProvider
         auth.userDetailsService( myUserDetailsService ).passwordEncoder( new BCryptPasswordEncoder( ) );
     }
-//
-//    @Bean
-//    RoleHierarchy roleHierarchy() {
-//        RoleHierarchyImpl hierarchy = new RoleHierarchyImpl( );
-//        hierarchy.setHierarchy( "TA > SA SA > STU" );
-//        return hierarchy;
-//    }
+
 
     @Override
     protected void configure( HttpSecurity http ) throws Exception {
         http.cors( )
                 .and( )
                 .authorizeRequests( )
+//                .antMatchers("/**").hasIpAddress("10.20.99.115")
                 .antMatchers( "/user/**" ).hasAnyRole( "STU" , "TA" , "SA" )
                 .antMatchers( "/admin/**" ).hasAnyRole( "TA" , "SA" )
                 .antMatchers( "/super/**" ).hasAnyRole( "TA" )
                 .anyRequest( ).permitAll( )
 //                .and()
-//                .antMatchers("/**").hasIpAddress("127.0.0.1")
+
                 .and( )
                 .formLogin( ).loginPage( "/login" )
                 //以下是两个json接口的回调，用于处理登陆成功和失败的情况

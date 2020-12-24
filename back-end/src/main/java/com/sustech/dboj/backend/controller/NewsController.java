@@ -4,7 +4,6 @@ import com.sustech.dboj.backend.domain.News;
 import com.sustech.dboj.backend.domain.User;
 import com.sustech.dboj.backend.repository.NewsRepository;
 import com.sustech.dboj.backend.repository.UserRepository;
-import com.sustech.dboj.backend.util.IOUtil;
 import com.sustech.dboj.backend.util.MarkDown2HtmlWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

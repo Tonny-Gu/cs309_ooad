@@ -121,24 +121,30 @@ public class UserController {
         return "Join contest successfully";
     }
 
-    @PostMapping("/user/send/code")
-    @ApiOperation(value = "发送验证码")
-    public String sendCode( Integer user_id ) throws MessagingException {
+    @PostMapping("/send/code")
+    @ApiOperation(value = "发送验证码(无需登录)")
+    public String sendCode( String username ) throws MessagingException {
         String activeCode = SimpleUtil.getRandomCode( 6 );
-        User user = userRepository.findById( user_id ).orElse( null );
+        User user = userRepository.findByUsername( username );
         if ( user == null ) return "User Not Found";
         user.setActiveCode( activeCode );
-        String targetEmail = user.getUsername( ) + "@mail.sustech.edu.cn";
+        String targetEmail;
+        if(user.getUsername().contains( "11" )){
+            targetEmail = user.getUsername( ) + "@mail.sustech.edu.cn";
+        }else{
+            targetEmail = user.getUsername( ) + "@sustech.edu.cn";
+        }
         String msg = String.format( "[Sustech DBOJ] %s 同学, 你修改密码的验证码为 %s , 请勿泄露" , user.getName( ) , activeCode );
+        log.info( "active code: " + activeCode );
         mailServer.sendEmail( targetEmail , "Password Modify" , msg );
         userRepository.save( user );
         return "Sender Success";
     }
 
-    @PostMapping("/user/modify/password")
-    @ApiOperation(value = "修改密码")
-    public String modifyCode( Integer user_id , String password, String code){
-        User user = userRepository.findById( user_id ).orElse( null );
+    @PostMapping("/modify/password")
+    @ApiOperation(value = "修改密码(无需登录)")
+    public String modifyCode( String username , String password, String code){
+        User user = userRepository.findByUsername( username );
         if ( user == null ) return "User Not Found";
         if(user.getActiveCode().equals( code )){
             user.setActiveCode( null );
@@ -157,6 +163,18 @@ public class UserController {
         User user = userRepository.findById( user_id ).orElse( null );
         if ( user == null ) return "User Not Found";
         user.setNickname( nickname );
+        userRepository.save( user );
+        return "Modify Success";
+    }
+
+    @PostMapping("/admin/modify/role")
+    @ApiOperation(value = "权限更改")
+    public String modifyRole( String username , String role){
+        User user = userRepository.findByUsername( username );
+        if ( user == null ) return "User Not Found";
+        if ( ( !role.equals( "TA" ) ) && ( !role.equals( "SA" ) ) && ( !role.equals( "STU" ) ) )
+            return "Invalid role";
+        user.setRole( "ROLE_" + role );
         userRepository.save( user );
         return "Modify Success";
     }

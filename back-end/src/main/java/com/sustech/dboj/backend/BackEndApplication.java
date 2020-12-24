@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class BackEndApplication {
     //mvn package -DskipTests
-    //nohup java -jar back-end-0.0.1-SNAPSHOT.jar >backend.log 2>&1 &
+    //nohup java -Dfile.encoding=utf-8 -jar back-end-0.0.1-SNAPSHOT.jar >backend.log 2>&1 &
     public static void main( String[] args ) {
         SpringApplication.run( BackEndApplication.class , args );
     }

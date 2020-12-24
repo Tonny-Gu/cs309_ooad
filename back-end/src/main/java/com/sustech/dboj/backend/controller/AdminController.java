@@ -1,17 +1,16 @@
 package com.sustech.dboj.backend.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sustech.dboj.backend.domain.News;
+import com.sustech.dboj.backend.domain.JudgeLog;
 import com.sustech.dboj.backend.domain.Question;
-import com.sustech.dboj.backend.domain.Submission;
 import com.sustech.dboj.backend.domain.User;
 import com.sustech.dboj.backend.repository.*;
-import com.sustech.dboj.backend.util.IOUtil;
+import com.sustech.dboj.backend.util.FileUtil;
 import com.sustech.dboj.backend.util.MarkDown2HtmlWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,27 +26,29 @@ import java.util.Objects;
 @RestController
 @Api(tags = "管理员接口")
 public class AdminController {
+    private static final Logger log = LoggerFactory.getLogger( AdminController.class );
     private final UserRepository userRepository;
     private final SubmissionRepository submissionRepository;
     private final QuestionRepository questionRepository;
     private final ContestRepository contestRepository;
     private final TestCaseRepository testCaseRepository;
     private final NewsRepository newsRepository;
+    private final JudgeLogRepository judgeLogRepository;
 
 
     private static final String pathName = "questions/";
 
     private static final String ansPathName = "ans/";//path of standard code '.sql'
 
-    public AdminController( UserRepository userRepository , SubmissionRepository submissionRepository , QuestionRepository questionRepository , ContestRepository contestRepository , TestCaseRepository testCaseRepository , NewsRepository newsRepository ) {
+    public AdminController( UserRepository userRepository , SubmissionRepository submissionRepository , QuestionRepository questionRepository , ContestRepository contestRepository , TestCaseRepository testCaseRepository , NewsRepository newsRepository , JudgeLogRepository judgeLogRepository) {
         this.userRepository = userRepository;
         this.submissionRepository = submissionRepository;
         this.questionRepository = questionRepository;
         this.contestRepository = contestRepository;
         this.testCaseRepository = testCaseRepository;
         this.newsRepository = newsRepository;
+        this.judgeLogRepository = judgeLogRepository;
     }
-
 
 
     @Transactional
@@ -65,37 +66,39 @@ public class AdminController {
             if ( !( degree.equalsIgnoreCase( "Hard" ) || degree.equalsIgnoreCase( "Mid" ) || degree.equalsIgnoreCase( "Easy" ) ) ) {
                 return "error: degree error";
             }
-            if ( !( dbType.equalsIgnoreCase( "ALL" ) || dbType.equalsIgnoreCase( "SQLite" )
+            if ( !( dbType.equalsIgnoreCase( "SQLite" )
                     || dbType.equalsIgnoreCase( "MySQL" ) || dbType.equalsIgnoreCase( "PostgreSQL" ) ) ) {
                 return "error: dbType error";
             }
             MarkDown2HtmlWrapper w2h = new MarkDown2HtmlWrapper( );
             try {
-                IOUtil.fileStore( questionFile , pathName +
-                        Objects.requireNonNull( questionFile.getOriginalFilename( ) ) );
+                String fileName = Objects.requireNonNull( questionFile.getOriginalFilename( ) ).split( "\\." )[0].replace( " " , "-" );
+                FileUtil.fileStore( questionFile , pathName +
+                        fileName + ".md" );
                 question.setContent( Base64.getEncoder( ).encodeToString( w2h.markdown2Html( questionFile.getInputStream( ) ).getBytes( StandardCharsets.UTF_8 ) ) );
-                IOUtil.fileStore( ansFile , ansPathName + questionFile.getOriginalFilename( ) + ".sql" );
-                question.setAnswerCode( Base64.getEncoder( ).encodeToString( ansFile.getBytes( ) ) );
-            } catch (IOException e) {
+
+                FileUtil.fileStore( ansFile , ansPathName + fileName + ".sql" );
+                String ans = new String (ansFile.getBytes()).replace( "\r\n", "\n" );
+                question.setAnswerCode( Base64.getEncoder( ).encodeToString( ans.getBytes() ) );
+            } catch (Exception e) {
                 e.printStackTrace( );
                 return "error: " + e.getMessage( );
             }
             String questionName = questionFile.getOriginalFilename( ).split( "\\." )[0];
-            if(questionRepository.findByName( questionName )!=null)return "error: duplicate question name";
+            if ( questionRepository.findByName( questionName ) != null ) return "error: duplicate question name";
             question.setName( questionName );
             question.setDegree( degree );
             question.setDbType( dbType );
             question.setAuthor( au );
-            if ( extenFile!=null && !extenFile.isEmpty( ) ) {
+            if ( extenFile != null && !extenFile.isEmpty( ) ) {
                 try {
-                    question.setExtension( Base64.getEncoder( ).encodeToString( extenFile.getBytes( ) ) );
+                    question.setExtension( new String( extenFile.getBytes( ) ) );
                 } catch (IOException e) {
                     e.printStackTrace( );
                     return "error: " + e.getMessage( );
                 }
             }
             questionRepository.save( question );
-
             return "success: " + question.getId( );
         }
 
@@ -105,7 +108,7 @@ public class AdminController {
     @ApiOperation(value = "修改题目")
     public String modifyQuestion( Question question ) {
         questionRepository.save( question );
-        return "Success: " + question.getId();
+        return "Success: " + question.getId( );
     }
 
     @PostMapping("/admin/question/cancel")
@@ -113,10 +116,19 @@ public class AdminController {
     public String cancelQuestion( Question question ) {
         question.setEnable( false );
         questionRepository.save( question );
-        // TODO: 删除关联的testcase
-        return "Success: " + question.getId();
+        return "Success: " + question.getId( );
     }
 
+    @PostMapping("/admin/judge/log")
+    @ApiOperation(value = "查找某个提交的评测报告")
+    public List<JudgeLog> cancelQuestion( Integer submission ) {
+        return judgeLogRepository.findBySubmission( submission );
+    }
 
+    @PostMapping("/admin/getUser")
+    @ApiOperation(value = "通过用户名获取用户")
+    public User getUser( String username ) {
+        return userRepository.findByUsername( username );
+    }
 
 }

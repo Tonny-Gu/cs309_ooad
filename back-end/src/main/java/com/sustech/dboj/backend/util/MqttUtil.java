@@ -1,32 +1,25 @@
 package com.sustech.dboj.backend.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.sustech.dboj.backend.domain.Score;
-import com.sustech.dboj.backend.domain.Submission;
-import com.sustech.dboj.backend.domain.TestCase;
-import com.sustech.dboj.backend.domain.User;
-import com.sustech.dboj.backend.repository.ScoreRepository;
-import com.sustech.dboj.backend.repository.SubmissionRepository;
-import com.sustech.dboj.backend.repository.TestCaseRepository;
-import com.sustech.dboj.backend.repository.UserRepository;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
+import com.sustech.dboj.backend.domain.*;
+import com.sustech.dboj.backend.repository.*;
+import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
 @Configuration
 public class MqttUtil {
+    private final static String[] topics = {"env/recv" , "code/recv" , "mail"};
 
     @Autowired
     private TestCaseRepository testCaseRepository;
@@ -41,6 +34,9 @@ public class MqttUtil {
     private UserRepository userRepository;
 
     @Autowired
+    private JudgeLogRepository judgeLogRepository;
+
+    @Autowired
     private MailServer mailServer;
 
     private static final Logger logger = LoggerFactory.getLogger( MqttUtil.class );
@@ -53,102 +49,159 @@ public class MqttUtil {
         connOpts.setCleanSession( true );
         MqttMessage mqttMessage = new MqttMessage( );
         mqttMessage.setQos( qos );
-        mqttMessage.setPayload( message.getBytes( ) );
+        mqttMessage.setPayload( Base64.getEncoder( ).encode( message.getBytes( ) ) );
         publisher.connect( );
         publisher.publish( topic , mqttMessage );
         publisher.disconnect( );
     }
 
     @Bean
-    @Lazy
-    public void initListener() throws MqttException {
-        String broker = "tcp://192.168.122.10:1883";
-        String topic = "env/recv";
-        String clientId = "initListener";
-        MemoryPersistence persistence = new MemoryPersistence( );
-        MqttClient sampleClient = null;
-        sampleClient = new MqttClient( broker , clientId , persistence );
-        MqttConnectOptions connOpts = new MqttConnectOptions( );
-        connOpts.setCleanSession( true );
-        logger.info( "Connecting to broker: " + broker );
-        sampleClient.connect( connOpts );
-        logger.info( broker + ":Connected Successful" );
-        sampleClient.subscribe( topic , ( t , msg ) -> {
-            // ... payload handling omitted
-            logger.info( "topic: {} msg:{}" , t , msg );
+    public void initListener() {
+        try {
+            String broker = "tcp://192.168.122.10:1883";
+            String topic = "env/recv";
+            String clientId = "initListener";
+            MemoryPersistence persistence = new MemoryPersistence( );
+            MqttClient sampleClient;
+            sampleClient = new MqttClient( broker , clientId , persistence );
+            MqttConnectOptions connOpts = new MqttConnectOptions( );
+            connOpts.setCleanSession( true );
+            logger.info( "Connecting to broker: " + broker );
+            sampleClient.connect( connOpts );
+            logger.info( broker + ":Connected Successful" );
             ObjectMapper objectMapper = new ObjectMapper( );
-            TestCase testCase = objectMapper.readValue( msg.getPayload( ) , TestCase.class );
-            testCaseRepository.initEnv( testCase.getId( ) , testCase.getEnv( ) );
-        } );
+            sampleClient.subscribe( topic , 2 , ( t , msg ) -> {
+                try {
+                    // ... payload handling omitted
+                    logger.info( "topic: {} msg:{}" , t , msg );
+                    String msgInfo = new String( Base64.getDecoder( ).decode( msg.getPayload( ) ) );
+                    ObjectNode testCase = objectMapper.readValue( msgInfo , ObjectNode.class );
+                    if ( !testCase.get( "status" ).asText( ).equalsIgnoreCase( "success" ) ) {
+                        String targetEmail = "11811905@mail.sustech.edu.cn";
+                        String alertMsg = "[Sustech DBOJ] 李逸飞 同学, 你的测试样例上传失败，请找顾同舟击剑。";
+                        mailServer.sendEmail( targetEmail , "Upload Failed" , alertMsg );
+                    }
+                    testCaseRepository.initEnv( testCase.get( "id" ).asInt( ) , testCase.get( "env" ).asText( ) );
+                } catch (Exception e) {
+                    e.printStackTrace( );
+                }
+            } );
+        } catch (Exception e) {
+            initListener( );
+
+            logger.info( "Upload error: " );
+            e.printStackTrace( );
+        }
     }
 
     @Bean
-    @Lazy
-    public void submitListener() throws MqttException {
-        String broker = "tcp://192.168.122.10:1883";
-        String topic = "code/recv";
-        String clientId = "submitListener";// use different clintID for different listener
-        MemoryPersistence persistence = new MemoryPersistence( );
-        MqttClient sampleClient = new MqttClient( broker , clientId , persistence );
-        MqttConnectOptions connOpts = new MqttConnectOptions( );
-        connOpts.setCleanSession( true );
-        logger.info( "Connecting to broker: " + broker );
-        sampleClient.connect( connOpts );
-        logger.info( broker + ":Connected Successful" );
-        sampleClient.subscribe( topic , ( t , msg ) -> {
-            // ... payload handling omitted
-            logger.info( "topic: {} msg: {}" , t , msg );
-            ObjectNode node = new ObjectMapper( ).readValue( msg.getPayload( ) , ObjectNode.class );
-            if ( node.has( "info" ) && node.has( "id" ) ) {
-                String info = node.get( "info" ).asText( );
-                String status = node.get( "status" ).asText( );//will del
-                Integer id = node.get( "id" ).asInt( );
-                submissionRepository.updateInfo( id , info , status );
-                // change score table
-                boolean pass = status.equals( "Accept" );
-                Submission submission = submissionRepository.findById( id ).orElse( null );
-                assert submission != null;
-                Score now = scoreRepository.findByStudentAndQuestionAndContest( submission.getStudent( ) , submission.getQuestion( ) , submission.getContest( ) );
-                now.setSubmit( now.getSubmit( ) + 1 );
-                if ( pass && !now.getAc( ) ) {
-                    now.setAc( true );
-                    String acTime = node.get( "submitTime" ).asText( );
-                    now.setAcTime( acTime );
-                } else if ( !pass && !now.getAc( ) ) {
-                    now.setWa( now.getWa( ) + 1 );
+    public void submitListener() {
+        try {
+            String broker = "tcp://192.168.122.10:1883";
+            String topic = "code/recv";
+            String clientId = "submitListener";// use different clintID for different listener
+            MemoryPersistence persistence = new MemoryPersistence( );
+            MqttClient sampleClient = new MqttClient( broker , clientId , persistence );
+            MqttConnectOptions connOpts = new MqttConnectOptions( );
+            connOpts.setCleanSession( true );
+            logger.info( "Connecting to broker: " + broker );
+            sampleClient.connect( connOpts );
+            logger.info( broker + ":Connected Successful" );
+            sampleClient.subscribe( topic , 2 , ( t , msg ) -> {
+                try {
+                    // ... payload handling omitted
+                    logger.info( "topic: {} msg: {}" , t , msg );
+                    String msgInfo = new String( Base64.getDecoder( ).decode( msg.getPayload( ) ) );
+                    ObjectNode node = new ObjectMapper( ).readValue( msgInfo , ObjectNode.class );
+                    if ( node.has( "info" ) && node.has( "id" ) && node.has( "testCases" ) ) {
+                        String totInfo;
+                        String totStatus = "Accepted";
+                        Integer id = node.get( "id" ).asInt( );
+                        int caseLen = node.get( "testCases" ).size( );
+                        boolean pass = true;
+                        ObjectMapper infoMapper = new ObjectMapper( );
+                        ArrayNode root = infoMapper.createArrayNode( );
+                        for (int i = 0; i < caseLen; i++) {
+                            String status;
+                            String stdout = node.get( "testCases" ).get( i ).get( "info" ).get( "stdout" ).asText( );
+                            String stderr = node.get( "testCases" ).get( i ).get( "info" ).get( "stderr" ).asText( );
+                            if ( stdout.contains( "\'isAccepted\': True" ) ) status = "Accepted";
+                            else if ( stdout.contains( "run time limit" ) ) status = "Time Limited";
+                            else {
+                                status = "Wrong Answer";
+                            }
+//                            if ( stdout.contains( "\'isAccepted\': False" ) || stdout.contains( "Exited with exit code 1" ) )
+//                                status = "Wrong Answer";
+                            JudgeLog judgeLog = new JudgeLog( );
+                            judgeLog.setInfo( String.format( "{\"stdout\":\"%s\",\"stderr\":\"%s\"}" , stdout , stderr ) );
+                            judgeLog.setSubmission( id );
+                            judgeLogRepository.save( judgeLog );
+                            if ( !status.equals( "Accepted" ) ) {
+                                pass = false;
+                                totStatus = status;
+                            }
+                            ObjectNode nowCase = infoMapper.createObjectNode( );
+                            nowCase.put( "id" , i );
+                            nowCase.put( "status" , status );
+                            root.add( nowCase );
+                        }
+                        totInfo = infoMapper.writeValueAsString( root );
+                        submissionRepository.updateInfo( id , totInfo , totStatus );
+                        // change score table
+                        Submission submission = submissionRepository.findById( id ).orElse( null );
+                        assert submission != null;
+                        Score now = scoreRepository.findByStudentAndQuestionAndContest( submission.getStudent( ) , submission.getQuestion( ) , submission.getContest( ) );
+                        now.setSubmit( now.getSubmit( ) + 1 );
+                        if ( pass && !now.getAc( ) ) {
+                            now.setAc( true );
+                            String acTime = node.get( "submitTime" ).asText( );
+                            now.setAcTime( acTime );
+                        } else if ( !pass && !now.getAc( ) ) {
+                            now.setWa( now.getWa( ) + 1 );
+                        }
+                        scoreRepository.save( now );
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace( );
                 }
-                scoreRepository.save( now );
-            }
-        } );
+            } );
+
+        } catch (MqttException e) {
+            logger.info( e.getMessage( ) );
+        }
     }
 
     @Bean
-    @Lazy
-    public void mailListener() throws MqttException {
-        String broker = "tcp://192.168.122.10:1883";
-        String topic = "mail";
-        String clientId = "mailListener";// use different clintID for different listener
-        MemoryPersistence persistence = new MemoryPersistence( );
-        MqttClient sampleClient = new MqttClient( broker , clientId , persistence );
-        MqttConnectOptions connOpts = new MqttConnectOptions( );
-        connOpts.setCleanSession( true );
-        logger.info( "Connecting to broker: " + broker );
-        sampleClient.connect( connOpts );
-        logger.info( broker + ":Connected Successful" );
-        sampleClient.subscribe( topic , ( t , msg ) -> {
-            // ... payload handling omitted
-            logger.info( "topic: {} msg: {}" , t , msg );
-            ObjectNode node = new ObjectMapper( ).readValue( msg.getPayload( ) , ObjectNode.class );
-            if ( node.has( "code" ) && node.has( "msg" ) ) {
-                String code = node.get( "code" ).asText( );
-                String message = node.get( "msg" ).asText( );
-                String mailMsg = String.format( "[Warning] SQLitz 判题系统预警\n警告码[%s]\n预警信息: %s",code,message );
-                List<User> SAs = userRepository.findAllByRole( "ROLE_SA" );
-                for (User sa : SAs) {
-                    String targetEmail = sa.getUsername( ) + "@mail.sustech.edu.cn";
-                    mailServer.sendEmail( targetEmail , "System Warning" , mailMsg );
+    public void mailListener() {
+        try {
+            String broker = "tcp://192.168.122.10:1883";
+            String topic = "mail";
+            String clientId = "mailListener";// use different clintID for different listener
+            MemoryPersistence persistence = new MemoryPersistence( );
+            MqttClient sampleClient = new MqttClient( broker , clientId , persistence );
+            MqttConnectOptions connOpts = new MqttConnectOptions( );
+            connOpts.setCleanSession( true );
+            logger.info( "Connecting to broker: " + broker );
+            sampleClient.connect( connOpts );
+            logger.info( broker + ":Connected Successful" );
+            sampleClient.subscribe( topic , 2 , ( t , msg ) -> {
+                // ... payload handling omitted
+                logger.info( "topic: {} msg: {}" , t , msg );
+                String msgInfo = new String( Base64.getDecoder( ).decode( msg.getPayload( ) ) );
+                ObjectNode node = new ObjectMapper( ).readValue( msgInfo , ObjectNode.class );
+                if ( node.has( "code" ) && node.has( "msg" ) ) {
+                    String code = node.get( "code" ).asText( );
+                    String message = node.get( "msg" ).asText( );
+                    String mailMsg = String.format( "[Warning] SQLitz 判题系统预警\n警告码[%s]\n预警信息: %s" , code , message );
+                    List<User> SAs = userRepository.findAllByRole( "ROLE_SA" );
+                    for (User sa : SAs) {
+                        String targetEmail = sa.getUsername( ) + "@mail.sustech.edu.cn";
+                        mailServer.sendEmail( targetEmail , "System Warning" , mailMsg );
+                    }
                 }
-            }
-        } );
+            } );
+        } catch (MqttException e) {
+            logger.info( e.getMessage( ) );
+        }
     }
 }

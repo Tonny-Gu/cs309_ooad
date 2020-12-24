@@ -37,15 +37,15 @@ spring:
     hibernate:
       ddl-auto: update #if use create, we will build new table and clean all the date.
     open-in-view: false
-    show-sql: true
+    show-sql: false
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   servlet:
     multipart:
-      max-file-size: 2000000
+      max-file-size: 10000000
   mail:
     username: xiongzc2017@126.com
     host: smtp.126.com
-    password: # secret
+    password: QFAQPLFQZRZBMVWQ # secret
     port: 25
     default-encoding: gbk
 
