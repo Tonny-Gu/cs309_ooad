@@ -128,8 +128,14 @@ public class UserController {
         User user = userRepository.findByUsername( username );
         if ( user == null ) return "User Not Found";
         user.setActiveCode( activeCode );
-        String targetEmail = user.getUsername( ) + "@mail.sustech.edu.cn";
+        String targetEmail;
+        if(user.getUsername().contains( "11" )){
+            targetEmail = user.getUsername( ) + "@mail.sustech.edu.cn";
+        }else{
+            targetEmail = user.getUsername( ) + "@sustech.edu.cn";
+        }
         String msg = String.format( "[Sustech DBOJ] %s 同学, 你修改密码的验证码为 %s , 请勿泄露" , user.getName( ) , activeCode );
+        log.info( "active code: " + activeCode );
         mailServer.sendEmail( targetEmail , "Password Modify" , msg );
         userRepository.save( user );
         return "Sender Success";

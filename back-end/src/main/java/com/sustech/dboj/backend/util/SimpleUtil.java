@@ -16,8 +16,6 @@ public class SimpleUtil {
             code[2] = lowercase;
             codeNum.append( (char) code[random.nextInt( 3 )] );
         }
-        System.out.println(codeNum);
-
         return codeNum.toString( );
     }
 }

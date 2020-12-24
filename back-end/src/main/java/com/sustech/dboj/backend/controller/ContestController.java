@@ -82,10 +82,8 @@ public class ContestController {
         questionRepository.addQuestion( contest_id , question_id );
         for (User myUser : userRepository.contestGetUsers( contest_id )){
             Score score = new Score( );
-            score.setContest( myContest );
-            score.setQuestion( question );
-            score.setStudent( myUser );
             scoreRepository.save( score );
+            scoreRepository.updateContestAndQuestion( score.getId(), contest_id, question_id, myUser.getId() );
         }
         logger.info( "Question: {} was added into Contest: {}" , question.getName( ) , myContest.getName( ) );
         return String.format( "success: add relation->contest %d, question: %d" , contest_id , question_id );
