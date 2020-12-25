@@ -18,14 +18,12 @@
 			</div>
 		</el-main>
 		<el-footer>
-			<susfoot></susfoot>
 		</el-footer>
 		<br />
 	</el-container>
 </template>
 
 <script>
-	import susfoot from './susfoot.vue'
 	export default {
 		data() {
 			return {
@@ -65,7 +63,6 @@
 			this.handleCurrentChange(1);
 		},
 		components: {
-			susfoot
 		}
 	}
 </script>

@@ -28,10 +28,9 @@
         </div>
         <div class="vintage" style="font-size: 50px;" :style="'margin-top:-' + clientHeight * 20 / 100 + 'px;'">Sustech SQLitz</div>
       </div>
-      <div style="position: absolute">
-<!-- :style="'margin-left: ' + clientWidth * 20 / 100+ 'px; margin-top: ' + clientHeight * 5 / 100 + 'px;'" -->
+      <div v-if="!mobileFlag">
         <li v-for="item in cards_data" v-bind:key="item.id" style="float: left; list-style:none; " >
-          <div id="zyq" class="teacher_card"
+          <div id="zyq" class="teacher" :style="'margin-left: ' + ( firstClientWidth - 5 * 200 ) / 6 + 'px;'"
                >
             <el-card class="box-card" :body-style="{padding: 0}">
               <div class="cardHeader">
@@ -53,48 +52,6 @@
             </el-card>
           </div>
         </li>
-<!--        <div id="zyq" class="teacher_card"-->
-<!--             :style="'margin-left: ' + clientWidth * 20 / 100+ 'px; margin-top: ' + clientHeight * 5 / 100 + 'px;'">-->
-<!--          <el-card class="box-card" :body-style="{padding: 0}">-->
-<!--            <div class="cardHeader">-->
-<!--              <el-image :src="require('../assets/zyq.jpg')" :style="{height: imageHeight + 'px' }" @load="setheight">-->
-<!--              </el-image>-->
-<!--              <div>张煜群</div>-->
-<!--            </div>-->
-<!--            <div class='identity'>任课老师</div>-->
-<!--            <el-divider class='divider'></el-divider>-->
-<!--            <div class='Email'>-->
-<!--              E-Mail: Zhangyq@sustech.edu.cn-->
-<!--            </div>-->
-<!--            <div class='qq'>-->
-<!--              QQ: secret-->
-<!--            </div>-->
-<!--            <div class='WeChat'>-->
-<!--              WeChat: secret-->
-<!--            </div>-->
-<!--          </el-card>-->
-<!--        </div>-->
-<!--        <div id="zym" class="teacher_card"-->
-<!--             :style="'margin-left: ' + clientWidth * 20 / 100+ 'px; margin-top: ' + clientHeight * 5 / 100 + 'px;'">-->
-<!--          <el-card class="box-card" :body-style="{padding: 0}">-->
-<!--            <div class="cardHeader">-->
-<!--              <el-image :src="require('../assets/zym.jpg')" :style="{height: imageHeight + 'px' }" @load="setheight">-->
-<!--              </el-image>-->
-<!--              <div>朱悦铭</div>-->
-<!--            </div>-->
-<!--            <div class='identity'>助理老师</div>-->
-<!--            <el-divider class='divider'></el-divider>-->
-<!--            <div class='Email'>-->
-<!--              E-Mail: Zhangyq@sustech.edu.cn-->
-<!--            </div>-->
-<!--            <div class='qq'>-->
-<!--              QQ: secret-->
-<!--            </div>-->
-<!--            <div class='WeChat'>-->
-<!--              WeChat: secret-->
-<!--            </div>-->
-<!--          </el-card>-->
-<!--        </div>-->
       </div>
     </div>
     <router-view v-else></router-view>
@@ -103,14 +60,18 @@
 
 <script>
 import NavHeader from "./NavHeader"
-
+import api from "@/views/api";
+import qs from "qs";
+import VueApexCharts from "vue-apexcharts";
 export default {
   components: {
     NavHeader
   },
   data() {
     return {
+      mobileFlag: false,
       imageHeight: '',
+      firstClientWidth: document.body.clientWidth,
       clientHeight: document.documentElement.clientHeight,
       clientWidth: document.body.clientWidth,
       cards_data:[
@@ -119,7 +80,7 @@ export default {
           name: '姚星河',
           pic_src: require('../assets/yxh.jpg'),
           identity: '学生助理',
-          email: 'xxx@mail.sustech.edu.cn',
+          email: '11712406@mail.sustech.edu.cn',
           qq: 'secret',
           wechat: 'secret'
         },
@@ -155,7 +116,7 @@ export default {
           name: '胡青翘',
           pic_src: require('../assets/hqq.jpg'),
           identity: '学生助理',
-          email: 'xxx@sustech.edu.cn',
+          email: '11711807@sustech.edu.cn',
           qq: 'secret',
           wechat: 'secret'
         },
@@ -163,21 +124,27 @@ export default {
     }
   },
   methods: {
+    _isMobile() {
+      let flag = navigator.userAgent.match(
+        /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i
+      );
+      return flag;
+    },
     setheight(event) {
       let image = event.target;
       this.imageHeight = image.width;
     },
   },
   mounted() {
-    console.log(this.$route.fullPath)
+    if(this._isMobile() !== null){
+      this.mobileFlag = true;
+    }
     this.clientWidth = document.body.clientWidth;
-    // 监听window的resize事件．在浏览器窗口变化时再设置下区域高度．
     const _this = this;
     window.onresize = function temp() {
       _this.clientWidth = document.body.clientWidth;
       _this.clientHeight = document.documentElement.clientHeight;
     };
-
   }
 }
 </script>
@@ -195,9 +162,8 @@ html, body {
   height: 100%;
 }
 
-.teacher_card {
+.teacher {
   float: left;
-  margin-left: 150px;
   margin-top: 60px;
 }
 

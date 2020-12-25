@@ -22,206 +22,16 @@
 			</div>
 		</el-main>
 		<el-footer>
-			<susfoot></susfoot>
 		</el-footer>
 		<br />
 	</el-container>
 </template>
 
 <script>
-	import susfoot from "./susfoot.vue"
 	export default {
 		data() {
 			return {
-				rawList: [{
-						QuestionId: '321',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "Pass"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '123',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					},
-					{
-						QuestionId: '23',
-						StudentId: '123',
-						submitTime: '2020-11-19 10:30',
-						runTime: '10ms',
-						statusName: "TLE"
-					}
+				rawList: [
 				],
 				currentPage1: 1,
 				pageSize: 10,
@@ -257,7 +67,6 @@
 			this.handleCurrentChange(1);
 		},
 		components: {
-			susfoot
 		}
 	}
 </script>

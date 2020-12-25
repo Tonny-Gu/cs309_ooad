@@ -6,6 +6,11 @@ import main from '../components/main.vue'
 import rate from '../components/rate.vue'
 import studentHome from "@/components/studentHome";
 Vue.use(VueRouter)
+ 
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err)
+}
 
 const routes = [{
 		path: '/',
@@ -42,12 +47,7 @@ const routes = [{
 	{
 		path: '/answer/:id',
 		name: 'answer',
-		component: () => import( /* webpackChunkName: "about" */ '../views/answer.vue'),
-		children: [{
-			path: '/answer/submissions',
-			name: 'submissions',
-			component: () => import('../components/submissionRecord.vue')
-		}]
+		component: () => import( /* webpackChunkName: "about" */ '../views/answer.vue')
 	},
 	{
 		path: '/adminMain',
@@ -55,8 +55,8 @@ const routes = [{
 		component: () => import('../views/adminMain.vue'),
 		children: [
 			{
-				path: '/adminMain/createContest',
-				name: 'createContest',
+				path: '/adminMain/ContestControl',
+				name: 'ContestControl',
 				component: () => import('../components/createContest')
 			},
 			{

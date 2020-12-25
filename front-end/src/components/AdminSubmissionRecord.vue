@@ -27,35 +27,43 @@
   </div>
   <el-button type="primary" style="float:left;" @click="searchSubmission">Search</el-button>
   <el-table
+  v-loading = 'tableLoad'
       :data="allSubmissionRecord"
       style="width: 90%; margin-left: 5%;">
     <el-table-column
-        prop=""
+        prop="submissionId"
         label="Submission Id" sortable>
     </el-table-column>
     <el-table-column
-        prop=""
-        label="Student Id">
+        prop="sid"
+        label="Student Id" sortable>
+    </el-table-column>
+
+    <el-table-column
+        prop="subTime"
+        label="Submission Time" sortable>
     </el-table-column>
     <el-table-column
-        prop=""
-        label="Contest Name">
+        prop="contestTitle"
+        label="Contest Name (Id)">
     </el-table-column>
     <el-table-column
-        prop=""
-        label="Question Title">
+        prop="questionTitle"
+        label="Question Title (Id)">
     </el-table-column>
     <el-table-column
-        prop=""
+        prop="language"
         label="Language">
     </el-table-column>
     <el-table-column
-        prop=""
-        label="Submission Time">
-    </el-table-column>
-    <el-table-column
-        prop=""
-        label="Statue">
+        prop="status"
+        label="Status">
+      <template slot-scope="scope">
+        <el-button type="primary" v-if="scope.row.status === 'Accepted'" style="background-color: #67C23A;width: 100px;border: black" size="small">{{ scope.row.status }}</el-button>
+        <el-button type="primary" v-else-if="scope.row.status === 'Wrong Answer'" style="background-color: #F56C6C;width: 100px;border: black" size="small">Wrong</el-button>
+        <el-button type="primary" v-else-if="scope.row.status === 'Time Limited'" style="background-color: #F56C6C;width: 100px;border: black" size="small">Time Limited Exceed</el-button>
+        <el-button type="primary" size="small" v-else style="background-color: rgb(245,187,1);width: 100px; border: black">Waiting</el-button>
+      </template>
     </el-table-column>
     <el-table-column
         label="Details">
@@ -67,35 +75,86 @@
   <el-dialog :visible.sync="detailVisible" title="More Details">
     <span>{{detailCode}}</span>
     <el-divider></el-divider>
-    <span>{{detailInfo}}</span>
+    <li v-for="info in detailInfo">
+            Test Case{{ info["id"] }}-----Status:{{ info["status"] }}
+          </li>
   </el-dialog>
 </div>
 </template>
 
 <script>
+import api from '@/views/api'
+import qs from 'qs'
 export default {
 name: "AdminSubmissionRecord",
   data(){
   return{
+    tableLoad: false,
     StudentId: '',
     QuestionId: '',
     ContestId: '',
-    allSubmissionRecord:[{
-      code: '123',
-      info: 'pass'
-    }],
+    allSubmissionRecord:[],
     detailVisible: false,
     detailCode: '23',
-    detailInfo: 'pas'
+    detailInfo: 'pas',
+    sidforsearch:'',
   }
   },
   methods: {
-detail(row){
-  this.detailVisible = true;
-  this.detailCode = row.code;
-  this.detailInfo = row.info;
-},
-    searchSubmission(){
+    detail(row){
+      this.detailCode = '';
+      this.detailInfo = [];
+      this.detailVisible = true;
+      row.submissionId
+      let data = {
+        id:row.submissionId
+      }
+      api.getResult(qs.stringify(data)).then(res =>{
+        this.detailCode = atob(res.data.code)
+        this.detailInfo = JSON.parse(res.data.info)
+      })
+  },
+    async searchSubmission(){
+      this.tableLoad = true
+      this.allSubmissionRecord = [];
+      let data = new Object() ;
+      if(this.ContestId !== ''){
+          data.contest_id = this.ContestId
+      }
+      if(this.StudentId !== ''){
+        let datatmp = {
+          username:this.StudentId
+        }
+        await api.getUserbyusername(qs.stringify(datatmp)).then(res =>{
+          this.sidforsearch = res.data.id
+          data.user_id = this.sidforsearch
+        })
+
+      }
+      if(this.QuestionId !== ''){
+        data.question_id = this.QuestionId
+      }
+      data.withCode = false
+      api.getSubmissionForTeacher(qs.stringify(data)).then(res=>{
+        if(res.data.length>0){
+        for (let i = 0; i < res.data.length;i++){
+          let unit = {
+            submissionId:res.data[i].id,
+            sid:res.data[i].student.username,
+            contestTitle: res.data[i].contest.name+" ("+res.data[i].contest.id+")",
+            questionTitle: res.data[i].question.name+" ("+res.data[i].question.id+")",
+            subTime:res.data[i].submitTime,
+            language:res.data[i].question.dbType,
+            status:res.data[i].status
+
+          }
+          this.allSubmissionRecord.push(unit)
+          this.tableLoad = false
+        }
+        }else{
+          this.$message.error("Something goes wrong")
+        }
+      })
 
     }
   }
