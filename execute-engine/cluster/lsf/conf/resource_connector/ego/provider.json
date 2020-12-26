@@ -1,0 +1,24 @@
+{
+    "host_type": "ego_host",
+    "interfaces":
+    [{
+        "name": "getAvailableTemplates",
+        "action": "resource_connector/ego/scripts/getAvailableTemplates.sh"
+    },
+    {
+        "name": "getReturnRequests",
+        "action": "resource_connector/ego/scripts/getReturnRequests.sh"
+    },
+    {
+        "name": "requestMachines",
+        "action": "resource_connector/ego/scripts/requestMachines.sh"
+    },
+    {
+        "name": "requestReturnMachines",
+        "action": "resource_connector/ego/scripts/requestReturnMachines.sh"
+    },
+    {
+        "name": "getRequestStatus",
+        "action": "resource_connector/ego/scripts/getRequestStatus.sh"
+    }]
+}

@@ -1,17 +1,9 @@
-# Sandboxing SQL Online Judge System
+# SQLitz - Distributed SQL Online Judge System
 
 CS309 OOAD Course Project
 
-## Description
+## Introduction
 
+[Google Slides](https://docs.google.com/presentation/d/16Ab8LlvQb1R4jkvnoGILdEzpKXar2ieX9Jdev2tYLGA/edit?usp=sharing)
 
-
-## Architecture
-
-### Front-End
-
-### Back-End
-
-### Execution Engine
-
->>>>>>> 100630e69ef6304edf9d3c4a050b489825dc896f
+![Architecture](assets/pic1.png)

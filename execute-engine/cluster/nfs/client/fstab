@@ -1,0 +1,2 @@
+192.168.122.10:/home /home nfs auto,nofail,noatime,nolock,intr,tcp,actimeo=1800 0 0
+192.168.122.10:/opt  /opt nfs auto,nofail,noatime,nolock,intr,tcp,actimeo=1800 0 0

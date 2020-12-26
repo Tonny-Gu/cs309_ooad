@@ -1,0 +1,24 @@
+{
+    "host_type": "openstack_host",
+    "interfaces":
+    [{
+        "name": "getAvailableTemplates",
+        "action": "resource_connector/openstack/scripts/getAvailableTemplates.sh"
+    },
+    {
+        "name": "getReturnRequests",
+        "action": "resource_connector/openstack/scripts/getReturnRequests.sh"
+    },
+    {
+        "name": "requestMachines",
+        "action": "resource_connector/openstack/scripts/requestMachines.sh"
+    },
+    {
+        "name": "requestReturnMachines",
+        "action": "resource_connector/openstack/scripts/requestReturnMachines.sh"
+    },
+    {
+        "name": "getRequestStatus",
+        "action": "resource_connector/openstack/scripts/getRequestStatus.sh"
+    }]
+}
